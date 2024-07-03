@@ -28,6 +28,7 @@ def process_data_gui(self, xray=False):
     crystal_name = self.crystal_name.get().strip()
     completeness, step_size, filtering_percentage = get_input(self, crystal_name)
     run_refine_wght = self.wght_refinement_var.get()
+    run_solve_filtered = self.solve_filtered_var.get()
 
     output_folder = get_subfolder(output_dir, crystal_name, completeness, xray)
 
@@ -45,7 +46,7 @@ def process_data_gui(self, xray=False):
                 
                 target_percentages = create_percentage_list(start_completeness, completeness, step_size)
                 
-                if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, xds_dir, xray):
+                if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
                     dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
                     self.root.wait_window(dlg)
 
@@ -62,7 +63,7 @@ def process_data_gui(self, xray=False):
             
             target_percentages = create_percentage_list(start_completeness, completeness, step_size)
             
-            if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, xds_dir, xray):
+            if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
                 dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
                 self.root.wait_window(dlg)
                 

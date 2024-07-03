@@ -17,7 +17,7 @@ from gui.multi_progress_bar_window import MultiProgressBarWindow
 from util.test.solve_filtered import solve_filtered
 
 
-def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, xds_directory=None, xray=False):
+def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_directory=None, xray=False):
     root = tk.Tk()
     root.title("Progress")
 
@@ -25,8 +25,10 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
     tasks = {
         'Filtering': len(target_percentages),
         'Processing filtering results': len(target_percentages),
-        'Solving structure for filtered data': len(target_percentages),
+        # 'Solving structure for filtered data': len(target_percentages),
     }
+    if run_solve_filtered:
+        tasks['Solving structure for filtered data'] = len(target_percentages)
     if run_refine_wght:
         tasks['Refining WGHT'] = len(target_percentages)
     tasks['Extracting stats from filtering'] = len(target_percentages)
@@ -42,7 +44,8 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
         filter(output_folder, target_percentages, filtering_percentage, update_progress=update_progress)
         process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
 
-        solve_filtered(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
+        if run_solve_filtered:
+            solve_filtered(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
 
         if run_refine_wght:
             refine_wght_progress(output_folder, target_percentages, update_progress=update_progress)

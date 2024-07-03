@@ -58,3 +58,7 @@ most from the mean, regardless of how much the completeness changes."""
 TOOLTIP_WGHT_REFINEMENT = """Description: 
 When enabled, the WGHT factor for filtered data is dynamically updated during an iterative SHELXL refinement process. 
 This process continues until the WGHT factor stabilizes or a maximum of 10 iterations is reached."""
+
+TOOLTIP_SOLVE_FILTERED = """Description: 
+When enabled, the program will use SHELXT to solve the structure for the data filtered away.
+The resulting files are found in the subfolder solve_filtered."""

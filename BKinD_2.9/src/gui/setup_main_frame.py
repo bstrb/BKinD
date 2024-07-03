@@ -100,22 +100,26 @@ def setup_main_frame(self, xray=False):
     # Create a frame to hold the label and checkbox together
     self.wght_refinement_var = tk.BooleanVar(value=False)
     wght_frame = ttk.Frame(input_frame)
-    wght_frame.grid(row=5, column=2, sticky="w", padx=5, pady=5)
-
-    # Create the label
+    wght_frame.grid(row=6, column=1, sticky="w", padx=5, pady=5)
     wght_label = ttk.Label(wght_frame, text="Refine WGHT     ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
-
-    # Create the checkbox
     self.wght_refinement_button = ttk.Checkbutton(wght_frame, variable=self.wght_refinement_var)
     self.wght_refinement_button.pack(side="left")
-
-    # Add tooltip to the frame (tooltip will apply to the whole frame including both label and checkbox)
     self.create_tooltip(wght_frame, TOOLTIP_WGHT_REFINEMENT)
+
+    # Create a frame to hold the label and checkbox together
+    self.solve_filtered_var = tk.BooleanVar(value=False)
+    solve_filtered = ttk.Frame(input_frame)
+    solve_filtered.grid(row=6, column=2, sticky="w", padx=5, pady=5)
+    wght_label = ttk.Label(solve_filtered, text="Solve Structure for Filtered Data ")
+    wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
+    self.solve_filtered_var_button = ttk.Checkbutton(solve_filtered, variable=self.solve_filtered_var)
+    self.solve_filtered_var_button.pack(side="left")
+    self.create_tooltip(solve_filtered, TOOLTIP_SOLVE_FILTERED)
 
     # Filter Data Button
     self.process_btn = ttk.Button(input_frame, text="Filter 3DED Data" if not xray else "Filter Merged 3DED/SCXRD Data", command=lambda: self.process_data_gui(xray))
-    self.process_btn.grid(row=6, column=0, columnspan=10, pady=(50,5))
+    self.process_btn.grid(row=7, column=0, columnspan=10, pady=(50,5))
 
     # Back to Welcome Frame Button
     self.back_btn = ttk.Button(input_frame, text="Back to Start Frame", command=self.show_welcome_frame)

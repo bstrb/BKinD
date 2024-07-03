@@ -1,0 +1,85 @@
+|-- setup
+|   |-- requirements.txt
+|   |-- setup_check.py
+|-- bkind.py
+|-- README.md
+|-- assets
+|   |-- bkind_logo.jpg
+|-- src
+|   |-- process_logic.py
+|   |-- plot
+|   |   |-- open_plot.py
+|   |   |-- plot_dfm_vs_frame.py
+|   |   |-- plot_dfm_distribution.py
+|   |   |-- plot_res_vs_dfm.py
+|   |   |-- append_percentage.py
+|   |   |-- plot_fvar_npd_vs_completeness.py
+|   |   |-- plot_r_vs_completeness.py
+|   |-- util
+|   |   |-- misc
+|   |   |   |-- create_percentage_list.py
+|   |   |   |-- round_up.py
+|   |   |-- test
+|   |   |   |-- solve_filtered.py
+|   |   |   |-- move_filtered_data.py
+|   |   |-- file
+|   |   |   |-- aggregate.py
+|   |   |   |-- create_subfolder.py
+|   |   |   |-- find_file.py
+|   |   |   |-- rem_merg_zero.py
+|   |   |   |-- clean_aggregate.py
+|   |   |   |-- manage_files.py
+|   |   |   |-- remove_macos_artifacts.py
+|   |   |   |-- modify_ins_file.py
+|   |   |   |-- get_subfolder.py
+|   |   |-- read
+|   |   |   |-- extract_space_group_number_from_cif.py
+|   |   |   |-- read_fcf.py
+|   |   |   |-- extract_unit_cell_from_fcf.py
+|   |   |   |-- extract_parts_from_path.py
+|   |   |-- data
+|   |   |   |-- compute_start_completeness.py
+|   |   |   |-- compute_completeness_from_df_sgn_uc.py
+|   |   |   |-- save_filtered_data.py
+|   |   |   |-- filter_data_step.py
+|   |   |-- stats
+|   |   |   |-- save_statistics.py
+|   |   |   |-- merge_stats_sections.py
+|   |   |   |-- extract_stats.py
+|   |   |   |-- append_refinement_stats.py
+|   |   |-- process
+|   |   |   |-- filter_function.py
+|   |   |   |-- calculate_dfm.py
+|   |   |   |-- run_process.py
+|   |   |   |-- objective_function.py
+|   |   |   |-- refine_wght.py
+|   |-- ed
+|   |   |-- copy_and_reduce_hkl.py
+|   |   |-- create_xds_ascii_nem.py
+|   |   |-- modify_xds_inp.py
+|   |   |-- integrate.py
+|   |   |-- create_xdsconv.py
+|   |   |-- create_xdsconv_nem.py
+|   |-- data_processing
+|   |   |-- refine_wght_progress.py
+|   |   |-- process_sample_data.py
+|   |   |-- filter.py
+|   |   |-- process_filtering_results.py
+|   |   |-- extract.py
+|   |   |-- prepare.py
+|   |-- gui
+|   |   |-- tooltip.py
+|   |   |-- get_dir.py
+|   |   |-- option_dialog.py
+|   |   |-- get_input.py
+|   |   |-- post_process_dialog.py
+|   |   |-- setup_main_frame.py
+|   |   |-- invalid_completeness_error.py
+|   |   |-- multi_progress_bar_window.py
+|   |   |-- app_gui.py
+|   |   |-- process_data_gui.py
+|   |   |-- tooltip_descriptions.py
+|   |   |-- prepare_progress_bar.py
+|   |-- xray
+|   |   |-- convert_csv_to_hkl.py
+|   |   |-- calculate_asu_and_resolution.py

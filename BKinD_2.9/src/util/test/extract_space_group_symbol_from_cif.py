@@ -23,7 +23,7 @@ def extract_space_group_symbol_from_cif(dir):
     with open(cif_file_path, 'r') as file:
         for line in file:
             if line.startswith('_space_group_name_H-M_alt'):
-                space_group_symbol = ' '.join(line.split()[1:]).replace(' ', '')
+                space_group_symbol = ' '.join(line.split()[1:]).replace(' ', '').replace('/','_')
                 break
     
     if space_group_symbol is None:

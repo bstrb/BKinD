@@ -21,6 +21,7 @@ from util.read.extract_space_group_number_from_cif import extract_space_group_nu
 from ed.modify_xds_inp import modify_xds_inp
 from ed.create_xdsconv import create_xdsconv
 from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
+from test.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
 
 # X-ray Imports
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
@@ -43,8 +44,10 @@ def solve_filtered(output_folder, target_percentages, xds_directory, xray, updat
         manage_files('copy', output_folder, target_directory, new_filename='solve_filtered' + '.ins', extension='.ins')
         rem_merg_zero(target_directory)
 
-        sgn = extract_space_group_number_from_cif(output_folder)
-        sgs = get_space_group_symbol(sgn)
+        # sgn = extract_space_group_number_from_cif(output_folder)
+        # sgs = get_space_group_symbol(sgn)
+
+        sgs = extract_space_group_symbol_from_cif(output_folder)
 
         run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
 

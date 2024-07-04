@@ -4,7 +4,7 @@
 import os
 
 # Third-Party Imports
-from tkinter import messagebox, Tk
+from tkinter import messagebox
 
 # GUI Module Imports
 from gui.get_dir import get_dir
@@ -32,10 +32,6 @@ def process_data_gui(self, xray=False):
 
     output_folder = get_subfolder(output_dir, crystal_name, completeness, xray)
 
-    # Create a hidden root window to prevent the entire application from closing
-    hidden_root = Tk()
-    hidden_root.withdraw()
-
     try:
         if os.path.exists(output_folder):
             user_choice = show_option_dialog(self.root, self.style)
@@ -50,12 +46,12 @@ def process_data_gui(self, xray=False):
                 target_percentages = create_percentage_list(start_completeness, completeness, step_size)
 
                 if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
-                    dlg = PostProcessDialog(hidden_root, output_folder, self.style, DFM_plot=not xray)
-                    hidden_root.wait_window(dlg)
+                    dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
+                    self.root.wait_window(dlg)
 
             elif user_choice == 'show':
-                dlg = PostProcessDialog(hidden_root, output_folder, self.style, DFM_plot=not xray)
-                hidden_root.wait_window(dlg)
+                dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
+                self.root.wait_window(dlg)
         else:
             prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray)
 
@@ -67,8 +63,8 @@ def process_data_gui(self, xray=False):
             target_percentages = create_percentage_list(start_completeness, completeness, step_size)
 
             if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
-                dlg = PostProcessDialog(hidden_root, output_folder, self.style, DFM_plot=not xray)
-                hidden_root.wait_window(dlg)
+                dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
+                self.root.wait_window(dlg)
 
     except InvalidCompletenessError as e:
         messagebox.showerror(
@@ -78,5 +74,3 @@ def process_data_gui(self, xray=False):
             f"Start Completeness: {e.start_completeness:.2f}%\n\n"
             f"Please ensure that the target completeness is less than the start completeness."
         )
-    finally:
-        hidden_root.destroy()  # Ensure the hidden root is destroyed at the end

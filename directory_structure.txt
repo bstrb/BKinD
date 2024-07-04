@@ -1,0 +1,387 @@
+|-- BKinD_2.9
+|   |-- setup
+|   |   |-- requirements.txt
+|   |   |-- setup_check.py
+|   |-- bkind.py
+|   |-- README.md
+|   |-- assets
+|   |   |-- bkind_logo.jpg
+|   |-- src
+|   |   |-- process_logic.py
+|   |   |-- plot
+|   |   |   |-- open_plot.py
+|   |   |   |-- plot_dfm_vs_frame.py
+|   |   |   |-- plot_dfm_distribution.py
+|   |   |   |-- plot_res_vs_dfm.py
+|   |   |   |-- append_percentage.py
+|   |   |   |-- plot_fvar_npd_vs_completeness.py
+|   |   |   |-- plot_r_vs_completeness.py
+|   |   |-- util
+|   |   |   |-- misc
+|   |   |   |   |-- create_percentage_list.py
+|   |   |   |   |-- round_up.py
+|   |   |   |-- test
+|   |   |   |   |-- get_space_group_symbol.py
+|   |   |   |   |-- solve_filtered.py
+|   |   |   |   |-- move_filtered_data.py
+|   |   |   |-- file
+|   |   |   |   |-- aggregate.py
+|   |   |   |   |-- create_subfolder.py
+|   |   |   |   |-- find_file.py
+|   |   |   |   |-- rem_merg_zero.py
+|   |   |   |   |-- clean_aggregate.py
+|   |   |   |   |-- manage_files.py
+|   |   |   |   |-- remove_macos_artifacts.py
+|   |   |   |   |-- modify_ins_file.py
+|   |   |   |   |-- get_subfolder.py
+|   |   |   |-- read
+|   |   |   |   |-- extract_space_group_number_from_cif.py
+|   |   |   |   |-- read_fcf.py
+|   |   |   |   |-- extract_unit_cell_from_fcf.py
+|   |   |   |   |-- extract_parts_from_path.py
+|   |   |   |-- data
+|   |   |   |   |-- compute_start_completeness.py
+|   |   |   |   |-- compute_completeness_from_df_sgn_uc.py
+|   |   |   |   |-- save_filtered_data.py
+|   |   |   |   |-- filter_data_step.py
+|   |   |   |-- stats
+|   |   |   |   |-- save_statistics.py
+|   |   |   |   |-- merge_stats_sections.py
+|   |   |   |   |-- extract_stats.py
+|   |   |   |   |-- append_refinement_stats.py
+|   |   |   |-- process
+|   |   |   |   |-- filter_function.py
+|   |   |   |   |-- calculate_dfm.py
+|   |   |   |   |-- run_process.py
+|   |   |   |   |-- objective_function.py
+|   |   |   |   |-- refine_wght.py
+|   |   |-- ed
+|   |   |   |-- copy_and_reduce_hkl.py
+|   |   |   |-- create_xds_ascii_nem.py
+|   |   |   |-- modify_xds_inp.py
+|   |   |   |-- integrate.py
+|   |   |   |-- create_xdsconv.py
+|   |   |   |-- create_xdsconv_nem.py
+|   |   |-- data_processing
+|   |   |   |-- refine_wght_progress.py
+|   |   |   |-- process_sample_data.py
+|   |   |   |-- filter.py
+|   |   |   |-- process_filtering_results.py
+|   |   |   |-- extract.py
+|   |   |   |-- prepare.py
+|   |   |-- gui
+|   |   |   |-- create_button.py
+|   |   |   |-- create_tooltip.py
+|   |   |   |-- tooltip.py
+|   |   |   |-- get_dir.py
+|   |   |   |-- option_dialog.py
+|   |   |   |-- get_input.py
+|   |   |   |-- post_process_dialog.py
+|   |   |   |-- setup_main_frame.py
+|   |   |   |-- invalid_completeness_error.py
+|   |   |   |-- multi_progress_bar_window.py
+|   |   |   |-- app_gui.py
+|   |   |   |-- process_data_gui.py
+|   |   |   |-- tooltip_descriptions.py
+|   |   |   |-- prepare_progress_bar.py
+|   |   |-- xray
+|   |   |   |-- convert_csv_to_hkl.py
+|   |   |   |-- calculate_asu_and_resolution.py
+|-- .git
+|   |-- ORIG_HEAD
+|   |-- config
+|   |-- objects
+|   |   |-- 59
+|   |   |   |-- 62ffd48b1350890eb808e066b6ec5cfee62073
+|   |   |-- 0c
+|   |   |   |-- 54ff33d225017e39ff2e0dc48872dce96c0566
+|   |   |-- 66
+|   |   |   |-- c6fed761713d1db288348b41c6951573afcfd3
+|   |   |   |-- 38116a045332ffe06f9e4009c74b0fe38ecde6
+|   |   |-- 68
+|   |   |   |-- e8e53d64b8392c71e0e40b6c2ee590f50af16e
+|   |   |-- 3b
+|   |   |   |-- bb67899af4f3ea50209bef6930e8428cb5c5b4
+|   |   |   |-- fa8c74e439fe85f6e4a77e06670ec5897f7b57
+|   |   |-- 9b
+|   |   |   |-- 6cb040d8e471c09e072664fb9518d51430f731
+|   |   |-- 6a
+|   |   |   |-- e2009daf05f1d31c21eeed13a82d43e8e6eb21
+|   |   |-- 56
+|   |   |   |-- 68be88cbd3d58a7bd13c580ee8ee7f7429b012
+|   |   |   |-- c0db01034d14963a0518e29983e992f45c1d26
+|   |   |   |-- 3ee92311da5af55a40d6630ca0171dc119bc13
+|   |   |-- 0b
+|   |   |   |-- 18a901cd90df29c488316b64416faa1355a457
+|   |   |-- 93
+|   |   |   |-- 654fc79b870a02488d199bf34422067c33a584
+|   |   |   |-- e158478f589ddedbb641216a2d3f8729dbc44f
+|   |   |-- 94
+|   |   |   |-- cd59999101e25d40a80739890e8aac65fdc93a
+|   |   |-- 60
+|   |   |   |-- 3943d52a9b5e10be3143a528ab39bd05c1b7fd
+|   |   |-- 5a
+|   |   |   |-- e0d316a3651dfc3faad4f61452e41fc0b095aa
+|   |   |-- 05
+|   |   |   |-- 7fef3a14e2ba17d236effb9b768a680de1db16
+|   |   |-- 02
+|   |   |   |-- 03cb369763ad8c16bf23615bfdeede6d68ddaf
+|   |   |-- a4
+|   |   |   |-- f5a1bd1ac718279e5ecbaa6266f3a8fb45e619
+|   |   |-- b5
+|   |   |   |-- 9d74a2ae875f1439b4a0c8b9e503a63b1b8d81
+|   |   |-- d9
+|   |   |   |-- 0a9b0ace13f0d526177d08d3e43ad0fa44ceea
+|   |   |-- bb
+|   |   |   |-- d836fdda7382e4aa9e46f2dfbdf000a8967f2d
+|   |   |-- d0
+|   |   |   |-- a9d997d48d665c4cfc296d1d645173a1d2ed4c
+|   |   |-- b3
+|   |   |   |-- a46f4df4812e425ab717c9bf9b92a983c7d3a4
+|   |   |   |-- 82fa55ac238b3921b6cf3c1c700164246c967a
+|   |   |-- df
+|   |   |   |-- 5fd7045b96add88a66b3f2024a99560266649e
+|   |   |-- da
+|   |   |   |-- abf5501bd81966ce450f82efa7bc86fb804a14
+|   |   |   |-- 765f3230745da3902a3e13dc7575c356720289
+|   |   |   |-- 8309b1dfcc445e0389acb62556fb76704caedd
+|   |   |-- a2
+|   |   |   |-- 33364ee21374fd5f28da071547bda34d21c361
+|   |   |-- a5
+|   |   |   |-- 7b9016983659b73388c22222200d84f275111c
+|   |   |   |-- 0ef2d7bf66ed422c21c97960ea34db041b28a2
+|   |   |-- bd
+|   |   |   |-- 4a4741b52f16833cb8d088877985ea55353047
+|   |   |   |-- 810d0cf07f500d5b23bcddb4c160b35f7e2962
+|   |   |-- d1
+|   |   |   |-- 22fb9fe4c5ac10ee6b4a9fc2daebf84333a2fa
+|   |   |   |-- 1d30beb1e9c3cd4cf2476d0bb514bc65f3efeb
+|   |   |-- bc
+|   |   |   |-- 36ef118ad1a38c2d9a9ed01906fd18779eac7d
+|   |   |-- ae
+|   |   |   |-- 215520bd0a0916de4c3666d4c42d316c6d4cd5
+|   |   |-- e2
+|   |   |   |-- 153df37201e8dfacd808d171ea9356cb3c1f12
+|   |   |   |-- 6049d5a4e57f5b713f46d2ce0058a35833b557
+|   |   |-- f4
+|   |   |   |-- ba54d4e8a7b82cc31d64bd13e20430e5caf560
+|   |   |-- c0
+|   |   |   |-- ba41fa39a011bfbe2d249b58762ba39d049f46
+|   |   |-- ee
+|   |   |   |-- b1744f171758d803537a1dabc60b63025a88ab
+|   |   |-- fd
+|   |   |   |-- 6ebf3d021df6fcfedb0ec6b8dc0110f41f5e17
+|   |   |-- f5
+|   |   |   |-- 21dc7da3abead7e5bcf93daf56097f55d78891
+|   |   |-- cf
+|   |   |   |-- 0c69256a351c20f6d5c159b17250731308cedc
+|   |   |   |-- b0a100110645b62736d32e63633dee59a6f95e
+|   |   |-- e4
+|   |   |   |-- 2f1b223fd6e7e39a953e96f351ecdd08cccb74
+|   |   |   |-- 83c8b815a53ed02cc372e019088aed519e99a7
+|   |   |-- fb
+|   |   |   |-- 63aae8799b80e7a5fbf81550b9a96955f51ea0
+|   |   |-- ed
+|   |   |   |-- 33ff1a0d2152abbf00e84e62c33ea1a997af5e
+|   |   |-- 18
+|   |   |   |-- 55434f2eed463e722c976da27b84697d58df6b
+|   |   |-- 27
+|   |   |   |-- 7cb5d62cdc75fe06f9303c07ddbe0c6fae010d
+|   |   |-- 4b
+|   |   |   |-- 435292a9324d80f268839798d9200ba32d1b2a
+|   |   |   |-- 1e8f7c319e3953451a3d36a37e9e603286a467
+|   |   |-- pack
+|   |   |   |-- pack-95ffa3a656836a0849557fbbbd01e48254683190.idx
+|   |   |   |-- pack-95ffa3a656836a0849557fbbbd01e48254683190.pack
+|   |   |-- 7d
+|   |   |   |-- 51685e42687c39621360164a616b69166f6527
+|   |   |-- 80
+|   |   |   |-- 55e4729d7d30486a69cfca91c53a9d728baf40
+|   |   |   |-- 9f39927045314e1b398ec41ccd7bb1f72bbb73
+|   |   |-- 74
+|   |   |   |-- cf479f6119839b34d70c12f5f76c6912b2d06e
+|   |   |-- 17
+|   |   |   |-- b7177f4513412879ebc143ec8013f3a6a57ad4
+|   |   |   |-- 85f355c06ee2457c5c9e3814eed47ad0e4152f
+|   |   |-- 7e
+|   |   |   |-- 0d3480828901ce9ce50c545b633d092b0b39c8
+|   |   |-- 19
+|   |   |   |-- e47c979cb08dc2c182d209ed287587e27b2a2f
+|   |   |   |-- e25874e5d6eb58ac93bd631b7303db256038a8
+|   |   |-- 26
+|   |   |   |-- 6bea33be9bc5abfbe76ac9f016ea55dcfa8061
+|   |   |   |-- 02ed867896ab68286c49a87abc3b59997c3d91
+|   |   |   |-- 4d764a64915adba911c1836b3520792bd90fb6
+|   |   |-- 4d
+|   |   |   |-- 1c91ef7b92a0dd80e962b50078171b74236e21
+|   |   |-- 86
+|   |   |   |-- 6219121395ee76719241e0d66284e75141988b
+|   |   |-- 2a
+|   |   |   |-- 29c4d3cf58a42f1ead777aafe8d00f5a5cc6e6
+|   |   |   |-- acdd787de2c25756cdbed010aa643386556bb4
+|   |   |   |-- 8cef8259eb2fdfc8aedba8fca37445d98b1ca6
+|   |   |-- 43
+|   |   |   |-- 2554cfcc708564e32c7b87dbb66a517e9fb997
+|   |   |-- 6e
+|   |   |   |-- 8331c90f52e63e8a78031c27cf8485422071c1
+|   |   |-- 09
+|   |   |   |-- 8554c90bfedb5cb40394986a73016646538800
+|   |   |-- 5d
+|   |   |   |-- 7e6fd15e5aac44926854958ac3982be757148e
+|   |   |-- 31
+|   |   |   |-- 7fc45ff68554d0d5b309fdae4a4c42f4d117ab
+|   |   |   |-- 30980e59a12e5f0b5e123a5d61572c15b8ac0a
+|   |   |-- info
+|   |   |-- 91
+|   |   |   |-- 25805370536f56b128a0c1a7940a4bfae60ef1
+|   |   |-- 65
+|   |   |   |-- 39f75fdb372d22ee3d7895d450874e0caa072a
+|   |   |-- 62
+|   |   |   |-- 506137dcb22d234524f120bd6a7810a9ebeceb
+|   |   |   |-- 0b9a8577cc99a31278e2266d7abeee5bdec588
+|   |   |-- 96
+|   |   |   |-- 4e9797d2d184721c90b8b35a4ce67310b8eb2c
+|   |   |-- 3f
+|   |   |   |-- 3d837e21b0d2f92ca6ba3ec413cd346157ce28
+|   |   |-- 5b
+|   |   |   |-- 7208c55f115d3c23bc60bc21e8a74d27df5052
+|   |   |   |-- 5cc4702aacebda5ffb0d6d8a83f518e90ea292
+|   |   |-- 01
+|   |   |   |-- 68be6c9805cdbe580f48169ed355e66803dfc8
+|   |   |-- 6c
+|   |   |   |-- d07fbc527b4559f700584a05eccc2526abf077
+|   |   |   |-- 2579d19ce70ec9db88c8f54394917585ff7b1e
+|   |   |-- 99
+|   |   |   |-- 4bef6748b090823301e484e8390cbdab90f1bb
+|   |   |-- 0f
+|   |   |   |-- a03a38c5ba2d745c8de7ebc9cce9442ad844e3
+|   |   |-- 90
+|   |   |   |-- bad45df16e9555ff0fe16149dc38c0ccf3f744
+|   |   |-- d4
+|   |   |   |-- 60d992fcdf64f37f271afd47ee3e4071426987
+|   |   |   |-- 968d44a5f9e75c9bbba805b0802ecde510ebc7
+|   |   |-- b8
+|   |   |   |-- b37435ff8e44382203e24df08d592d090af629
+|   |   |-- a9
+|   |   |   |-- 146409ea8879445aecc474b49fe330164b70a3
+|   |   |-- d5
+|   |   |   |-- b0b0dba30b868264c22313b895eee235acc615
+|   |   |-- d2
+|   |   |   |-- 2daa10736179a6949c9ba3698b1fa8a38f23d0
+|   |   |-- af
+|   |   |   |-- 41f5d1609f1f3cffb1b1452e13f704a994928c
+|   |   |   |-- 310a8c3eb6e93b52db67231226f043b3d39564
+|   |   |-- de
+|   |   |   |-- 529e77975d9a23c109d61919ac397f5cc0026d
+|   |   |   |-- 820263014077e2bacaabeb71952859eb2ea4d7
+|   |   |-- ef
+|   |   |   |-- 854d3ee6ce09db00a54fdb81b3409b541697d0
+|   |   |   |-- 0066e4f2508d28246aeea1d1987c8eceb3f027
+|   |   |-- cc
+|   |   |   |-- 067b5decbaf1acb7aeabda562d3b35fdb5eb00
+|   |   |   |-- 55c2664ff8cb9f5c0493c57fa32cf347be69a5
+|   |   |-- e6
+|   |   |   |-- 1b244b2a6ec8023f2e97a4f0f4bafb99b29cd3
+|   |   |-- f9
+|   |   |   |-- c84462ed6eeb72f1205899ce0c91772aea6749
+|   |   |-- f0
+|   |   |   |-- cb6bdf279106c9990b0726cb4dd085be6e1e05
+|   |   |   |-- 495311ef68c9c4ec8025931f7f5a334c6f8084
+|   |   |-- fa
+|   |   |   |-- 35f37cc6c213ed508649c2a889141684f5c170
+|   |   |-- c2
+|   |   |   |-- 3e49f2394c33e5a618ceb4fda3768be08de061
+|   |   |-- f1
+|   |   |   |-- c0eceebb5c762b52a65a4858e2afca5e7a547d
+|   |   |   |-- 0b823e87cee3b6dbccbc21f14358f495ce4b2e
+|   |   |-- e7
+|   |   |   |-- 084a2a9a81a74bffb39a9f963cccc9c6043a2d
+|   |   |-- cb
+|   |   |   |-- 7a5c71ef826640d0dcadc2beda5e74a571c1f5
+|   |   |-- 2c
+|   |   |   |-- dfaac4cb9db4dfb8519f79268456c0f61933ba
+|   |   |   |-- 018ae1feea2fd880a550cc258aa790c43ab4e2
+|   |   |   |-- e10f4a015281b8a8f443f7d8cbadc4591c485d
+|   |   |-- 2d
+|   |   |   |-- 52afb268a468a284dfc50f5a9828f524ceb0e7
+|   |   |-- 1b
+|   |   |   |-- 0b1911dbe98c4409215f8c5d91baf5029284ae
+|   |   |-- 77
+|   |   |   |-- 3fc6f86be45efae949e2365e1b3eb34bd93ca0
+|   |   |   |-- cb3c3143686108478e483599d659e5be84f434
+|   |   |-- 1e
+|   |   |   |-- dfa756884ced00f2e53dbd03bcbd6d40ed589b
+|   |   |-- 84
+|   |   |   |-- 62d9ac11f76748826f1613b718ba1307e89ea1
+|   |   |   |-- 1f51d2e14a19aaa9efe8cf84f2d721a4b3a4ab
+|   |   |-- 4a
+|   |   |   |-- 31a7e9306b8500f4ac771682677e373224b0f5
+|   |   |   |-- 14751a77e6ee6f2e32373c3ab3de0e0284a333
+|   |   |   |-- 6a4366891ec7b48e45cc2eb364659fec5fbb99
+|   |   |-- 24
+|   |   |   |-- c75f7189bc51dfa04a725fa43020b910f37c26
+|   |   |-- 23
+|   |   |   |-- b72374f8927806eb32ff843986c75a6a97fe8b
+|   |   |   |-- 455118552292cdd781884f1ce3ee6526bd74cb
+|   |   |   |-- 64e8b37f59f0f725d24f55c307623e12643699
+|   |   |-- 1d
+|   |   |   |-- e4fe1028c8a15aee8e5a5511b741aad3f4bcee
+|   |   |-- 40
+|   |   |   |-- 6eeddfd072f751902caadc0ad9aaa58a716ef3
+|   |   |-- 2e
+|   |   |   |-- e783f17dffbf79ba327dc52a0dab66b9285dac
+|   |   |-- 2b
+|   |   |   |-- 538d57df0ea50c6d00a79e7032046ad2f97ec5
+|   |   |   |-- 5e5995b385cdc0a955040f3ec06009f8811eb8
+|   |   |   |-- 721c90d9d5aceef1953a4887b9f46c72033c47
+|   |   |-- 47
+|   |   |   |-- 333895b651184c21ed8b625e9906b0e3de1862
+|   |   |-- 7f
+|   |   |   |-- 6b0c5acdc67ffbbd5aa81920407f7a9611a9a9
+|   |   |-- 8e
+|   |   |   |-- 9525b5f615163d13028f2655ceb85b0b95a788
+|   |   |-- 22
+|   |   |   |-- af87750d9dfb95b0091006628b7b5b29319629
+|   |   |-- 25
+|   |   |   |-- d56e9add6be582936c4b81fae5650a151a8894
+|   |   |   |-- db9278fc4ecc71fabe8838d31b77ff583fef5b
+|   |-- HEAD
+|   |-- info
+|   |   |-- exclude
+|   |-- logs
+|   |   |-- HEAD
+|   |   |-- refs
+|   |   |   |-- heads
+|   |   |   |   |-- main
+|   |   |   |-- remotes
+|   |   |   |   |-- origin
+|   |   |   |   |   |-- HEAD
+|   |   |   |   |   |-- main
+|   |-- description
+|   |-- hooks
+|   |   |-- commit-msg.sample
+|   |   |-- pre-rebase.sample
+|   |   |-- pre-commit.sample
+|   |   |-- applypatch-msg.sample
+|   |   |-- fsmonitor-watchman.sample
+|   |   |-- pre-receive.sample
+|   |   |-- prepare-commit-msg.sample
+|   |   |-- post-update.sample
+|   |   |-- pre-merge-commit.sample
+|   |   |-- pre-applypatch.sample
+|   |   |-- pre-push.sample
+|   |   |-- update.sample
+|   |   |-- push-to-checkout.sample
+|   |-- refs
+|   |   |-- heads
+|   |   |   |-- main
+|   |   |-- tags
+|   |   |-- remotes
+|   |   |   |-- origin
+|   |   |   |   |-- HEAD
+|   |   |   |   |-- main
+|   |-- index
+|   |-- packed-refs
+|   |-- COMMIT_EDITMSG
+|   |-- FETCH_HEAD
+|-- update_repo.sh

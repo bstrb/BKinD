@@ -108,7 +108,21 @@ def apply_theme(root):
     style.configure("TLabel", font=("Arial", 16))
 
 
+def update_repo():
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Run the update_repo.sh script
+    update_script = os.path.join(script_dir, 'update_repo.sh')
+    
+    try:
+        result = subprocess.run(['bash', update_script], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to update the repository: {e.stderr}")
+
 def main():
+    update_repo()
     ensure_conda_environment()
     ensure_python_version()
     check_requirements()

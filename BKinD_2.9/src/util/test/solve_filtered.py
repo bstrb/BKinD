@@ -13,6 +13,10 @@ from util.file.rem_merg_zero import rem_merg_zero
 # Utility Process Imports
 from util.process.run_process import run_process
 
+from util.file.find_file import find_file
+from util.test.get_space_group_symbol import get_space_group_symbol
+from util.read.extract_space_group_number_from_cif import extract_space_group_number_from_cif
+
 # ED Imports
 from ed.modify_xds_inp import modify_xds_inp
 from ed.create_xdsconv import create_xdsconv
@@ -33,9 +37,16 @@ def solve_filtered(output_folder, target_percentages, xds_directory, xray, updat
             run_process(["xds"], target_directory, suppress_output=True)
             run_process(["xdsconv"], target_directory, suppress_output=True)
 
+        if find_file(target_directory, '.hkl') is None:
+            return
+        
         manage_files('copy', output_folder, target_directory, new_filename='solve_filtered' + '.ins', extension='.ins')
         rem_merg_zero(target_directory)
-        run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True)
+
+        sgn = extract_space_group_number_from_cif(output_folder)
+        sgs = get_space_group_symbol(sgn)
+
+        run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
 
     for i, target in enumerate(tqdm(target_percentages, desc="Solving structure for filtered data")):
         target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered')

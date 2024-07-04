@@ -4,15 +4,15 @@
 import os
 import shutil
 
-def create_subfolder(base_directory, crys, completeness, xray=False):
+def create_subfolder(base_directory, crys, target_completeness, xray=False):
     """
-    Creates a subfolder named 'bkind_{crys}_to_{completeness}_completeness' in the specified base directory. 
+    Creates a subfolder named 'bkind_{crys}_to_{target_completeness}_completeness' in the specified base directory. 
     If the subfolder already exists, it is cleaned of all contents.
     
     Parameters:
     - base_directory (str): The path to the directory where the subfolder will be created.
     - crys (str): The crystal identifier.
-    - completeness (int or float): The completeness value.
+    - target_completeness (int or float): The target_completeness value.
     - xray (bool): If True, prefix 'XRAY_' to the subfolder name.
     
     Returns:
@@ -20,7 +20,8 @@ def create_subfolder(base_directory, crys, completeness, xray=False):
     """
     # Determine the folder name based on the xray flag
     prefix = "XRAY_" if xray else ""
-    subfolder_path = os.path.join(base_directory, f'bkind_{prefix}{crys}_to_{int(completeness)}_completeness')
+    # subfolder_path = os.path.join(base_directory, f'bkind_{prefix}{crys}_to_{int(target_completeness)}_completeness')
+    subfolder_path = os.path.join(base_directory, f'bkind_{prefix}{crys}_to_{target_completeness}_completeness')
 
     # Check if the directory already exists
     if os.path.exists(subfolder_path):

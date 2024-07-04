@@ -18,7 +18,8 @@ def get_subfolder(base_directory, crys, target_completeness, xray=False):
     """
     # Determine the folder name based on the xray flag
     prefix = "XRAY_" if xray else ""
-    subfolder_name = f'bkind_{prefix}{crys}_to_{int(target_completeness)}_completeness'
+    # subfolder_name = f'bkind_{prefix}{crys}_to_{int(target_completeness)}_completeness'
+    subfolder_name = f'bkind_{prefix}{crys}_to_{target_completeness}_completeness'
     subfolder_path = os.path.join(base_directory, subfolder_name)
 
     return subfolder_path

@@ -116,8 +116,7 @@ class App:
         return has_ins and has_hkl
 
     def process_data_gui(self, xray=False):
-        # This function should call the process_data_gui from process_data_gui.py
         process_data_gui(self, xray)
 
-App.setup_main_frame = setup_main_frame
-App.process_data_gui = process_data_gui
+    def setup_main_frame(self, xray=False):
+        setup_main_frame(self, xray)

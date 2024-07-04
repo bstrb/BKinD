@@ -1,7 +1,5 @@
 # bkind.py
 
-# ok lets try
-
 # Standard library imports
 import os
 import sys

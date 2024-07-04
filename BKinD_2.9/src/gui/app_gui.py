@@ -34,7 +34,7 @@ class App:
         self.main_frame = ttk.Frame(self.root, padding=(20, 20))
 
     def setup_welcome_frame(self):
-        welcome_label = ttk.Label(self.welcome_frame, text="Welcome to BKinD!", style="Custom.TLabel")
+        welcome_label = ttk.Label(self.welcome_frame, text="Welcome to NEW BKinD!", style="Custom.TLabel")
         welcome_label.pack(pady=20)
 
         # Load the image

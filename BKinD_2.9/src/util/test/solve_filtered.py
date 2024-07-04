@@ -21,7 +21,7 @@ from util.read.extract_space_group_number_from_cif import extract_space_group_nu
 from ed.modify_xds_inp import modify_xds_inp
 from ed.create_xdsconv import create_xdsconv
 from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
-from test.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
+from util.test.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
 
 # X-ray Imports
 from xray.convert_csv_to_hkl import convert_csv_to_hkl

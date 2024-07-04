@@ -1,7 +1,8 @@
 # extract_space_group_symbol_from_cif.py
 # %%
+
 # Utility File Imports
-from find_file import find_file
+from util.file.find_file import find_file
 
 def extract_space_group_symbol_from_cif(dir):
     """

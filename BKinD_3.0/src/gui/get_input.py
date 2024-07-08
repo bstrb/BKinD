@@ -4,7 +4,7 @@
 from tkinter import messagebox
 
 # def no_unnecessary_zeros(number):
-#     return float(f"{number:.10g}")
+·#     return float(f"{number:.10g}")
 
 def get_input(self, crystal_name):
     try:

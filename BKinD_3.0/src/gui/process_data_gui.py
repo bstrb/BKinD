@@ -26,7 +26,7 @@ def process_data_gui(self, xray=False):
     # Gather user input
     xds_dir, shelx_dir, output_dir = get_dir(self, xray)
     crystal_name = self.crystal_name.get().strip()
-    completeness, step_size, filtering_percentage = get_input(self, crystal_name)
+    completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps = get_input(self, crystal_name)
     run_refine_wght = self.wght_refinement_var.get()
     run_solve_filtered = self.solve_filtered_var.get()
 
@@ -43,7 +43,7 @@ def process_data_gui(self, xray=False):
                 if start_completeness <= completeness:
                     raise InvalidCompletenessError(start_completeness, completeness)
 
-                target_percentages = create_percentage_list(start_completeness, completeness, step_size)
+                target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, include_steps)
 
                 if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
                     dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
@@ -60,7 +60,7 @@ def process_data_gui(self, xray=False):
             if start_completeness <= completeness:
                 raise InvalidCompletenessError(start_completeness, completeness)
 
-            target_percentages = create_percentage_list(start_completeness, completeness, step_size)
+            target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, include_steps)
 
             if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
                 dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)

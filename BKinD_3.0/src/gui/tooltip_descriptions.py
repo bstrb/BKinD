@@ -43,6 +43,9 @@ will reduce the current completeness by 1 percentage point. For instance,
 if the starting completeness is 100% and the target is 90%, the procedure
 will present 10 intermediate steps with a step size of 1 percentage point."""
 
+TOOLTIP_NUM_STEPS = "Number of intermediate steps"
+
+
 TOOLTIP_FILTERING_PERCENTAGE = """Description: 
 This parameter indicates the percentage of total data to be filtered out in each 
 iterative step, based on their deviation from the mean value.

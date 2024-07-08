@@ -3,8 +3,8 @@
 # Third-party imports
 from tkinter import messagebox
 
-def no_unnecessary_zeros(number):
-    return float(f"{number:.10g}")
+# def no_unnecessary_zeros(number):
+#     return float(f"{number:.10g}")
 
 def get_input(self, crystal_name):
     try:
@@ -17,7 +17,7 @@ def get_input(self, crystal_name):
             "Filtering Diffraction Data",
             f"Crystal Name: {crystal_name}\n"
             f"Target Completeness: {completeness}%\n"
-            f"Step Size: {step_size}%\n"
+            f"Step Size: {step_size} p. p.\n"
             f"Filtering Percentage: {filtering_percentage}%"
         )
         if result:

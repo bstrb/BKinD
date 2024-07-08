@@ -23,7 +23,6 @@ from util.data.compute_completeness_from_df_sgn_uc import compute_completeness_f
 from util.data.filter_data_step import filter_data_step
 from util.data.save_filtered_data import save_filtered_data
 
-
 def filter_extreme_data(output_folder, target_completeness, extreme_percent_step, max_iterations=10000):
     """
     Filters out data points from a DataFrame based on deviations from the mean DFM value in steps,
@@ -72,10 +71,11 @@ def filter_extreme_data(output_folder, target_completeness, extreme_percent_step
         # Calculate the mean and deviation of the remaining DFM values
         current_mean = remaining_df['DFM'].mean()
         deviation = abs(remaining_df['DFM'] - current_mean)
-        cutoff = deviation.quantile(1 - extreme_percent_step / 100)  
-
+        cutoff = deviation.quantile(1 - extreme_percent_step / 100)
+        # print(cutoff)
         # Filter the data
         remaining_df, current_filtered = filter_data_step(remaining_df, current_mean, cutoff)
+        # print(len(remaining_df))
 
         if not current_filtered.empty:
             with warnings.catch_warnings():
@@ -86,7 +86,8 @@ def filter_extreme_data(output_folder, target_completeness, extreme_percent_step
 
     target_folder = os.path.join(output_folder, f"filtered_{target_completeness}")
     save_filtered_data(remaining_df, filtered_df, target_folder)
-
+    resulting_completeness = 100 * compute_completeness_from_df_sgn_uc(remaining_df, sgn, uc)
+    print (resulting_completeness) 
     data_filtered_count = len(remaining_df)
     data_filtered_percentage = 100 * (data_filtered_count / original_count)
     filtered_completeness = 100 * compute_completeness_from_df_sgn_uc(filtered_df, sgn, uc)

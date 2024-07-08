@@ -9,19 +9,17 @@ from tqdm import tqdm
 # Utility File Imports
 from util.file.manage_files import manage_files
 from util.file.rem_merg_zero import rem_merg_zero
+from util.file.find_file import find_file
 
 # Utility Process Imports
 from util.process.run_process import run_process
 
-from util.file.find_file import find_file
-from util.test.get_space_group_symbol import get_space_group_symbol
-from util.read.extract_space_group_number_from_cif import extract_space_group_number_from_cif
+from util.read.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
 
 # ED Imports
 from ed.modify_xds_inp import modify_xds_inp
 from ed.create_xdsconv import create_xdsconv
 from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
-from util.test.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
 
 # X-ray Imports
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
@@ -43,9 +41,6 @@ def solve_filtered(output_folder, target_percentages, xds_directory, xray, updat
         
         manage_files('copy', output_folder, target_directory, new_filename='solve_filtered' + '.ins', extension='.ins')
         rem_merg_zero(target_directory)
-
-        # sgn = extract_space_group_number_from_cif(output_folder)
-        # sgs = get_space_group_symbol(sgn)
 
         sgs = extract_space_group_symbol_from_cif(output_folder)
 

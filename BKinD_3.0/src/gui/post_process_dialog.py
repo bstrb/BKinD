@@ -20,6 +20,8 @@ from plot.plot_fvar_npd_vs_completeness import plot_FVAR_NPD_vs_completeness
 # GUI Imports
 from gui.create_button import create_button
 from gui.create_tooltip import create_tooltip
+from gui.show_output_folder import show_output_folder
+from gui.clean_output_folder import clean_output_folder
 
 class PostProcessDialog(tk.Toplevel):
     """A dialog for post-processing options after filtering."""
@@ -69,63 +71,27 @@ eventual plots(.html-files) and folder with filtered data(.csv-format).""")
         self.destroy()
 
     def show_output_folder(self):
-        os_name = platform.system()
-        if os_name == 'Darwin':
-            subprocess.call(['open', self.output_folder])
-        elif os_name == 'Linux' and 'microsoft' in platform.uname().release.lower():
-            # Convert the WSL path to a Windows path
-            if self.output_folder.startswith('/mnt/'):
-                drive_letter = self.output_folder[5]
-                windows_path = f"{drive_letter.upper()}:" + self.output_folder[6:].replace('/', '\\')
-            else:
-                result = subprocess.run(['wslpath', '-w', self.output_folder], capture_output=True, text=True)
-                windows_path = result.stdout.strip()
-
-            try:
-                os.startfile(windows_path)
-                return
-            except AttributeError:
-                pass
-            except FileNotFoundError:
-                messagebox.showinfo("Error", "The specified Windows path does not exist.")
-                return
-            except Exception as e:
-                messagebox.showinfo("Error", f"An unexpected error occurred: {e}")
-                return
-
-            try:
-                verify_command = f'powershell.exe Test-Path "{windows_path}"'
-                result = subprocess.run(verify_command, shell=True, capture_output=True, text=True)
-                if result.stdout.strip() == "False":
-                    messagebox.showinfo("Error", "The specified Windows path does not exist.")
-                    return
-
-                open_command = f'powershell.exe Start-Process "{windows_path}"'
-                result = subprocess.run(open_command, shell=True, capture_output=True, text=True)
-                result.check_returncode()
-            except subprocess.CalledProcessError as e:
-                messagebox.showinfo("Error", f"Failed to open the folder: {e}")
-            except Exception as e:
-                messagebox.showinfo("Error", f"An unexpected error occurred: {e}")
-        else:
-            messagebox.showinfo("Unsupported OS", "This functionality is supported only on macOS and WSL.")
+        show_output_folder(self)
 
     def clean_output_folder(self):
-        for filename in os.listdir(self.output_folder):
-            file_path = os.path.join(self.output_folder, filename)
+        clean_output_folder(self)
 
-            if filename.endswith('.txt') or filename.endswith('.html'):
-                continue
+    # def clean_output_folder(self):
+    #     for filename in os.listdir(self.output_folder):
+    #         file_path = os.path.join(self.output_folder, filename)
 
-            if os.path.isdir(file_path) and filename == 'aggregated_filtered':
-                continue
+    #         if filename.endswith('.txt') or filename.endswith('.html'):
+    #             continue
 
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
+    #         if os.path.isdir(file_path) and filename == 'aggregated_filtered':
+    #             continue
 
-        messagebox.showinfo("Cleanup", "Output folder has been cleaned, preserving .txt, .html files and the 'aggregated_filtered' folder.")
+    #         if os.path.isfile(file_path):
+    #             os.unlink(file_path)
+    #         elif os.path.isdir(file_path):
+    #             shutil.rmtree(file_path)
+
+    #     messagebox.showinfo("Cleanup", "Output folder has been cleaned, preserving .txt, .html files and the 'aggregated_filtered' folder.")
 
     def plot_data(self, plot_function):
         try:

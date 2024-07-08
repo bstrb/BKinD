@@ -3,18 +3,27 @@
 # Third-party imports
 from tkinter import messagebox
 
-# def no_unnecessary_zeros(number):
-#     return float(f"{number:.10g}")
-
 def get_input(self, crystal_name):
     try:
+        include_steps = self.include_steps.get()
+        step_mode = self.step_mode.get()
+
         completeness = float(self.completeness.get())
         filtering_percentage = float(self.filtering_percentage.get())
 
         num_steps = int(self.num_steps.get())
         step_size = float(self.step_size.get())
 
-        # if not (0 < completeness <= 100 and 0 < step_size <= 100 - completeness and 0 < filtering_percentage <= step_size):
+        message = (
+            f"Crystal Name: {crystal_name}\n"
+            f"Target Completeness: {completeness}%\n"
+            f"Filtering Percentage: {filtering_percentage}%\n"
+        )
+        if include_steps:
+            if step_mode == "size":
+                message += f"Intermediate Step Size: {step_size} p. p.\n"
+            else:
+                message += f"Number Intermediate Steps: {num_steps}"
         
         if not (0 < completeness <= 100 and
                 0 < step_size <= 100 - completeness and
@@ -22,17 +31,11 @@ def get_input(self, crystal_name):
                 isinstance(num_steps, int) and
                 num_steps >= 1):
             raise ValueError
-        result = messagebox.askokcancel(
-            "Filtering Diffraction Data",
-            f"Crystal Name: {crystal_name}\n"
-            f"Target Completeness: {completeness}%\n"
-            f"Step Size: {step_size} p. p.\n"
-            f"Filtering Percentage: {filtering_percentage}%"
-        )
+        result = messagebox.askokcancel("Filtering Diffraction Data", message)
         if result:
-            return completeness, step_size, filtering_percentage
+            return completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps
         else:
-            return None, None, None
+            return None, None, None, None
     except ValueError:
-        messagebox.showerror("Input Error", "Please ensure all numerical entries are valid percentages between 0 and 100. For example:\n- Target Unique Reflections Percentage: 90\n- Filtering Percentage: 1\n- Intermediate Output Step Size: 1")
-        return None, None, None
+        messagebox.showerror("Input Error", "Please ensure all numerical entries are valid.")
+        return None, None, None, None

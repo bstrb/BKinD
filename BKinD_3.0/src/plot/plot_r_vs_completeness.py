@@ -90,11 +90,11 @@ def plot_R1_Rint_vs_completeness(output_folder):
                             hoverinfo='text+x'))
 
     # Set x-axis title
-    fig.update_xaxes(title_text='Completeness (%)', autorange="reversed")
+    fig.update_xaxes(title_text='Target Completeness (%)', autorange="reversed")
 
     # Set y-axes titles and apply font sizes
     fig.update_layout(
-        title=dict(text='R1, Rint, Remaining Data % and Average Multiplicity vs Completeness', font=dict(size=32)),
+        title=dict(text='R1, Rint, Remaining Data % and Average Multiplicity vs Target Completeness', font=dict(size=32)),
         xaxis=dict(title=dict(font=dict(size=32)), tickfont=dict(size=24)),
         yaxis=dict(title=dict(text='R1 and Rint Values', font=dict(size=32)), tickfont=dict(size=24)),
         yaxis2=dict(title=dict(text='Remaining Data (%)', font=dict(size=32)), tickfont=dict(size=24), overlaying='y', side='right'),

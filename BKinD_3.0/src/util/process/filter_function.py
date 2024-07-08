@@ -87,7 +87,7 @@ def filter_extreme_data(output_folder, target_completeness, extreme_percent_step
     target_folder = os.path.join(output_folder, f"filtered_{target_completeness}")
     save_filtered_data(remaining_df, filtered_df, target_folder)
     resulting_completeness = 100 * compute_completeness_from_df_sgn_uc(remaining_df, sgn, uc)
-    print (resulting_completeness) 
+    # print (resulting_completeness) 
     data_filtered_count = len(remaining_df)
     data_filtered_percentage = 100 * (data_filtered_count / original_count)
     filtered_completeness = 100 * compute_completeness_from_df_sgn_uc(filtered_df, sgn, uc)
@@ -98,6 +98,7 @@ def filter_extreme_data(output_folder, target_completeness, extreme_percent_step
         original_count,
         initial_completeness,
         target_completeness,
+        resulting_completeness,
         iteration,
         data_filtered_percentage,
         data_filtered_count,

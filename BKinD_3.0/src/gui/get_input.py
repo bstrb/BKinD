@@ -9,9 +9,18 @@ from tkinter import messagebox
 def get_input(self, crystal_name):
     try:
         completeness = float(self.completeness.get())
-        step_size = float(self.step_size.get())
         filtering_percentage = float(self.filtering_percentage.get())
-        if not (0 < completeness <= 100 and 0 < step_size <= 100 - completeness and 0 < filtering_percentage <= 100):
+
+        num_steps = int(self.num_steps.get())
+        step_size = float(self.step_size.get())
+
+        # if not (0 < completeness <= 100 and 0 < step_size <= 100 - completeness and 0 < filtering_percentage <= step_size):
+        
+        if not (0 < completeness <= 100 and
+                0 < step_size <= 100 - completeness and
+                0 < filtering_percentage <= step_size and
+                isinstance(num_steps, int) and
+                num_steps >= 0):
             raise ValueError
         result = messagebox.askokcancel(
             "Filtering Diffraction Data",

@@ -20,7 +20,7 @@ def get_input(self, crystal_name):
                 0 < step_size <= 100 - completeness and
                 0 < filtering_percentage <= step_size and
                 isinstance(num_steps, int) and
-                num_steps >= 0):
+                num_steps >= 1):
             raise ValueError
         result = messagebox.askokcancel(
             "Filtering Diffraction Data",

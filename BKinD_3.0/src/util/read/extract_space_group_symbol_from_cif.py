@@ -1,5 +1,4 @@
 # extract_space_group_symbol_from_cif.py
-# %%
 
 # Utility File Imports
 from util.file.find_file import find_file
@@ -30,13 +29,3 @@ def extract_space_group_symbol_from_cif(dir):
         print("Space group symbol not found in the .cif file.")
     
     return space_group_symbol
-
-# directory = '/Users/xiaodong/Desktop/bkind_LTA_to_96.5_completeness/filtered_96.5'
-
-# space_group_symbol = extract_space_group_symbol_from_cif(directory)
-    
-# if space_group_symbol:
-#     print(f"Extracted space group symbol: {space_group_symbol}")
-# else:
-#     print("No space group symbol found.")
-# # %%

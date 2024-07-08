@@ -17,7 +17,7 @@ def setup_main_frame(self, xray=False):
     input_frame = self.main_frame
     input_frame.pack(fill='both', expand=True, padx=10, pady=10)
 
-    # Set directory variables based on the OS and mode (xray or non-xray)
+    # Set directory variables based on the OS and mode (xray or non-xray) for developer
     if os_name == 'Darwin':
         if xray:
             self.shelx_dir_xray = tk.StringVar(value='/Users/xiaodong/Downloads/SCXRD-DATA/SCXRDLTA')
@@ -38,8 +38,18 @@ def setup_main_frame(self, xray=False):
         print("Unsupported OS. This script supports only macOS and WSL.")
         return
 
+    # User settings
+    # if xray:
+    #     self.shelx_dir_xray = tk.StringVar()
+    #     self.output_dir_xray = tk.StringVar()
+    # else:
+    #     self.xds_dir = tk.StringVar()
+    #     self.shelx_dir = tk.StringVar()
+    #     self.output_dir = tk.StringVar()
+
     # Common inputs
     self.crystal_name = tk.StringVar(value="LTA")
+    # self.crystal_name = tk.StringVar()
     ttk.Label(input_frame, text="Crystal Name:").grid(row=0, column=0, sticky="w", padx=5, pady=(5,20))
     crystal_name_entry = ttk.Entry(input_frame, textvariable=self.crystal_name, width=40)
     crystal_name_entry.grid(row=0, column=1, columnspan=2, sticky="w", padx=5, pady=(5,20))

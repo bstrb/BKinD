@@ -9,12 +9,11 @@ from data_processing.filter import filter
 from data_processing.process_filtering_results import process_filtering_results
 from data_processing.refine_wght_progress import refine_wght_progress
 from data_processing.extract import extract_stats_from_filtering
+from data_processing.solve_filtered import solve_filtered
 
 # GUI Imports
 from gui.multi_progress_bar_window import MultiProgressBarWindow
 
-# Test Imports
-from util.test.solve_filtered import solve_filtered
 
 
 def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_directory=None, xray=False):

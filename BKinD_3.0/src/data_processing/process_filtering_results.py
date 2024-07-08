@@ -22,13 +22,14 @@ from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
 # Test Imports
-from util.test.move_filtered_data import move_filtered_data
+# from util.test.move_filtered_data import move_filtered_data
 
 
 
 def process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=None):
     def process_target(target_directory):
-        move_filtered_data(target_directory)
+        # move_filtered_data(target_directory)
+        manage_files('move', target_directory, os.path.join(target_directory,'solve_filtered'), 'filtered_data.csv')
         if xray:
             convert_csv_to_hkl(target_directory)
         else:

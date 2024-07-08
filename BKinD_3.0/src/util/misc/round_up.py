@@ -3,10 +3,10 @@
 # Standard Library Imports
 import math
 
-# Function to round to the closest decimal above
-def round_up(value):
-    return math.ceil(value * 10) / 10
-
-# # Function to round to the closest part of 100 above
+# # Function to round to the closest decimal above
 # def round_up(value):
-#     return math.ceil(value * 100) / 100
+#     return math.ceil(value * 10) / 10
+
+# Function to round to the closest part of 100 above
+def round_up(value):
+    return math.ceil(value * 100) / 100

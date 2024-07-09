@@ -66,32 +66,20 @@ eventual plots(.html-files) and folder with filtered data(.csv-format).""")
         
         ttk.Button(self, text="Close", command=self.on_close, style="TButton").pack(pady=20)
 
+    # def on_close(self):
+    #     """Handle the close button press event to only close the dialog."""
+    #     self.destroy()
+
     def on_close(self):
         """Handle the close button press event to only close the dialog."""
-        self.destroy()
+        self.withdraw()
+        self.parent.deiconify()  # Ensure the parent is shown
 
     def show_output_folder(self):
         show_output_folder(self)
 
     def clean_output_folder(self):
         clean_output_folder(self)
-
-    # def clean_output_folder(self):
-    #     for filename in os.listdir(self.output_folder):
-    #         file_path = os.path.join(self.output_folder, filename)
-
-    #         if filename.endswith('.txt') or filename.endswith('.html'):
-    #             continue
-
-    #         if os.path.isdir(file_path) and filename == 'aggregated_filtered':
-    #             continue
-
-    #         if os.path.isfile(file_path):
-    #             os.unlink(file_path)
-    #         elif os.path.isdir(file_path):
-    #             shutil.rmtree(file_path)
-
-    #     messagebox.showinfo("Cleanup", "Output folder has been cleaned, preserving .txt, .html files and the 'aggregated_filtered' folder.")
 
     def plot_data(self, plot_function):
         try:

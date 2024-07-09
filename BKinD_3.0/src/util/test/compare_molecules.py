@@ -1,5 +1,5 @@
 # %%
-
+import os
 from read_coordinates import read_coordinates
 
 import numpy as np
@@ -50,40 +50,22 @@ def compare_matrices(matrix1, matrix2, tolerance=0.1):
     
     return total_sum_diff < tolerance
 
-# # Example usage
-# coords1 = np.array([
-#     [0.5000, 0.3200, 0.8700],
-#     [0.5000, 0.2800, 1.0000],
-#     [0.5000, 0.2000, 0.8000],
-#     [0.6100, 0.3900, 0.8400]
-# ])
-
-# coords2 = np.array([
-#     [0.3200, 0.1200, 0.5000],
-#     [0.2800, 0.0000, 0.5800],
-#     [0.2000, 0.2000, 0.5000],
-#     [0.3900, 0.1600, 0.6100]
-# ])
-
-# # Check if the coordinates are equivalent under periodic boundary conditions
-# are_same = compare_matrices(coords1, coords2, tolerance=0.1)
-
-# print(f"Are the molecules the same? {are_same}")
-
+path_res_100 = '/Users/xiaodong/Desktop/bkind_LTA_to_90.0_completeness/filtered_99.43'
 # Example usage for solve_filtered.ins
-file_name_ins = '/mnt/c/Users/bubl3932/Desktop/bkind_LTA_to_96.0_completeness/filtered_96.0/solve_filtered/solve_filtered.ins'
-coords_ins = read_coordinates(file_name_ins, 'FVAR', 'HKLF 4')
-print("Coordinates from solve_filtered.ins:")
-print(coords_ins)
+file_name_res_100 = os.path.join(path_res_100, 'filtered_99.43_a.res')
+coords_res_100 = read_coordinates(file_name_res_100, 'PLAN', 'HKLF 4')
+print("Coordinates from filtered_100.0_a.res:")
+print(coords_res_100)
 
-# Example usage for solve_filtered_a.res
-file_name_res = '/mnt/c/Users/bubl3932/Desktop/bkind_LTA_to_96.0_completeness/filtered_96.0/solve_filtered/solve_filtered_a.res'
+path_res = '/Users/xiaodong/Desktop/bkind_LTA_to_90.0_completeness/filtered_90.0/solve_filtered'
+file_name_res = os.path.join(path_res, 'solve_filtered_a.res')
 coords_res = read_coordinates(file_name_res, 'PLAN', 'HKLF 4')
 print("Coordinates from solve_filtered_a.res:")
 print(coords_res)
 
-compare_ins_res = compare_matrices(coords_ins, coords_res)
-
+# print(len(coords_res_100))
+# print(len(coords_res))
+compare_ins_res = compare_matrices(coords_res_100, coords_res)
 
 print(f"Are the molecules the same? {compare_ins_res}")
 # %%

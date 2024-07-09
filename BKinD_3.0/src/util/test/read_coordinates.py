@@ -1,7 +1,5 @@
 # read_coordinates.py
 
-# %%
-
 import numpy as np
 
 def read_coordinates(file_name, start_keyword, end_keyword):
@@ -27,17 +25,3 @@ def read_coordinates(file_name, start_keyword, end_keyword):
 
     return np.array(coordinates)
 
-# Example usage for solve_filtered.ins
-file_name_ins = '/mnt/c/Users/bubl3932/Desktop/bkind_LTA_to_96.0_completeness/filtered_96.0/solve_filtered/solve_filtered.ins'
-coords_ins = read_coordinates(file_name_ins, 'FVAR', 'HKLF 4')
-print("Coordinates from solve_filtered.ins:")
-print(coords_ins)
-
-# Example usage for solve_filtered_a.res
-file_name_res = '/mnt/c/Users/bubl3932/Desktop/bkind_LTA_to_96.0_completeness/filtered_96.0/solve_filtered/solve_filtered_a.res'
-coords_res = read_coordinates(file_name_res, 'PLAN', 'HKLF 4')
-print("Coordinates from solve_filtered_a.res:")
-print(coords_res)
-
-
-# %%

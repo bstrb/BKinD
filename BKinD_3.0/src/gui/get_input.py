@@ -25,9 +25,11 @@ def get_input(self, crystal_name):
             else:
                 message += f"Number Intermediate Steps: {num_steps}"
         
+        if include_steps and step_mode == "size" and not (0 < filtering_percentage <= step_size):
+            raise ValueError("Filtering percentage must be less than or equal to step size in 'size' mode when steps are included.")
+        
         if not (0 < completeness <= 100 and
                 0 < step_size <= 100 - completeness and
-                0 < filtering_percentage <= step_size and
                 isinstance(num_steps, int) and
                 num_steps >= 1):
             raise ValueError
@@ -35,7 +37,7 @@ def get_input(self, crystal_name):
         if result:
             return completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps
         else:
-            return None, None, None, None
-    except ValueError:
-        messagebox.showerror("Input Error", "Please ensure all numerical entries are valid.")
-        return None, None, None, None
+            return None, None, None, None, None, None
+    except ValueError as e:
+        messagebox.showerror("Input Error", f"Please ensure all numerical entries are valid. Error: {str(e)}")
+        return None, None, None, None, None, None

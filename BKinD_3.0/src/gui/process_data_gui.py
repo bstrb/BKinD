@@ -2,6 +2,7 @@
 
 # Standard Library Imports
 import os
+import shutil
 
 # Third-Party Imports
 from tkinter import messagebox
@@ -29,6 +30,7 @@ def process_data_gui(self, xray=False):
     completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps = get_input(self, crystal_name)
     run_refine_wght = self.wght_refinement_var.get()
     run_solve_filtered = self.solve_filtered_var.get()
+    run_solve_remaining = self.solve_remaining_var.get()
 
     output_folder = get_subfolder(output_dir, crystal_name, completeness, xray)
 
@@ -41,11 +43,12 @@ def process_data_gui(self, xray=False):
                 start_completeness = compute_start_completeness(output_folder)
 
                 if start_completeness <= completeness:
+                    shutil.rmtree(output_folder)
                     raise InvalidCompletenessError(start_completeness, completeness)
 
                 target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, include_steps)
 
-                if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
+                if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
                     dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
                     self.root.wait_window(dlg)
 
@@ -58,11 +61,12 @@ def process_data_gui(self, xray=False):
             start_completeness = compute_start_completeness(output_folder)
 
             if start_completeness <= completeness:
+                shutil.rmtree(output_folder)
                 raise InvalidCompletenessError(start_completeness, completeness)
 
             target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, include_steps)
 
-            if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_dir, xray):
+            if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
                 dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
                 self.root.wait_window(dlg)
 

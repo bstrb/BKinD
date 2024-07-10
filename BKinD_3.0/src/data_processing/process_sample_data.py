@@ -13,6 +13,8 @@ from util.read.extract_unit_cell_from_fcf import extract_unit_cell_from_fcf
 from util.read.extract_parts_from_path import extract_parts_from_path
 from util.read.read_fcf import read_fcf
 
+from util.read.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
+
 # Utility File Imports
 from util.file.find_file import find_file
 
@@ -48,6 +50,8 @@ def process_sample_data(user_directory, xray=False):
         return pd.DataFrame()
     
     spacegroup_no = extract_space_group_number_from_cif(user_directory)
+
+    spacegroup_symbol = extract_space_group_symbol_from_cif(user_directory)
 
     # Create a DataFrame from .fcf
     sample_fcf_df = read_fcf(fcf_path)
@@ -86,7 +90,7 @@ def process_sample_data(user_directory, xray=False):
     # Write the optimal_u value to filtering_stats.txt
     stats_output_path = os.path.join(user_directory, 'filtering_stats.txt')
     with open(stats_output_path, 'w') as stats_file:
-            stats_file.write(f"Filtering Diffraction Data for Crystal {second_part} to {fourth_part} % Completeness\nSpace Group Number: {spacegroup_no}\nUnit Cell Parameters: {unit_cell_params}\n")
+            stats_file.write(f"Filtering Diffraction Data for Crystal {second_part} to {fourth_part} % Completeness\nSpace Group Number: {spacegroup_no} Space Group Symbol:{spacegroup_symbol}\nUnit Cell Parameters: {unit_cell_params}\n")
 
     # Ensure the optimal instability factor 'u' is a reasonable value
     if abs(initial_u - optimal_u) > initial_u + 0.001:

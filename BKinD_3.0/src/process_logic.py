@@ -16,7 +16,7 @@ from gui.multi_progress_bar_window import MultiProgressBarWindow
 
 
 
-def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, xds_directory=None, xray=False):
+def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_directory=None, xray=False):
     root = tk.Tk()
     root.title("Progress")
 
@@ -49,7 +49,7 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
         if run_refine_wght:
             refine_wght_progress(output_folder, target_percentages, update_progress=update_progress)
 
-        extract_stats_from_filtering(output_folder, target_percentages, update_progress=update_progress)
+        extract_stats_from_filtering(output_folder, target_percentages, run_solve_remaining, update_progress=update_progress)
         # Signal that tasks are done
         root.quit()
 

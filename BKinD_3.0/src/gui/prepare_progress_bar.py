@@ -1,24 +1,3 @@
-# # prepare_progress_bar.py
-
-# # Third-Party Imports
-# from tkinter import Toplevel, ttk
-
-# # Data Processing Imports
-# from data_processing.prepare import prepare
-
-# def prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray):
-#     # Create a new window for the progress bar
-#     progress_window = Toplevel(self.root)
-#     progress_window.title("Preparing Data")
-#     progress = ttk.Progressbar(progress_window, orient="horizontal", length=300, mode="determinate")
-#     progress.pack(pady=20)
-#     self.root.update_idletasks()
-
-#     prepare(shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray, progress)
-
-#     # Destroy the progress window after completion
-#     progress_window.destroy()
-
 # prepare_progress_bar.py
 
 # Third-Party Imports

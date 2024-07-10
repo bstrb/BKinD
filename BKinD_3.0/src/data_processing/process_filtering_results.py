@@ -21,15 +21,9 @@ from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
 # X-ray Imports
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
-# Test Imports
-# from util.test.move_filtered_data import move_filtered_data
-
-
-
 def process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=None):
-    def process_target(target_directory):
-        # move_filtered_data(target_directory)
-        manage_files('move', target_directory, os.path.join(target_directory,'solve_filtered'), 'filtered_data.csv')
+    def process_target(target, target_directory):
+        manage_files('move', target_directory, os.path.join(target_directory,f'solve_filtered_{target}'), 'filtered_data.csv')
         if xray:
             convert_csv_to_hkl(target_directory)
         else:
@@ -45,7 +39,7 @@ def process_filtering_results(output_folder, target_percentages, xds_directory, 
 
     for i, target in enumerate(tqdm(target_percentages, desc="Processing filtering results")):
         target_directory = os.path.join(output_folder, f'filtered_{target}')
-        process_target(target_directory)
+        process_target(target, target_directory)
 
         # Update progress bar if callback is provided
         if update_progress:

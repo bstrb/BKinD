@@ -21,6 +21,7 @@ from plot.plot_fvar_npd_vs_completeness import plot_FVAR_NPD_vs_completeness
 from gui.create_button import create_button
 from gui.create_tooltip import create_tooltip
 from gui.show_output_folder import show_output_folder
+from gui.show_filtering_stats import show_filtering_stats
 from gui.clean_output_folder import clean_output_folder
 
 class PostProcessDialog(tk.Toplevel):
@@ -52,12 +53,13 @@ the filtering_stats.txt file located in the output folder. Please select an acti
         ).pack(pady=10)
 
         ttk.Button(self, text="Show Output Folder", command=self.show_output_folder, style="TButton").pack(fill='x', expand=True, padx=20, pady=5)
+        ttk.Button(self, text="Show Filtering Stats", command=self.show_filtering_stats, style="TButton").pack(fill='x', expand=True, padx=20, pady=5)
         if DFM_plot:
-            self.create_button("Plot DFM vs Frame", self.plot_data, plot_DFM_vs_Frame, "Interactive Plot of Filtered Data as DFM vs Frame.")
+            self.create_button("Plot DFM vs Frame Number", self.plot_data, plot_DFM_vs_Frame, "Interactive Plot of Filtered Data as DFM vs Frame Number.")
         self.create_button("Plot Resolution vs DFM", self.plot_data, plot_Resolution_vs_DFM, "Interactive Plot of Filtered Data as Resolution vs DFM.")
         self.create_button("Plot DFM Distribution", self.plot_data, plot_DFM_distribution, "Interactive Plot of Filtered Data DFM Distribution.")
         self.create_button("Plot R1, Rint and Remaining Data Percentage vs ASU", self.plot_data, plot_R1_Rint_vs_completeness, "Plot R1 and Rint along with Remaining Data Percentage and Average Multiplicity vs Completeness.")
-        self.create_button("Plot FVAR, NPD vs ASU", self.plot_data, plot_FVAR_NPD_vs_completeness, "Plot FVAR and Number of NPDs vs Completeness.")
+        self.create_button("Plot FVAR and Number of NPD's vs ASU", self.plot_data, plot_FVAR_NPD_vs_completeness, "Plot FVAR and Number of NPDs vs Completeness.")
         
         self.clean_output_folder_button = ttk.Button(self, text="Clean Output Folder", command=self.clean_output_folder, style="TButton")
         self.clean_output_folder_button.pack(fill='x', expand=True, padx=20, pady=5)
@@ -66,10 +68,6 @@ eventual plots(.html-files) and folder with filtered data(.csv-format).""")
         
         ttk.Button(self, text="Close", command=self.on_close, style="TButton").pack(pady=20)
 
-    # def on_close(self):
-    #     """Handle the close button press event to only close the dialog."""
-    #     self.destroy()
-
     def on_close(self):
         """Handle the close button press event to only close the dialog."""
         self.withdraw()
@@ -77,6 +75,9 @@ eventual plots(.html-files) and folder with filtered data(.csv-format).""")
 
     def show_output_folder(self):
         show_output_folder(self)
+        
+    def show_filtering_stats(self):
+        show_filtering_stats(self)
 
     def clean_output_folder(self):
         clean_output_folder(self)

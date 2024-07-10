@@ -57,7 +57,6 @@ def compare_matrices(matrix1, matrix2, tolerance=0.1):
 file_name_res_orig = '/Users/xiaodong/Desktop/bkind_XRAY_feacacmerge_to_89.0_completeness/filtered_91.87/filtered_91.87_a.res'
 file_name_res = '/Users/xiaodong/Desktop/bkind_XRAY_feacacmerge_to_89.0_completeness/filtered_89.0/solve_filtered/solve_filtered_a.res'
 
-
 file_name_res_orig = '/Users/xiaodong/Desktop/bkind_XRAY_feacacmerge_to_89.0_completeness/filtered_91.87/filtered_91.87_a.res'
 file_name_res = '/Users/xiaodong/Desktop/bkind_XRAY_feacacmerge_to_89.0_completeness/filtered_89.0/solve_filtered/solve_filtered_a.res'
 

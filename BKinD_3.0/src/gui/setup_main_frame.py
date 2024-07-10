@@ -89,7 +89,7 @@ def setup_main_frame(self, xray=False):
 
     # Intermediate Steps Checkbox and Options
     self.include_steps = tk.BooleanVar(value=False)
-    self.step_mode = tk.StringVar(value="size")
+    self.step_mode = tk.StringVar()
     self.step_size = tk.StringVar(value="1")
     self.num_steps = tk.StringVar(value="1")
 
@@ -129,7 +129,7 @@ def setup_main_frame(self, xray=False):
     # Create a frame to hold the label and checkbox together
     self.wght_refinement_var = tk.BooleanVar(value=False)
     wght_frame = ttk.Frame(input_frame)
-    wght_frame.grid(row=11, column=1, sticky="w", padx=5, pady=5)
+    wght_frame.grid(row=11, column=0, sticky="w", padx=5, pady=5)
     wght_label = ttk.Label(wght_frame, text="Refine WGHT     ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.wght_refinement_button = ttk.Checkbutton(wght_frame, variable=self.wght_refinement_var)
@@ -139,12 +139,23 @@ def setup_main_frame(self, xray=False):
     # Create a frame to hold the label and checkbox together
     self.solve_filtered_var = tk.BooleanVar(value=False)
     solve_filtered = ttk.Frame(input_frame)
-    solve_filtered.grid(row=11, column=2, sticky="w", padx=5, pady=5)
+    solve_filtered.grid(row=11, column=1, sticky="w", padx=5, pady=5)
     wght_label = ttk.Label(solve_filtered, text="Solve Structure for Filtered Data ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.solve_filtered_var_button = ttk.Checkbutton(solve_filtered, variable=self.solve_filtered_var)
     self.solve_filtered_var_button.pack(side="left")
     self.create_tooltip(solve_filtered, TOOLTIP_SOLVE_FILTERED)
+
+    
+    # Create a frame to hold the label and checkbox together
+    self.solve_remaining_var = tk.BooleanVar(value=False)
+    solve_remaining = ttk.Frame(input_frame)
+    solve_remaining.grid(row=11, column=2, sticky="w", padx=5, pady=5)
+    wght_label = ttk.Label(solve_remaining, text="Solve Structure for Remaining Data ")
+    wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
+    self.solve_remaining_var_button = ttk.Checkbutton(solve_remaining, variable=self.solve_remaining_var)
+    self.solve_remaining_var_button.pack(side="left")
+    self.create_tooltip(solve_remaining, TOOLTIP_SOLVE_FILTERED)
 
     # Filter Data Button
     self.process_btn = ttk.Button(input_frame, text="Filter 3DED Data" if not xray else "Filter Merged 3DED/SCXRD Data", command=lambda: self.process_data_gui(xray))

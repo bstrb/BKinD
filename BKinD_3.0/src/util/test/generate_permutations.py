@@ -1,4 +1,4 @@
-# %%
+# generate_permutations.py
 
 import itertools
 import numpy as np
@@ -32,21 +32,3 @@ def generate_permutations(matrix):
     all_permuted_matrices = [np.array(matrix) for matrix in all_permuted_matrices]
     
     return all_permuted_matrices
-
-# Example usage
-matrix1 = np.array([
-    [0.1, 0.2, 0.3],
-    [0.4, 0.5, 0.6]
-])
-
-matrix2 = np.array([
-    [0.1, 0.2, 0.3],
-    [0.4, 0.5, 0.6]
-])
-all_permuted_matrices = generate_permutations(matrix1)
-
-for i, permuted_matrix in enumerate(all_permuted_matrices):
-    print(f"Matrix {i+1}:\n{permuted_matrix}\n")
-
-print(all_permuted_matrices - matrix2)
-# %%

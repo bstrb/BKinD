@@ -25,7 +25,8 @@ from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
 def solve_filtered(output_folder, target_percentages, xds_directory, xray, update_progress=None):
-    def process_target(target_directory):
+    sgs = extract_space_group_symbol_from_cif(output_folder)
+    def process_target(target, target_directory):
         if xray:
             convert_csv_to_hkl(target_directory)
         else:
@@ -39,17 +40,17 @@ def solve_filtered(output_folder, target_percentages, xds_directory, xray, updat
         if find_file(target_directory, '.hkl') is None:
             return
         
-        manage_files('copy', output_folder, target_directory, new_filename='solve_filtered' + '.ins', extension='.ins')
+        manage_files('copy', output_folder, target_directory, new_filename=f'solve_filtered_{target}' + '.ins', extension='.ins')
         rem_merg_zero(target_directory)
-
-        sgs = extract_space_group_symbol_from_cif(output_folder)
 
         run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
 
     for i, target in enumerate(tqdm(target_percentages, desc="Solving structure for filtered data")):
-        target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered')
-        process_target(target_directory)
+        target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered_{target}')
+        process_target(target, target_directory)
 
         # Update progress bar if callback is provided
         if update_progress:
             update_progress('Solving structure for filtered data', i + 1)
+    
+    run_process(["shelxt"], output_folder, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')

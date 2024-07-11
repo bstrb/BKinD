@@ -32,6 +32,9 @@ def create_percentage_list(start, end, step_size, num_steps, step_mode, include_
 
             # Generate the list
             percentage_list = [round(start + i * step_size,1) for i in range(num_steps + 2)]
+            
+            if percentage_list[-1] != end:
+                percentage_list.append(end)
     else:
         percentage_list = [start, end]
 

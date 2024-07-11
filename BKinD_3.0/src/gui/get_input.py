@@ -35,9 +35,9 @@ def get_input(self, crystal_name):
             raise ValueError
         result = messagebox.askokcancel("Filtering Diffraction Data", message)
         if result:
-            return completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps
+            return result, completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps
         else:
-            return None, None, None, None, None, None
+            return False, None, None, None, None, None, None
     except ValueError as e:
         messagebox.showerror("Input Error", f"Please ensure all numerical entries are valid. Error: {str(e)}")
-        return None, None, None, None, None, None
+        return False, None, None, None, None, None, None

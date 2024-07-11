@@ -47,7 +47,7 @@ class OptionDialog(tk.Toplevel):
     def cancel(self):
         """Handle the cancel action."""
         self.user_choice = 'cancel'
-        self.destroy()
+        self.destroy() 
 
 def show_option_dialog(root, style):
     """Show the OptionDialog and wait for user input.

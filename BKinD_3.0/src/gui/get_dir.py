@@ -15,13 +15,13 @@ def get_dir(self, xray):
 
         if not (os.path.exists(xds_dir) and os.path.exists(shelx_dir) and os.path.exists(output_dir)):
             messagebox.showerror("Directory Error", "One or more directories are invalid or do not exist. Please ensure the XDS, SHELX, and Output directories are correctly specified.")
-            return None, None, None
+            return False, None, None, None
     else:
         xds_dir = None
         shelx_dir = self.shelx_dir_xray.get()
         output_dir = self.output_dir_xray.get()
         if not (os.path.exists(shelx_dir) and os.path.exists(output_dir)):
             messagebox.showerror("Directory Error", "One or more directories are invalid or do not exist. Please ensure the SHELX and Output directories are correctly specified.")
-            return None, None, None
+            return False, None, None, None
 
-    return xds_dir, shelx_dir, output_dir
+    return True, xds_dir, shelx_dir, output_dir

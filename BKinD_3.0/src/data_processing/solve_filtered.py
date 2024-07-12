@@ -40,17 +40,19 @@ def solve_filtered(output_folder, target_percentages, xds_directory, xray, updat
         if find_file(target_directory, '.hkl') is None:
             return
         
-        manage_files('copy', output_folder, target_directory, new_filename=f'solve_filtered_{target}' + '.ins', extension='.ins')
+        # manage_files('copy', output_folder, target_directory, new_filename=f'solve_filtered_{target}' + '.ins', extension='.ins')
+        manage_files('copy', output_folder, target_directory, new_filename=f'removed_data_{target}' + '.ins', extension='.ins')
         rem_merg_zero(target_directory)
 
         run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
 
-    for i, target in enumerate(tqdm(target_percentages, desc="Solving structure for filtered data")):
-        target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered_{target}')
+    for i, target in enumerate(tqdm(target_percentages, desc="Solving Structure for Removed Data")):
+        # target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered_{target}')
+        target_directory = os.path.join(output_folder, f'filtered_{target}/removed_data_{target}')
         process_target(target, target_directory)
 
         # Update progress bar if callback is provided
         if update_progress:
-            update_progress('Solving structure for filtered data', i + 1)
+            update_progress('Solving Structure for Removed Data', i + 1)
     
     run_process(["shelxt"], output_folder, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')

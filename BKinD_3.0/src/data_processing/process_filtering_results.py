@@ -23,7 +23,8 @@ from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
 def process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=None):
     def process_target(target, target_directory):
-        manage_files('move', target_directory, os.path.join(target_directory,f'solve_filtered_{target}'), 'filtered_data.csv')
+        # manage_files('move', target_directory, os.path.join(target_directory,f'solve_filtered_{target}'), 'removed_data.csv')
+        manage_files('move', target_directory, os.path.join(target_directory,f'removed_data_{target}'), 'removed_data.csv')
         if xray:
             convert_csv_to_hkl(target_directory)
         else:
@@ -37,10 +38,10 @@ def process_filtering_results(output_folder, target_percentages, xds_directory, 
         manage_files('copy', output_folder, target_directory, new_filename=os.path.basename(target_directory) + '.ins', extension='.ins')
         rem_merg_zero(target_directory)
 
-    for i, target in enumerate(tqdm(target_percentages, desc="Processing filtering results")):
+    for i, target in enumerate(tqdm(target_percentages, desc="Processing Filtering Results")):
         target_directory = os.path.join(output_folder, f'filtered_{target}')
         process_target(target, target_directory)
 
         # Update progress bar if callback is provided
         if update_progress:
-            update_progress('Processing filtering results', i + 1)
+            update_progress('Processing Filtering Results', i + 1)

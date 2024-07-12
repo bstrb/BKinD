@@ -14,6 +14,7 @@ def save_filtered_data(remaining_df, filtered_df, target_folder):
     """
     os.makedirs(target_folder, exist_ok=True)
     remaining_data_path = os.path.join(target_folder, 'remaining_data.csv')
-    filtered_data_path = os.path.join(target_folder, 'filtered_data.csv')
+    # filtered_data_path = os.path.join(target_folder, 'filtered_data.csv')
+    filtered_data_path = os.path.join(target_folder, 'removed_data.csv')
     remaining_df.to_csv(remaining_data_path, index=False)
     filtered_df.to_csv(filtered_data_path, index=False)

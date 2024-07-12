@@ -5,7 +5,7 @@ import os
 def run_command(command):
     """Run a command in the shell and return the output."""
     try:
-        print(f"Running command: {command}")
+        # print(f"Running command: {command}")
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
@@ -35,9 +35,10 @@ def main():
     env_name = "bkind_env"
 
     if conda_env_exists(env_name):
-        print(f"Conda environment '{env_name}' exists.")
+        # print(f"Conda environment '{env_name}' exists.")
+        pass
     else:
-        print(f"Conda environment '{env_name}' does not exist.")
+        print(f"Conda environment '{env_name}' does not exist but is created. Rerun the program.")
         create_conda_env(env_name)
 
     # Run the shell script

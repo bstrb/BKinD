@@ -15,7 +15,6 @@ from util.stats.merge_stats_sections import merge_stats_sections
 from util.stats.append_refinement_stats import append_refinement_stats
 from util.read.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
 
-
 def extract_stats_from_filtering(output_folder, target_percentages, run_solve_remaining=False, update_progress=None):
     for i, target in enumerate(tqdm(target_percentages, desc="Extracting stats from filtering")):
         target_directory = os.path.join(output_folder, f'filtered_{target}')

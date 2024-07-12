@@ -140,7 +140,7 @@ def setup_main_frame(self, xray=False):
     self.solve_filtered_var = tk.BooleanVar(value=False)
     solve_filtered = ttk.Frame(input_frame)
     solve_filtered.grid(row=11, column=1, sticky="w", padx=5, pady=5)
-    wght_label = ttk.Label(solve_filtered, text="Solve Structure for Filtered Data ")
+    wght_label = ttk.Label(solve_filtered, text="Solve Structure for Removed Data ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.solve_filtered_var_button = ttk.Checkbutton(solve_filtered, variable=self.solve_filtered_var)
     self.solve_filtered_var_button.pack(side="left")

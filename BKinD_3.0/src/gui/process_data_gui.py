@@ -26,19 +26,6 @@ from util.misc.create_percentage_list import create_percentage_list
 
 def process_data_gui(self, xray=False):
 
-    # # Gather user input
-    # dir_ok, xds_dir, shelx_dir, output_dir = get_dir(self, xray)
-    # if dir_ok:
-    #     input_ok, completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps = get_input(self, crystal_name)
-    # else:
-    #     input_ok = False
-
-    # crystal_name = self.crystal_name.get().strip()
-    # run_refine_wght = self.wght_refinement_var.get()
-    # run_solve_filtered = self.solve_filtered_var.get()
-    # run_solve_remaining = self.solve_remaining_var.get()
-
-
     # Function to validate the crystal name
     def is_valid_crystal_name(name):
         # Valid if the name contains only alphanumeric characters, is not empty, and has no spaces

@@ -22,15 +22,14 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
 
     # Initialize tasks
     tasks = {
-        'Filtering': len(target_percentages),
-        'Processing filtering results': len(target_percentages),
-        # 'Solving structure for filtered data': len(target_percentages),
+        'Filtering Away Extreme Data': len(target_percentages),
+        'Processing Filtering Results': len(target_percentages),
     }
     if run_solve_filtered:
-        tasks['Solving structure for filtered data'] = len(target_percentages)
+        tasks['Solving Structure for Removed Data'] = len(target_percentages)
     if run_refine_wght:
         tasks['Refining WGHT'] = len(target_percentages)
-    tasks['Extracting stats from filtering'] = len(target_percentages)
+    tasks['Extracting Stats From Filtering'] = len(target_percentages)
 
     progress_window = MultiProgressBarWindow(root, tasks)
 

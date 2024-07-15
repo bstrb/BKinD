@@ -39,8 +39,8 @@ def compare_matrices(matrix1, matrix2):
 
 if __name__ == "__main__":
     # File paths
-    file_name_res_orig = '/Users/xiaodong/Desktop/bkind_FEACAC13_to_79.0_completeness/bkind_a.res'
-    file_name_res = '/Users/xiaodong/Desktop/bkind_FEACAC13_to_79.0_completeness/filtered_79.0/removed_data_79.0/removed_data_79.0_a.res'
+    file_name_res_orig = '/Users/xiaodong/Desktop/bkind_FEACAC13_to_80.0_completeness/bkind_a.res'
+    file_name_res = '/Users/xiaodong/Desktop/bkind_FEACAC13_to_80.0_completeness/filtered_80.0/removed_data_80.0/removed_data_80.0_a.res'
 
     # Read coordinates and extract relevant columns
     coords_res_orig = read_coordinates(file_name_res_orig, 'PLAN', 'HKLF')
@@ -65,5 +65,5 @@ if __name__ == "__main__":
     print(best_permutation_orig)
     print("Best permutation (Filtered):")
     print(best_permutation_filtered)
-
+    
 # %%

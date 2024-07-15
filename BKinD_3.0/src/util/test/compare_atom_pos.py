@@ -42,8 +42,14 @@ def compare_matrices(matrix1, matrix2, large_cost=1e6):
 
     return cost_matrix
 
+# Function to drop rows with NaN values
+def drop_nan_rows(matrix):
+    return matrix[~np.isnan(matrix).any(axis=1)]
+
 def calculate_differences(matrix1, matrix2):
-    differences = np.minimum(np.abs(matrix1 - matrix2), np.abs(1 - matrix1 - matrix2))
+    diff = drop_nan_rows(matrix1-matrix2)
+    summ = drop_nan_rows(matrix1+matrix2)
+    differences = np.minimum(np.abs(diff), np.abs(1 - summ))
     return differences
 
 if __name__ == "__main__":

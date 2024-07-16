@@ -73,7 +73,7 @@ def plot_R1_Rint_vs_completeness(output_folder):
     fig = go.Figure()
 
     # Add Remaining Percentage as a transparent bar plot
-    fig.add_trace(go.Bar(x=df['Target'], y=df['Remaining_Percentage'], name='Remaining Data Percentage',
+    fig.add_trace(go.Bar(x=df['Target'], y=df['Remaining_Percentage'], name='Remaining Data',
                         yaxis='y2', marker_color='firebrick', opacity=0.5, text=df['Average_Multiplicity'],
                         textposition='outside', texttemplate='Avg Mult: %{text:.2f}'))  # Display Average Multiplicity
 
@@ -97,7 +97,7 @@ def plot_R1_Rint_vs_completeness(output_folder):
         title=dict(text='R1, Rint, Remaining Data % and Average Multiplicity vs Target Completeness', font=dict(size=32)),
         xaxis=dict(title=dict(font=dict(size=32)), tickfont=dict(size=24)),
         yaxis=dict(title=dict(text='R1 and Rint Values', font=dict(size=32)), tickfont=dict(size=24)),
-        yaxis2=dict(title=dict(text='Remaining Data (%)', font=dict(size=32)), tickfont=dict(size=24), overlaying='y', side='right'),
+        yaxis2=dict(title=dict(text='Remaining (%)', font=dict(size=32)), tickfont=dict(size=24), overlaying='y', side='right'),
         legend=dict(title=dict(text='   Metrics', font=dict(size=32)), font=dict(size=24)),
         template="plotly_white"
     )

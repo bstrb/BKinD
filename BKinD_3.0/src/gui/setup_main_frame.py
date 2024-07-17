@@ -1,4 +1,4 @@
-# setup_main_frame.py
+# setup_main_frame_test.py
 
 # Standard Library Imports
 import platform
@@ -48,8 +48,7 @@ def setup_main_frame(self, xray=False):
     #     self.output_dir = tk.StringVar()
 
     # Common inputs
-    self.crystal_name = tk.StringVar(value="LTA4")
-    # self.crystal_name = tk.StringVar()
+    self.crystal_name = tk.StringVar()
     ttk.Label(input_frame, text="Crystal Name:").grid(row=0, column=0, sticky="w", padx=5, pady=(5,20))
     crystal_name_entry = ttk.Entry(input_frame, textvariable=self.crystal_name, width=40)
     crystal_name_entry.grid(row=0, column=1, columnspan=2, sticky="w", padx=5, pady=(5,20))
@@ -92,6 +91,7 @@ def setup_main_frame(self, xray=False):
     self.step_mode = tk.StringVar()
     self.step_size = tk.StringVar(value="1")
     self.num_steps = tk.StringVar(value="1")
+    self.custom_intermediate_steps = tk.StringVar()
 
     self.include_steps_check = ttk.Checkbutton(
         input_frame, text="Include Intermediate Steps", variable=self.include_steps, command=self.toggle_steps)
@@ -105,10 +105,14 @@ def setup_main_frame(self, xray=False):
         input_frame, text="Number of Steps", variable=self.step_mode, value="num", command=self.toggle_step_mode)
     self.step_mode_num.grid(row=7, column=0, sticky="w", padx=5, pady=5)
 
+    self.step_mode_custom = ttk.Radiobutton(
+        input_frame, text="Custom Intermediate Steps", variable=self.step_mode, value="custom", command=self.toggle_step_mode)
+    self.step_mode_custom.grid(row=8, column=0, sticky="w", padx=5, pady=5)
+
     self.step_size_label = ttk.Label(input_frame, text="Step Size:")
-    self.step_size_label.grid(row=8, column=0, sticky="w", padx=5, pady=5)
+    self.step_size_label.grid(row=9, column=0, sticky="w", padx=5, pady=5)
     self.step_size_entry = ttk.Entry(input_frame, textvariable=self.step_size, width=10)
-    self.step_size_entry.grid(row=8, column=1, sticky="w", padx=5, pady=5)
+    self.step_size_entry.grid(row=9, column=1, sticky="w", padx=5, pady=5)
     self.create_tooltip(self.step_size_entry, TOOLTIP_STEP_SIZE)
 
     self.num_steps_label = ttk.Label(input_frame, text="Number of Steps:")
@@ -116,6 +120,12 @@ def setup_main_frame(self, xray=False):
     self.num_steps_entry = ttk.Entry(input_frame, textvariable=self.num_steps, width=10)
     self.num_steps_entry.grid(row=9, column=1, sticky="w", padx=5, pady=5)
     self.create_tooltip(self.num_steps_entry, TOOLTIP_NUM_STEPS)
+
+    self.custom_steps_label = ttk.Label(input_frame, text="Custom Intermediate Steps:")
+    self.custom_steps_label.grid(row=9, column=0, sticky="w", padx=5, pady=5)
+    self.custom_steps_entry = ttk.Entry(input_frame, textvariable=self.custom_intermediate_steps, width=40)
+    self.custom_steps_entry.grid(row=9, column=1, columnspan=2, sticky="w", padx=5, pady=5)
+    self.create_tooltip(self.custom_steps_entry, "Enter the custom intermediate steps separated by commas.")
 
     # Initialize the widgets
     self.toggle_steps()
@@ -146,7 +156,6 @@ def setup_main_frame(self, xray=False):
     self.solve_filtered_var_button.pack(side="left")
     self.create_tooltip(solve_filtered, TOOLTIP_SOLVE_FILTERED)
 
-    
     # Create a frame to hold the label and checkbox together
     self.solve_remaining_var = tk.BooleanVar(value=False)
     solve_remaining = ttk.Frame(input_frame)
@@ -169,6 +178,7 @@ def toggle_steps(self):
     state = tk.NORMAL if self.include_steps.get() else tk.DISABLED
     self.step_mode_size.config(state=state)
     self.step_mode_num.config(state=state)
+    self.step_mode_custom.config(state=state)
     self.toggle_step_mode()
 
 def toggle_step_mode(self):
@@ -177,15 +187,27 @@ def toggle_step_mode(self):
         self.step_size_entry.grid_remove()
         self.num_steps_label.grid_remove()
         self.num_steps_entry.grid_remove()
+        self.custom_steps_label.grid_remove()
+        self.custom_steps_entry.grid_remove()
     else:
         if self.step_mode.get() == "size":
             self.step_size_label.grid()
             self.step_size_entry.grid()
             self.num_steps_label.grid_remove()
             self.num_steps_entry.grid_remove()
-        else:
+            self.custom_steps_label.grid_remove()
+            self.custom_steps_entry.grid_remove()
+        elif self.step_mode.get() == "num":
             self.step_size_label.grid_remove()
             self.step_size_entry.grid_remove()
             self.num_steps_label.grid()
             self.num_steps_entry.grid()
-
+            self.custom_steps_label.grid_remove()
+            self.custom_steps_entry.grid_remove()
+        elif self.step_mode.get() == "custom":
+            self.step_size_label.grid_remove()
+            self.step_size_entry.grid_remove()
+            self.num_steps_label.grid_remove()
+            self.num_steps_entry.grid_remove()
+            self.custom_steps_label.grid()
+            self.custom_steps_entry.grid()

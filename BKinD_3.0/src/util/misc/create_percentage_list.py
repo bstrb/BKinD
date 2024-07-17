@@ -3,7 +3,7 @@
 # Utility Misc Imports
 from util.misc.round_up import round_up
 
-def create_percentage_list(start, end, step_size, num_steps, step_mode, include_steps=False):
+def create_percentage_list(start, end, step_size, num_steps, step_mode, custom_steps, include_steps=False):
 
     # start = round(start, 1)
     start = round_up(start)
@@ -25,15 +25,21 @@ def create_percentage_list(start, end, step_size, num_steps, step_mode, include_
             if not percentage_list[0] == start:
                 # Add the start percentage at the beginning
                 percentage_list.insert(0, start)
-        else:
+
+        elif step_mode == "num":
 
             # Calculate the step size
             step_size = round((end - start) / (num_steps + 1),2)
 
             # Generate the list
             percentage_list = [round(start + i * step_size,1) for i in range(num_steps + 2)]
+        
+        else:
+
+            percentage_list = [start] + custom_steps + [end]
+
 
     else:
-        percentage_list = [start, end]
+            percentage_list = [start, end]
 
     return percentage_list

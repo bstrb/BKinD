@@ -13,6 +13,10 @@ def get_input(self, crystal_name):
 
         num_steps = int(self.num_steps.get())
         step_size = float(self.step_size.get())
+        custom_steps_str = self.custom_intermediate_steps.get()
+        
+        # Split the string by commas, convert to float, and sort in descending order if in custom mode
+        custom_steps = sorted([float(step.strip()) for step in custom_steps_str.split(",")], reverse=True) if step_mode == "custom" else []
 
         message = (
             f"Crystal Name: {crystal_name}\n"
@@ -22,22 +26,27 @@ def get_input(self, crystal_name):
         if include_steps:
             if step_mode == "size":
                 message += f"Intermediate Step Size: {step_size} p. p.\n"
-            else:
-                message += f"Number Intermediate Steps: {num_steps}"
+            elif step_mode == "num":
+                message += f"Number of Intermediate Steps: {num_steps}\n"
+            elif step_mode == "custom":
+                message += f"Custom Intermediate Steps: {custom_steps}\n"
         
         if include_steps and step_mode == "size" and not (0 < filtering_percentage <= step_size):
             raise ValueError("Filtering percentage must be less than or equal to step size in 'size' mode when steps are included.")
         
-        if not (0 < completeness <= 100 and
-                0 < step_size <= 100 - completeness and
-                isinstance(num_steps, int) and
-                num_steps >= 1):
-            raise ValueError
+        if not (0 < completeness <= 100):
+            raise ValueError("Completeness must be between 0 and 100.")
+        if include_steps and step_mode == "size" and not (0 < step_size <= 100 - completeness):
+            raise ValueError("Step size must be between 0 and 100 - completeness.")
+        if include_steps and step_mode == "num" and (not isinstance(num_steps, int) or num_steps < 1):
+            raise ValueError("Number of steps must be an integer greater than or equal to 1.")
+        
         result = messagebox.askokcancel("Filtering Diffraction Data", message)
         if result:
-            return result, completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps
+            # print(result, completeness, filtering_percentage, step_size, num_steps, step_mode, custom_steps, include_steps)
+            return result, completeness, filtering_percentage, step_size, num_steps, step_mode, custom_steps, include_steps
         else:
-            return False, None, None, None, None, None, None
+            return False, None, None, None, None, None, None, None
     except ValueError as e:
         messagebox.showerror("Input Error", f"Please ensure all numerical entries are valid. Error: {str(e)}")
-        return False, None, None, None, None, None, None
+        return False, None, None, None, None, None, None, None

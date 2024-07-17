@@ -139,7 +139,7 @@ def setup_main_frame(self, xray=False):
     # Create a frame to hold the label and checkbox together
     self.wght_refinement_var = tk.BooleanVar(value=False)
     wght_frame = ttk.Frame(input_frame)
-    wght_frame.grid(row=11, column=0, sticky="w", padx=5, pady=5)
+    wght_frame.grid(row=6, column=2, sticky="e", padx=5, pady=5)
     wght_label = ttk.Label(wght_frame, text="Refine WGHT     ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.wght_refinement_button = ttk.Checkbutton(wght_frame, variable=self.wght_refinement_var)
@@ -149,7 +149,7 @@ def setup_main_frame(self, xray=False):
     # Create a frame to hold the label and checkbox together
     self.solve_filtered_var = tk.BooleanVar(value=False)
     solve_filtered = ttk.Frame(input_frame)
-    solve_filtered.grid(row=11, column=1, sticky="w", padx=5, pady=5)
+    solve_filtered.grid(row=7, column=2, sticky="e", padx=5, pady=5)
     wght_label = ttk.Label(solve_filtered, text="Solve Structure for Removed Data ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.solve_filtered_var_button = ttk.Checkbutton(solve_filtered, variable=self.solve_filtered_var)
@@ -159,7 +159,7 @@ def setup_main_frame(self, xray=False):
     # Create a frame to hold the label and checkbox together
     self.solve_remaining_var = tk.BooleanVar(value=False)
     solve_remaining = ttk.Frame(input_frame)
-    solve_remaining.grid(row=11, column=2, sticky="w", padx=5, pady=5)
+    solve_remaining.grid(row=8, column=2, sticky="e", padx=5, pady=5)
     wght_label = ttk.Label(solve_remaining, text="Solve Structure for Remaining Data ")
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.solve_remaining_var_button = ttk.Checkbutton(solve_remaining, variable=self.solve_remaining_var)

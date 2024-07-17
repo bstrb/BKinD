@@ -1,4 +1,5 @@
 # create_xdsconv.py
+# %%
 
 # Standard Library Imports
 import os
@@ -20,3 +21,8 @@ def create_xdsconv(target_directory):
         xdsconv_file.write(f"OUTPUT_FILE={os.path.basename(target_directory)}.hkl SHELX ! or CCP4_I or CCP4_F or SHELX or CNS\n")
         xdsconv_file.write("FRIEDEL'S_LAW=FALSE ! store anomalous signal in output file even if weak\n")
         xdsconv_file.write("MERGE=FALSE\n")
+
+# # Example usage
+# target_directory = "/Users/xiaodong/Downloads/3DED-DATA/FEACAC/FEACACm"
+# xdsconv_file_path = create_xdsconv(target_directory)
+# # %%

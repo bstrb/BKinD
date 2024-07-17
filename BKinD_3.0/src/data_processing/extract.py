@@ -18,11 +18,8 @@ from util.read.extract_space_group_symbol_from_cif import extract_space_group_sy
 def extract_stats_from_filtering(output_folder, target_percentages, run_solve_remaining=False, update_progress=None):
     for i, target in enumerate(tqdm(target_percentages, desc="Extracting Stats From Filtering")):
         target_directory = os.path.join(output_folder, f'filtered_{target}')
-        run_process(["shelxl"], target_directory, input_file='.ins', suppress_output=True)
-        if run_solve_remaining:
-            sgs = extract_space_group_symbol_from_cif(target_directory)
-            run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
-
+        if not run_solve_remaining:
+            run_process(["shelxl"], target_directory, input_file='.ins', suppress_output=True)
         extract_stats(target_directory)
 
         # Update progress bar if callback is provided

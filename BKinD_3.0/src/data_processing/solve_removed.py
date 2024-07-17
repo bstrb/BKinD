@@ -24,7 +24,7 @@ from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
 # X-ray Imports
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
-def solve_filtered(output_folder, target_percentages, xds_directory, xray, update_progress=None):
+def solve_removed(output_folder, target_percentages, xds_directory, xray, update_progress=None):
     sgs = extract_space_group_symbol_from_cif(output_folder)
     def process_target(target, target_directory):
         if xray:
@@ -55,4 +55,4 @@ def solve_filtered(output_folder, target_percentages, xds_directory, xray, updat
         if update_progress:
             update_progress('Solving Structure for Removed Data', i + 1)
     
-    run_process(["shelxt"], output_folder, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
+    # run_process(["shelxt"], output_folder, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')

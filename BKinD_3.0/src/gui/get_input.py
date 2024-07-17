@@ -40,8 +40,12 @@ def get_input(self, crystal_name):
             raise ValueError("Step size must be between 0 and 100 - completeness.")
         if include_steps and step_mode == "num" and (not isinstance(num_steps, int) or num_steps < 1):
             raise ValueError("Number of steps must be an integer greater than or equal to 1.")
-        if include_steps and step_mode == "custom" and not all(step > completeness for step in custom_steps):
-            raise ValueError("All custom intermediate steps must be greater than the target completeness.")
+        if include_steps and step_mode == "custom":
+            if not all(step > completeness for step in custom_steps):
+                raise ValueError("All custom intermediate steps must be greater than the target completeness.")
+            if len(custom_steps) != len(set(custom_steps)):
+                raise ValueError("Custom intermediate steps must be unique.")
+
 
         result = messagebox.askokcancel("Filtering Diffraction Data", message)
         if result:

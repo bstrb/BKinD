@@ -9,12 +9,11 @@ from data_processing.filter import filter
 from data_processing.process_filtering_results import process_filtering_results
 from data_processing.refine_wght_progress import refine_wght_progress
 from data_processing.extract import extract_stats_from_filtering
-from data_processing.solve_filtered import solve_filtered
+from data_processing.solve_removed import solve_removed
+from data_processing.solve_remaining import solve_remaining
 
 # GUI Imports
 from gui.multi_progress_bar_window import MultiProgressBarWindow
-
-
 
 def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_directory=None, xray=False):
     root = tk.Tk()
@@ -27,6 +26,8 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
     }
     if run_solve_filtered:
         tasks['Solving Structure for Removed Data'] = len(target_percentages)
+    if run_solve_remaining:
+        tasks['Solving Structure for Remaining Data'] = len(target_percentages)
     if run_refine_wght:
         tasks['Refining WGHT'] = len(target_percentages)
     tasks['Extracting Stats From Filtering'] = len(target_percentages)
@@ -43,7 +44,10 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
         process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
 
         if run_solve_filtered:
-            solve_filtered(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
+            solve_removed(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
+
+        if run_solve_remaining:
+            solve_remaining(output_folder, target_percentages, update_progress=update_progress)
 
         if run_refine_wght:
             refine_wght_progress(output_folder, target_percentages, update_progress=update_progress)

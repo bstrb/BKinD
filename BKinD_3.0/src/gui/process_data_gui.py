@@ -38,7 +38,7 @@ def process_data_gui(self, xray=False):
     if dir_ok:
         # Validate the crystal name
         if is_valid_crystal_name(crystal_name):
-            input_ok, completeness, filtering_percentage, step_size, num_steps, step_mode, include_steps = get_input(self, crystal_name)
+            input_ok, completeness, filtering_percentage, step_size, num_steps, step_mode, custom_steps, include_steps = get_input(self, crystal_name)
         else:
             messagebox.showerror("Invalid Input", "Invalid crystal name. Ensure it is not empty and contains only letters and numbers without spaces or special characters.")
             input_ok = False
@@ -63,8 +63,13 @@ def process_data_gui(self, xray=False):
                     if start_completeness <= completeness:
                         shutil.rmtree(output_folder)
                         raise InvalidCompletenessError(start_completeness, completeness)
+                    elif step_mode == 'custom':
+                        for step in custom_steps:
+                            if start_completeness <= step:
+                                shutil.rmtree(output_folder)
+                                raise InvalidCompletenessError(start_completeness, step)
 
-                    target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, include_steps)
+                    target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
 
                     if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
                         dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
@@ -83,8 +88,13 @@ def process_data_gui(self, xray=False):
                 if start_completeness <= completeness:
                     shutil.rmtree(output_folder)
                     raise InvalidCompletenessError(start_completeness, completeness)
+                elif step_mode == 'custom':
+                    for step in custom_steps:
+                        if start_completeness <= step:
+                            shutil.rmtree(output_folder)
+                            raise InvalidCompletenessError(start_completeness, step)
 
-                target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, include_steps)
+                target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
 
                 if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
                     dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)

@@ -58,7 +58,7 @@ def plot_DFM_distribution(output_folder, bin_size=1000):
                        title='Distribution of DFM from all CSV files',
                        labels={'DFM': 'DFM'},
                        nbins=bin_size,
-                       category_orders={"Source": sorted(combined_df['Source'].unique(), reverse=True)})
+                       category_orders={"Source": sorted(combined_df['Source'].unique(), reverse=False)})
     
     fig.update_traces(opacity=0.75)
 

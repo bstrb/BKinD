@@ -16,7 +16,7 @@ def get_input(self, crystal_name):
         custom_steps_str = self.custom_intermediate_steps.get()
         
         # Split the string by commas, convert to float, and sort in descending order if in custom mode
-        custom_steps = sorted([float(step.strip()) for step in custom_steps_str.split(",")], reverse=True) if step_mode == "custom" else []
+        custom_steps = sorted([float(step.strip()) for step in custom_steps_str.split(",")], reverse=False) if step_mode == "custom" else []
 
         message = (
             f"Crystal Name: {crystal_name}\n"
@@ -41,8 +41,8 @@ def get_input(self, crystal_name):
         if include_steps and step_mode == "num" and (not isinstance(num_steps, int) or num_steps < 1):
             raise ValueError("Number of steps must be an integer greater than or equal to 1.")
         if include_steps and step_mode == "custom":
-            if not all(step > completeness for step in custom_steps):
-                raise ValueError("All custom intermediate steps must be greater than the target completeness.")
+            if not all(step < completeness for step in custom_steps):
+                raise ValueError("All custom intermediate steps must be smaller than the target completeness.")
             if len(custom_steps) != len(set(custom_steps)):
                 raise ValueError("Custom intermediate steps must be unique.")
 

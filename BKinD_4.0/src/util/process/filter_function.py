@@ -67,7 +67,7 @@ def filter_extreme_data(output_folder, target_completeness, extreme_percent_step
         # Check for NaNs and infinite values
         remaining_df = remaining_df.replace([np.inf, -np.inf], np.nan).dropna(subset=['DFM'])
         
-        if remaining_df.empty or remaining_df['asu'].nunique() <= target_asu:
+        if remaining_df.empty or filtered_df['asu'].nunique() >= target_asu:
             break
         
         # Calculate the mean and deviation of the remaining DFM values

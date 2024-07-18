@@ -47,7 +47,7 @@ def merge_stats_sections(main_directory):
         file.write("-------------------------\n")  # Separator for readability after initial data
 
         # Write each Target completeness % section formatted
-        for _, data in sorted(merged_data.items(), key=lambda x: float(x[0]), reverse=True):
+        for _, data in sorted(merged_data.items(), key=lambda x: float(x[0]), reverse=False):
             file.write(data["header"] + "\n")
             file.write("\n".join(data["content"]) + "\n")
             file.write("-------------------------\n")

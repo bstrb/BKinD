@@ -19,7 +19,7 @@ def clean_aggregate(folder_path):
 
     # Step 1: Collect all CSV files and sort them by decreasing target percentages
     files = [f for f in os.listdir(folder_path) if f.startswith('filtered_') and f.endswith('.csv')]
-    files.sort(key=lambda x: float(x.split('_')[1].replace('.csv', '')), reverse=True)
+    files.sort(key=lambda x: float(x.split('_')[1].replace('.csv', '')), reverse=False)
 
     # Append 'remaining_data.csv' after sorting
     files.append('remaining_data.csv')

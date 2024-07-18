@@ -77,7 +77,7 @@ def plot_FVAR_NPD_vs_completeness(output_folder):
 
 
     # Set x-axis title
-    fig.update_xaxes(title_text='Completeness', autorange="reversed")
+    fig.update_xaxes(title_text='Completeness')#, autorange="reversed")
 
     # Set y-axes titles and apply font sizes
     fig.update_layout(

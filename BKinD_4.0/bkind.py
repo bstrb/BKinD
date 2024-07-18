@@ -122,7 +122,7 @@ def update_repo():
         print(f"Failed to update the repository: {e.stderr}")
 
 def main():
-    update_repo()
+    # update_repo()
     ensure_conda_environment()
     ensure_python_version()
     check_requirements()

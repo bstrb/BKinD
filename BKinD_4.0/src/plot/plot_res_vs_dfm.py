@@ -57,7 +57,7 @@ def plot_Resolution_vs_DFM(output_folder):
     fig = px.scatter(combined_df, x='DFM', y='Resolution', color='Source', 
                      title='Resolution vs DFM for Filtered Data. Click the labels in the legend to hide/unhide data sets.', 
                      labels={'Resolution': 'Resolution', 'DFM': 'DFM'},
-                     category_orders={"Source": sorted(combined_df['Source'].unique(), reverse=True)})
+                     category_orders={"Source": sorted(combined_df['Source'].unique(), reverse=False)})
     
     fig.update_traces(marker=dict(size=8, line=dict(width=0,
                                                     color='DarkSlateGrey')),

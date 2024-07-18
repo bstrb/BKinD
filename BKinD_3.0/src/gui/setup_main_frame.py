@@ -9,6 +9,7 @@ from tkinter import ttk
 
 # Import tooltip descriptions
 from gui.tooltip_descriptions import *
+from gui.toggle_step import toggle_steps, toggle_step_mode
 
 def setup_main_frame(self, xray=False):
     os_name = platform.system()
@@ -17,7 +18,16 @@ def setup_main_frame(self, xray=False):
     input_frame = self.main_frame
     input_frame.pack(fill='both', expand=True, padx=10, pady=10)
 
-    # Set directory variables based on the OS and mode (xray or non-xray) for developer
+    # User settings
+    if xray:
+        self.shelx_dir_xray = tk.StringVar()
+        self.output_dir_xray = tk.StringVar()
+    else:
+        self.xds_dir = tk.StringVar()
+        self.shelx_dir = tk.StringVar()
+        self.output_dir = tk.StringVar()
+    
+    # Set default directories based on the OS and mode for developer
     if os_name == 'Darwin':
         if xray:
             self.shelx_dir_xray = tk.StringVar(value='/Users/xiaodong/Downloads/SCXRD-DATA/SCXRDLTA')
@@ -37,15 +47,6 @@ def setup_main_frame(self, xray=False):
     else:
         print("Unsupported OS. This script supports only macOS and WSL.")
         return
-
-    # User settings
-    # if xray:
-    #     self.shelx_dir_xray = tk.StringVar()
-    #     self.output_dir_xray = tk.StringVar()
-    # else:
-    #     self.xds_dir = tk.StringVar()
-    #     self.shelx_dir = tk.StringVar()
-    #     self.output_dir = tk.StringVar()
 
     # Common inputs
     self.crystal_name = tk.StringVar()
@@ -173,41 +174,3 @@ def setup_main_frame(self, xray=False):
     # Back to Welcome Frame Button
     self.back_btn = ttk.Button(input_frame, text="Back to Start Frame", command=self.show_welcome_frame)
     self.back_btn.grid(row=13, column=0, columnspan=10, pady=(10,5))
-
-def toggle_steps(self):
-    state = tk.NORMAL if self.include_steps.get() else tk.DISABLED
-    self.step_mode_size.config(state=state)
-    self.step_mode_num.config(state=state)
-    self.step_mode_custom.config(state=state)
-    self.toggle_step_mode()
-
-def toggle_step_mode(self):
-    if not self.include_steps.get():
-        self.step_size_label.grid_remove()
-        self.step_size_entry.grid_remove()
-        self.num_steps_label.grid_remove()
-        self.num_steps_entry.grid_remove()
-        self.custom_steps_label.grid_remove()
-        self.custom_steps_entry.grid_remove()
-    else:
-        if self.step_mode.get() == "size":
-            self.step_size_label.grid()
-            self.step_size_entry.grid()
-            self.num_steps_label.grid_remove()
-            self.num_steps_entry.grid_remove()
-            self.custom_steps_label.grid_remove()
-            self.custom_steps_entry.grid_remove()
-        elif self.step_mode.get() == "num":
-            self.step_size_label.grid_remove()
-            self.step_size_entry.grid_remove()
-            self.num_steps_label.grid()
-            self.num_steps_entry.grid()
-            self.custom_steps_label.grid_remove()
-            self.custom_steps_entry.grid_remove()
-        elif self.step_mode.get() == "custom":
-            self.step_size_label.grid_remove()
-            self.step_size_entry.grid_remove()
-            self.num_steps_label.grid_remove()
-            self.num_steps_entry.grid_remove()
-            self.custom_steps_label.grid()
-            self.custom_steps_entry.grid()

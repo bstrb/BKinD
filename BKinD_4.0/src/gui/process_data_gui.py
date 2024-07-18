@@ -69,7 +69,7 @@ def process_data_gui(self, xray=False):
                                 shutil.rmtree(output_folder)
                                 raise InvalidCompletenessError(start_completeness, step)
 
-                    target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
+                    target_percentages = create_percentage_list(0, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
 
                     if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
                         dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
@@ -94,7 +94,7 @@ def process_data_gui(self, xray=False):
                             shutil.rmtree(output_folder)
                             raise InvalidCompletenessError(start_completeness, step)
 
-                target_percentages = create_percentage_list(start_completeness, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
+                target_percentages = create_percentage_list(0, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
 
                 if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
                     dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)

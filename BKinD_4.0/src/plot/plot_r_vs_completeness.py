@@ -90,7 +90,7 @@ def plot_R1_Rint_vs_completeness(output_folder):
                             hoverinfo='text+x'))
 
     # Set x-axis title
-    fig.update_xaxes(title_text='Target Completeness (%)', autorange="reversed")
+    fig.update_xaxes(title_text='Target Completeness (%)')#, autorange="reversed")
 
     # Set y-axes titles and apply font sizes
     fig.update_layout(

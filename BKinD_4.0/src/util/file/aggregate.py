@@ -35,15 +35,15 @@ def aggregate_filtered(output_folder, target_percentages):
             print(f"No filtered file found for {target}%.")
 
     # Find the remaining data from the subfolder with the lowest target percentage
-    lowest_target = min(target_percentages)
-    lowest_folder = os.path.join(output_folder, f"filtered_{lowest_target}")
-    # lowest_folder = os.path.join(output_folder, f"removed_data{lowest_target}")
-    remaining_data_file_path = os.path.join(lowest_folder, 'remaining_data.csv')
+    highest_target = max(target_percentages)
+    highest_folder = os.path.join(output_folder, f"filtered_{highest_target}")
+    # highest_folder = os.path.join(output_folder, f"removed_data{highest_target}")
+    remaining_data_file_path = os.path.join(highest_folder, 'remaining_data.csv')
 
     if os.path.exists(remaining_data_file_path):
         df_remaining = pd.read_csv(remaining_data_file_path)
         # Optionally, save the remaining data in the aggregated folder
         df_remaining.to_csv(os.path.join(aggregate_folder, f"remaining_data.csv"), index=False)
     else:
-        print(f"No remaining data file found for the lowest target percentage {lowest_target}%.")
+        print(f"No remaining data file found for the lowest target percentage {highest_target}%.")
     return aggregate_folder

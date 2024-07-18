@@ -57,7 +57,7 @@ def plot_DFM_vs_Frame(output_folder):
     fig = px.scatter(combined_df, x='zobs', y='DFM', color='Source', 
                      title='DFM vs Frame Number for Filtered Data. Click the labels in the legend to hide/unhide data sets.', 
                      labels={'zobs': 'Frame', 'DFM': 'DFM'},
-                     category_orders={"Source": sorted(combined_df['Source'].unique(), reverse=True)})
+                     category_orders={"Source": sorted(combined_df['Source'].unique(), reverse=False)})
     
     fig.update_traces(marker=dict(size=8, line=dict(width=0,
                                                     color='DarkSlateGrey')),

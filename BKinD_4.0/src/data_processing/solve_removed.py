@@ -24,6 +24,8 @@ from ed.copy_and_reduce_hkl import copy_and_reduce_hkl
 # X-ray Imports
 from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
+from util.test.compare_atomic_positions.cap_util import process_files
+
 def solve_removed(output_folder, target_percentages, xds_directory, xray, update_progress=None):
     sgs = extract_space_group_symbol_from_cif(output_folder)
     def process_target(target, target_directory):
@@ -45,6 +47,10 @@ def solve_removed(output_folder, target_percentages, xds_directory, xray, update
         rem_merg_zero(target_directory)
 
         run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
+        file_name_res_orig = os.path.join(output_folder,'bkind_a.res')
+        file_name_res = os.path.join(target_directory, f'removed_data_{target}_a.res')
+        results, mean_difference = process_files(file_name_res_orig, file_name_res)
+        print(mean_difference)
 
     for i, target in enumerate(tqdm(target_percentages, desc="Solving Structure for Removed Data")):
         # target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered_{target}')

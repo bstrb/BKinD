@@ -33,8 +33,8 @@ def setup_main_frame(self, xray=False):
             self.shelx_dir_xray = tk.StringVar(value='/Users/xiaodong/Downloads/SCXRD-DATA/SCXRDLTA')
             self.output_dir_xray = tk.StringVar(value='/Users/xiaodong/Desktop')
         else:
-            self.xds_dir = tk.StringVar(value="/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA4/xds")
-            self.shelx_dir = tk.StringVar(value='/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA4/shelx')
+            self.xds_dir = tk.StringVar(value="/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA1/xds")
+            self.shelx_dir = tk.StringVar(value='/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA1/shelx')
             self.output_dir = tk.StringVar(value='/Users/xiaodong/Desktop')
     elif os_name == 'Linux' and 'microsoft' in platform.uname().release.lower():
         if xray:

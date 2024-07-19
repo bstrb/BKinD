@@ -15,7 +15,7 @@ from data_processing.solve_remaining import solve_remaining
 # GUI Imports
 from gui.multi_progress_bar_window import MultiProgressBarWindow
 
-def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_directory=None, xray=False):
+def process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_removed, run_solve_remaining, xds_directory=None, xray=False):
     root = tk.Tk()
     root.title("Progress")
 
@@ -24,7 +24,7 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
         'Filtering Away Extreme Data': len(target_percentages),
         'Processing Filtering Results': len(target_percentages),
     }
-    if run_solve_filtered:
+    if run_solve_removed:
         tasks['Solving Structure for Removed Data'] = len(target_percentages)
     if run_solve_remaining:
         tasks['Solving Structure for Remaining Data'] = len(target_percentages)
@@ -43,7 +43,7 @@ def process_data(output_folder, target_percentages, filtering_percentage, run_re
         filter(output_folder, target_percentages, filtering_percentage, update_progress=update_progress)
         process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
 
-        if run_solve_filtered:
+        if run_solve_removed:
             solve_removed(output_folder, target_percentages, xds_directory, xray, update_progress=update_progress)
 
         if run_solve_remaining:

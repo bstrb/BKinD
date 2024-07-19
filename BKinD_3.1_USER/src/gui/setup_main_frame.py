@@ -26,7 +26,7 @@ def setup_main_frame(self, xray=False):
         self.xds_dir = tk.StringVar()
         self.shelx_dir = tk.StringVar()
         self.output_dir = tk.StringVar()
-    
+     
     # Set default directories based on the OS and mode for developer
     # if os_name == 'Darwin':
     #     if xray:

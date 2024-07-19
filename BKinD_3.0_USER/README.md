@@ -7,14 +7,20 @@ This guide is divided into the following sections:
 System Requirements (These must be manually installed by the user prior to running the script; otherwise, the script will terminate and display an error message)
 
    1. Instructions to Install Conda
-   2. Instructions to Install SHELXL
+   2. Instructions to Install SHELX
    3. Instructions for Setting Up XDS
 
-When these are installed you can run the application by navigating to BKinD folder (using your preferred conda environment and making sure that shelxl and xds are runnable)
+When these are installed you can run the application by navigating to BKinD folder
 
 	cd path/to/BKinD
 
-and run the application using
+and run the application using (making sure that shelx and xds are runnable)
+
+./setup_and_run.sh
+
+The bash script will activate the conda environment if it already exists, or create and activate it if necessary, and then run the program.
+
+This can also be done using your preferred conda environment with
 
 	python bkind.py (python3 bkind.py for python versions 3.X.X)
 

@@ -46,7 +46,7 @@ def process_data_gui(self, xray=False):
         input_ok = False
 
     run_refine_wght = self.wght_refinement_var.get()
-    run_solve_filtered = self.solve_filtered_var.get()
+    run_solve_removed = self.solve_filtered_var.get()
     run_solve_remaining = self.solve_remaining_var.get()
 
     if input_ok:
@@ -56,7 +56,7 @@ def process_data_gui(self, xray=False):
             if os.path.exists(output_folder):
                 user_choice = show_option_dialog(self.root, self.style)
                 if user_choice == 'redo':
-                    prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray)
+                    prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, run_solve_remaining, xds_dir, xray)
 
                     start_completeness = compute_start_completeness(output_folder)
 
@@ -71,7 +71,7 @@ def process_data_gui(self, xray=False):
 
                     target_percentages = create_percentage_list(0, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
 
-                    if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
+                    if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_removed, run_solve_remaining, xds_dir, xray):
                         dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
                         self.root.wait_window(dlg)
 
@@ -81,7 +81,7 @@ def process_data_gui(self, xray=False):
                 elif user_choice == 'cancel':
                     pass
             else:
-                prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray)
+                prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, run_solve_remaining, xds_dir, xray)
 
                 start_completeness = compute_start_completeness(output_folder)
 
@@ -96,7 +96,7 @@ def process_data_gui(self, xray=False):
 
                 target_percentages = create_percentage_list(0, completeness, step_size, num_steps, step_mode, custom_steps, include_steps)
 
-                if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_filtered, run_solve_remaining, xds_dir, xray):
+                if process_data(output_folder, target_percentages, filtering_percentage, run_refine_wght, run_solve_removed, run_solve_remaining, xds_dir, xray):
                     dlg = PostProcessDialog(self.root, output_folder, self.style, DFM_plot=not xray)
                     self.root.wait_window(dlg)
 

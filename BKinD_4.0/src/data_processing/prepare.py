@@ -21,7 +21,7 @@ from util.process.run_process import run_process
 
 from util.read.extract_space_group_symbol_from_cif import extract_space_group_symbol_from_cif
 
-def prepare(shelx_directory, output_dir, crystal_name, target_completeness, xds_directory=None, xray=False, update_progress=None):
+def prepare(shelx_directory, output_dir, crystal_name, target_completeness, run_solve_remaining, xds_directory=None, xray=False, update_progress=None):
     """
     Prepares files and folders for processing based on the specified parameters.
     
@@ -65,8 +65,9 @@ def prepare(shelx_directory, output_dir, crystal_name, target_completeness, xds_
             run_process(["shelxl"], output_folder, input_file='.ins', suppress_output=True)
 
         elif step == "Running SHELXT":
-            sgs = extract_space_group_symbol_from_cif(output_folder)
-            run_process(["shelxt"], output_folder, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
+            if run_solve_remaining:
+                sgs = extract_space_group_symbol_from_cif(output_folder)
+                run_process(["shelxt"], output_folder, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
 
         elif step == "Processing Sample Data":
             process_sample_data(output_folder, xray)

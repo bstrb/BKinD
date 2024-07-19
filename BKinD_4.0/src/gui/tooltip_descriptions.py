@@ -12,7 +12,8 @@ TOOLTIP_SHELX_DIR = {
 }
 
 TOOLTIP_OUTPUT_DIR = """Please specify the directory where you would like the output folder to be created.
-All generated files and results will be saved in this location. Ensure that the file path is appropriate and contains no spaces to avoid errors when accessing the resulting files."""
+All generated files and results will be saved in this location. Ensure that the file path
+is appropriate and contains no spaces to avoid errors when accessing the resulting files."""
 
 TOOLTIP_COMPLETENESS = """Description:
 This parameter specifies the target final completeness level 
@@ -64,4 +65,8 @@ This process continues until the WGHT factor stabilizes or a maximum of 10 itera
 
 TOOLTIP_SOLVE_FILTERED = """Description: 
 When enabled, the program will use SHELXT to solve the structure for the data filtered away.
-The resulting files are found in the subfolder solve_filtered."""
+The resulting files are found in the subfolder removed_data_completeness."""
+
+TOOLTIP_SOLVE_REMAINING = """Description: 
+When enabled, the program will use SHELXT to solve the structure for the data filtered away.
+The resulting files are found in the subfolder filtered_completeness."""

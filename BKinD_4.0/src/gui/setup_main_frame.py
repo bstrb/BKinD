@@ -165,7 +165,7 @@ def setup_main_frame(self, xray=False):
     wght_label.pack(side="left", padx=(0, 10))  # Padding to add space between label and checkbox
     self.solve_remaining_var_button = ttk.Checkbutton(solve_remaining, variable=self.solve_remaining_var)
     self.solve_remaining_var_button.pack(side="left")
-    self.create_tooltip(solve_remaining, TOOLTIP_SOLVE_FILTERED)
+    self.create_tooltip(solve_remaining, TOOLTIP_SOLVE_REMAINING)
 
     # Filter Data Button
     self.process_btn = ttk.Button(input_frame, text="Filter 3DED Data" if not xray else "Filter Merged 3DED/SCXRD Data", command=lambda: self.process_data_gui(xray))

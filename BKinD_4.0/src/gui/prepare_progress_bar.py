@@ -7,7 +7,7 @@ from threading import Thread
 # Data Processing Imports
 from data_processing.prepare import prepare
 
-def prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray):
+def prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness, run_solve_remaining, xds_dir, xray):
     # Create a new window for the progress bar
     progress_window = Toplevel(self.root)
     progress_window.title("Preparing Data")
@@ -22,7 +22,7 @@ def prepare_progress_bar(self, shelx_dir, output_dir, crystal_name, completeness
         progress_window.update_idletasks()
 
     def run_tasks():
-        prepare(shelx_dir, output_dir, crystal_name, completeness, xds_dir, xray, update_progress)
+        prepare(shelx_dir, output_dir, crystal_name, completeness, run_solve_remaining, xds_dir, xray, update_progress)
         # Signal that tasks are done
         progress_window.quit()
 

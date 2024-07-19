@@ -56,7 +56,7 @@ def solve_removed(output_folder, target_percentages, xds_directory, xray, update
         with open(stats_filename, 'a') as file:
             file.write("-------------------------\n")
             file.write("-------------------------\n") 
-            file.write(f"Atomic Position Comparison for Structure Solition\n")
+            file.write(f"Atomic Position Comparison for Structure Solution\n")
             file.write(f"Removed Data with  {target} % Completeness\n {results}\n")
 
     for i, target in enumerate(tqdm(target_percentages, desc="Solving Structure for Removed Data")):

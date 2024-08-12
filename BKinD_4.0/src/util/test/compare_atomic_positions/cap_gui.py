@@ -1,3 +1,5 @@
+# %%
+
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
@@ -52,3 +54,5 @@ text_results.grid(row=2, column=0, pady=10)
 
 # Start the main event loop
 root.mainloop()
+
+# %%

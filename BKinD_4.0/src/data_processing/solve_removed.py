@@ -47,17 +47,18 @@ def solve_removed(output_folder, target_percentages, xds_directory, xray, update
         rem_merg_zero(target_directory)
 
         run_process(["shelxt"], target_directory, input_file='.ins', suppress_output=True, additional_command=f'-s{sgs}')
-        file_name_res_orig = os.path.join(output_folder,'bkind_a.res')
-        file_name_res = os.path.join(target_directory, f'removed_data_{target}_a.res')
-        results, mean_difference = process_files(file_name_res_orig, file_name_res)
+        
+        # file_name_res_orig = os.path.join(output_folder,'bkind_a.res')
+        # file_name_res = os.path.join(target_directory, f'removed_data_{target}_a.res')
+        # results, mean_difference = process_files(file_name_res_orig, file_name_res)
         # print(mean_difference)
 
-        stats_filename = os.path.join(output_folder,"atomic_position_comparison.txt")
-        with open(stats_filename, 'a') as file:
-            file.write("-------------------------\n")
-            file.write("-------------------------\n") 
-            file.write(f"Atomic Position Comparison for Structure Solution\n")
-            file.write(f"Removed Data with  {target} % Completeness\n {results}\n")
+        # stats_filename = os.path.join(output_folder,"atomic_position_comparison.txt")
+        # with open(stats_filename, 'a') as file:
+        #     file.write("-------------------------\n")
+        #     file.write("-------------------------\n") 
+        #     file.write(f"Atomic Position Comparison for Structure Solution\n")
+        #     file.write(f"Removed Data with  {target} % Completeness\n {results}\n")
 
     for i, target in enumerate(tqdm(target_percentages, desc="Solving Structure for Removed Data")):
         # target_directory = os.path.join(output_folder, f'filtered_{target}/solve_filtered_{target}')

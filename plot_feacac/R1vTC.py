@@ -1,3 +1,5 @@
+# %%
+
 import matplotlib.pyplot as plt
 import re
 
@@ -46,23 +48,21 @@ def plot_data(datasets, labels, annotations):
     plt.show()
 
 # Example usage
-file_paths = ['LTA1.txt', 'LTA2.txt', 'LTA3.txt', 'LTA4.txt', 'FEACAC13.txt', 'FEACACm.txt']
-labels = ['LTA1', 'LTA2', 'LTA3', 'LTA4', 'FEACAC13', 'FEACAC merged']
+file_paths = ['FEACAC11.txt','FEACAC12.txt','FEACAC13.txt', 'FEACACm.txt']
+labels = ['FEACAC11','FEACAC12','FEACAC13', 'FEACAC merged']
 
 # Extract data for each dataset
 datasets = [extract_data_from_file(file_path) for file_path in file_paths]
 
 # Annotations (You can adjust these based on the content)
 annotations = [
-('LTA1: Structure Solvable for\nRemaining Data with 64.3% Completeness', (96.9, 0.1396), (96, 0.32)),
-    ('LTA2: Structure Solvable for\nRemaining Data with 70.0% Completeness', (96.5, 0.1331), (91, 0.28)),
-    ('LTA3: Structure Solvable for\nRemaining Data with 81.7% Completeness', (95.5, 0.1447), (87, 0.23)),
-    ('LTA4: Structure Solvable for\nRemaining Data with 88.2% Completeness', (94.0, 0.1684), (85, 0.19)),
     ('FEACAC13: Structure Solvable for\nRemaining Data with 40.6% Completeness', (83.5, 0.135), (81.5, 0.16)),
     ('FEACAC merged: Structure Solvable for\nRemaining Data with 74.6% Completeness', (90.0, 0.08), (83.7, 0.07))
 ]
 
-# annotations = []
+annotations = []
 
 # Plot the data
 plot_data(datasets, labels, annotations)
+
+# %%

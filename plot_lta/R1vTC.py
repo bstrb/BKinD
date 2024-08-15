@@ -1,3 +1,5 @@
+# %%
+# 
 import matplotlib.pyplot as plt
 import re
 
@@ -54,11 +56,13 @@ datasets = [extract_data_from_file(file_path) for file_path in file_paths]
 
 # Annotations (You can adjust these based on the content)
 annotations = [
-('LTA1: Structure Solvable for\nRemaining Data with 64.3% Completeness', (96.9, 0.1396), (96.9, 0.32)),
-    ('LTA2: Structure Solvable for\nRemaining Data with 70.0% Completeness', (96.5, 0.1331), (94.5, 0.28)),
-    ('LTA3: Structure Solvable for\nRemaining Data with 81.7% Completeness', (95.5, 0.1447), (93, 0.23)),
-    ('LTA4: Structure Solvable for\nRemaining Data with 88.2% Completeness', (94.0, 0.1684), (91.7, 0.18))
+('LTA1: Structure Solvable for\nRemoved Data with 59.0% Completeness', (97, 0.1396), (96.9, 0.32)),
+    ('LTA2: Structure Solvable for\nRemoved Data with 67.5% Completeness', (96.7, 0.1331), (94.5, 0.28)),
+    ('LTA3: Structure Solvable for\nRemoved Data with 83.3% Completeness', (95.3, 0.1447), (93, 0.23)),
+    ('LTA4: Structure Solvable for\nRemoved Data with 89.5% Completeness', (93.8, 0.1684), (91.7, 0.19))
 ]
 
 # Plot the data
 plot_data(datasets, labels, annotations)
+
+# %%

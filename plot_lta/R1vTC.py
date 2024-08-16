@@ -48,18 +48,19 @@ def plot_data(datasets, labels, annotations):
     plt.show()
 
 # Example usage
-file_paths = ['LTA1.txt', 'LTA2.txt', 'LTA3.txt', 'LTA4.txt']
-labels = ['LTA1', 'LTA2', 'LTA3', 'LTA4']
+file_paths = ['LTA1.txt', 'LTA2.txt', 'LTA3.txt', 'LTA4.txt', 'LTA_SCXRD.txt']
+labels = ['LTA1', 'LTA2', 'LTA3', 'LTA4', 'LTA-SCXRD']
 
 # Extract data for each dataset
 datasets = [extract_data_from_file(file_path) for file_path in file_paths]
 
 # Annotations (You can adjust these based on the content)
 annotations = [
-('LTA1: Structure Solvable for\nRemoved Data with 59.0% Completeness', (97, 0.1396), (96.9, 0.32)),
-    ('LTA2: Structure Solvable for\nRemoved Data with 67.5% Completeness', (96.7, 0.1331), (94.5, 0.28)),
-    ('LTA3: Structure Solvable for\nRemoved Data with 83.3% Completeness', (95.3, 0.1447), (93, 0.23)),
-    ('LTA4: Structure Solvable for\nRemoved Data with 89.5% Completeness', (93.8, 0.1684), (91.7, 0.19))
+('LTA1: Structure Solvable for\nRemoved Data with 59.0% Completeness', (97, 0.1396), (97, 0.32)),
+    ('LTA2: Structure Solvable for\nRemoved Data with 67.5% Completeness', (96.7, 0.137), (94.5, 0.28)),
+    ('LTA3: Structure Solvable for\nRemoved Data with 83.3% Completeness', (95.3, 0.14), (93, 0.23)),
+    ('LTA4: Structure Solvable for\nRemoved Data with 89.5% Completeness', (93.8, 0.1654), (91.7, 0.19)),
+    ('LTA-SCXRD: Structure Solvable for\nRemoved Data with 43.2% Completeness', (98.8, 0.035), (97.8, 0.08))
 ]
 
 # Plot the data

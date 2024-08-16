@@ -56,11 +56,13 @@ datasets = [extract_data_from_file(file_path) for file_path in file_paths]
 
 # Annotations (You can adjust these based on the content)
 annotations = [
-    ('FEACAC13: Structure Solvable for\nRemaining Data with 40.6% Completeness', (83.5, 0.135), (81.5, 0.16)),
-    ('FEACAC merged: Structure Solvable for\nRemaining Data with 74.6% Completeness', (90.0, 0.08), (83.7, 0.07))
+    ('FEACAC11: Structure Solvable for\nRemoved Data with 50.3% Completeness', (73, 0.11), (74, 0.04)),
+    ('FEACAC12: Structure Solvable for\nRemoved Data with 49.5% Completeness', (78.5, 0.12), (78.2, 0.065)),
+    ('FEACAC13: Structure Solvable for\nRemoved Data with 37.7% Completeness', (83.8, 0.135), (84.5, 0.09)),
+    ('FEACAC merged: Structure Solvable for\nRemoved Data with 74.6% Completeness', (91, 0.1579), (85, 0.19))
 ]
 
-annotations = []
+# annotations = []
 
 # Plot the data
 plot_data(datasets, labels, annotations)

@@ -1,3 +1,5 @@
+# %%
+
 import matplotlib.pyplot as plt
 import re
 import os
@@ -36,11 +38,13 @@ def plot_data(datasets, labels):
     plt.show()
 
 # Example usage
-file_paths = ['LTA1.txt','LTA1_atom_removed.txt']  # Add more file names if you have multiple datasets
-labels = ['LTA1','LTA1 atom removed']  # Corresponding labels for each file
+file_paths = ['STW1.txt','STW1ar.txt']  # Add more file names if you have multiple datasets
+labels = ['STW1','STW1 atom removed']  # Corresponding labels for each file
 
 # Extract data for each dataset
 datasets = [extract_data_from_file(file_path) for file_path in file_paths]
 
 # Plot the data
 plot_data(datasets, labels)
+
+# %%

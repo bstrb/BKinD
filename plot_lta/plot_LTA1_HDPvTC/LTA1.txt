@@ -1,0 +1,248 @@
+Filtering Diffraction Data for Crystal LTA1 to 90.0 % Completeness
+Space Group Number: 221 Space Group Symbol:'Pm-3m'
+Unit Cell Parameters: [11.9, 11.9, 11.9, 90.0, 90.0, 90.0]
+Optimal Instability Factor (u): 0.00644
+Original Data Count: 14373
+Initial Completeness: 99.4299 %
+-------------------------
+-------------------------
+Target Completeness: 99.43 %
+Resulting Completeness: 99.4 %
+Completeness of Data Filtered Away: 0.0 %
+Number of Iterations: 0
+Resulting Data Percentage: 100.00 %
+Resulting Data Count: 14373
+Remaining Unique 'asu' Counts: 872
+Resulting Average Multiplicity: 16.5
+R1: 0.2288, Rint: 0.2824, FVAR: 27.8, Number of NPD's: 0.0
+Highest Diff Peak: 0.485, Deepest Hole: -0.694, One Sigma Level: 0.163
+-------------------------
+-------------------------
+Target Completeness: 99.0 %
+Resulting Completeness: 98.7 %
+Completeness of Data Filtered Away: 5.5 %
+Number of Iterations: 2
+Resulting Data Percentage: 99.79 %
+Resulting Data Count: 14343
+Remaining Unique 'asu' Counts: 866
+Resulting Average Multiplicity: 16.6
+R1: 0.1827, Rint: 0.2836, FVAR: 34.5, Number of NPD's: 0.0
+Highest Diff Peak: 0.273, Deepest Hole: -0.466, One Sigma Level: 0.074
+-------------------------
+-------------------------
+Target Completeness: 98.5 %
+Resulting Completeness: 98.4 %
+Completeness of Data Filtered Away: 4.6 %
+Number of Iterations: 4
+Resulting Data Percentage: 99.58 %
+Resulting Data Count: 14313
+Remaining Unique 'asu' Counts: 863
+Resulting Average Multiplicity: 16.6
+R1: 0.1701, Rint: 0.2667, FVAR: 36.3, Number of NPD's: 0.0
+Highest Diff Peak: 0.257, Deepest Hole: -0.467, One Sigma Level: 0.06
+-------------------------
+-------------------------
+Target Completeness: 98.0 %
+Resulting Completeness: 97.9 %
+Completeness of Data Filtered Away: 20.0 %
+Number of Iterations: 20
+Resulting Data Percentage: 97.91 %
+Resulting Data Count: 14073
+Remaining Unique 'asu' Counts: 859
+Resulting Average Multiplicity: 16.4
+R1: 0.1636, Rint: 0.2408, FVAR: 38.3, Number of NPD's: 0.0
+Highest Diff Peak: 0.266, Deepest Hole: -0.466, One Sigma Level: 0.059
+-------------------------
+-------------------------
+Target Completeness: 97.5 %
+Resulting Completeness: 97.5 %
+Completeness of Data Filtered Away: 26.6 %
+Number of Iterations: 32
+Resulting Data Percentage: 96.71 %
+Resulting Data Count: 13900
+Remaining Unique 'asu' Counts: 855
+Resulting Average Multiplicity: 16.3
+R1: 0.1579, Rint: 0.2294, FVAR: 37.9, Number of NPD's: 0.0
+Highest Diff Peak: 0.302, Deepest Hole: -0.487, One Sigma Level: 0.06
+-------------------------
+-------------------------
+Target Completeness: 97.0 %
+Resulting Completeness: 96.9 %
+Completeness of Data Filtered Away: 59.7 %
+Number of Iterations: 114
+Resulting Data Percentage: 88.84 %
+Resulting Data Count: 12769
+Remaining Unique 'asu' Counts: 850
+Resulting Average Multiplicity: 15.0
+R1: 0.1396, Rint: 0.1965, FVAR: 40.5, Number of NPD's: 0.0
+Highest Diff Peak: 0.179, Deepest Hole: -0.432, One Sigma Level: 0.055
+-------------------------
+-------------------------
+Target Completeness: 96.5 %
+Resulting Completeness: 96.5 %
+Completeness of Data Filtered Away: 72.7 %
+Number of Iterations: 175
+Resulting Data Percentage: 83.33 %
+Resulting Data Count: 11977
+Remaining Unique 'asu' Counts: 846
+Resulting Average Multiplicity: 14.2
+R1: 0.1248, Rint: 0.1847, FVAR: 42.0, Number of NPD's: 0.0
+Highest Diff Peak: 0.19, Deepest Hole: -0.388, One Sigma Level: 0.051
+-------------------------
+-------------------------
+Target Completeness: 96.0 %
+Resulting Completeness: 95.9 %
+Completeness of Data Filtered Away: 81.9 %
+Number of Iterations: 245
+Resulting Data Percentage: 77.49 %
+Resulting Data Count: 11137
+Remaining Unique 'asu' Counts: 841
+Resulting Average Multiplicity: 13.2
+R1: 0.1127, Rint: 0.1673, FVAR: 41.4, Number of NPD's: 0.0
+Highest Diff Peak: 0.177, Deepest Hole: -0.355, One Sigma Level: 0.046
+-------------------------
+-------------------------
+Target Completeness: 95.5 %
+Resulting Completeness: 95.4 %
+Completeness of Data Filtered Away: 93.3 %
+Number of Iterations: 447
+Resulting Data Percentage: 62.62 %
+Resulting Data Count: 9001
+Remaining Unique 'asu' Counts: 837
+Resulting Average Multiplicity: 10.8
+R1: 0.0936, Rint: 0.1326, FVAR: 39.9, Number of NPD's: 0.0
+Highest Diff Peak: 0.176, Deepest Hole: -0.335, One Sigma Level: 0.043
+-------------------------
+-------------------------
+Target Completeness: 95.0 %
+Resulting Completeness: 95.0 %
+Completeness of Data Filtered Away: 95.7 %
+Number of Iterations: 505
+Resulting Data Percentage: 58.99 %
+Resulting Data Count: 8478
+Remaining Unique 'asu' Counts: 833
+Resulting Average Multiplicity: 10.2
+R1: 0.0897, Rint: 0.1227, FVAR: 41.0, Number of NPD's: 0.0
+Highest Diff Peak: 0.193, Deepest Hole: -0.289, One Sigma Level: 0.042
+-------------------------
+-------------------------
+Target Completeness: 94.5 %
+Resulting Completeness: 94.4 %
+Completeness of Data Filtered Away: 97.0 %
+Number of Iterations: 624
+Resulting Data Percentage: 51.99 %
+Resulting Data Count: 7472
+Remaining Unique 'asu' Counts: 828
+Resulting Average Multiplicity: 9.0
+R1: 0.0848, Rint: 0.1088, FVAR: 41.0, Number of NPD's: 0.0
+Highest Diff Peak: 0.204, Deepest Hole: -0.317, One Sigma Level: 0.043
+-------------------------
+-------------------------
+Target Completeness: 94.0 %
+Resulting Completeness: 94.0 %
+Completeness of Data Filtered Away: 97.5 %
+Number of Iterations: 711
+Resulting Data Percentage: 47.33 %
+Resulting Data Count: 6803
+Remaining Unique 'asu' Counts: 824
+Resulting Average Multiplicity: 8.3
+R1: 0.083, Rint: 0.097, FVAR: 41.2, Number of NPD's: 0.0
+Highest Diff Peak: 0.216, Deepest Hole: -0.332, One Sigma Level: 0.042
+-------------------------
+-------------------------
+Target Completeness: 93.5 %
+Resulting Completeness: 93.4 %
+Completeness of Data Filtered Away: 98.3 %
+Number of Iterations: 778
+Resulting Data Percentage: 44.07 %
+Resulting Data Count: 6334
+Remaining Unique 'asu' Counts: 819
+Resulting Average Multiplicity: 7.7
+R1: 0.079, Rint: 0.0939, FVAR: 41.7, Number of NPD's: 0.0
+Highest Diff Peak: 0.222, Deepest Hole: -0.317, One Sigma Level: 0.039
+-------------------------
+-------------------------
+Target Completeness: 93.0 %
+Resulting Completeness: 92.9 %
+Completeness of Data Filtered Away: 98.1 %
+Number of Iterations: 818
+Resulting Data Percentage: 42.12 %
+Resulting Data Count: 6054
+Remaining Unique 'asu' Counts: 815
+Resulting Average Multiplicity: 7.4
+R1: 0.0783, Rint: 0.0906, FVAR: 42.0, Number of NPD's: 0.0
+Highest Diff Peak: 0.217, Deepest Hole: -0.322, One Sigma Level: 0.039
+-------------------------
+-------------------------
+Target Completeness: 92.5 %
+Resulting Completeness: 92.5 %
+Completeness of Data Filtered Away: 98.3 %
+Number of Iterations: 871
+Resulting Data Percentage: 39.85 %
+Resulting Data Count: 5728
+Remaining Unique 'asu' Counts: 811
+Resulting Average Multiplicity: 7.1
+R1: 0.0783, Rint: 0.0849, FVAR: 42.0, Number of NPD's: 0.0
+Highest Diff Peak: 0.219, Deepest Hole: -0.281, One Sigma Level: 0.039
+-------------------------
+-------------------------
+Target Completeness: 92.0 %
+Resulting Completeness: 91.9 %
+Completeness of Data Filtered Away: 98.7 %
+Number of Iterations: 919
+Resulting Data Percentage: 37.85 %
+Resulting Data Count: 5440
+Remaining Unique 'asu' Counts: 806
+Resulting Average Multiplicity: 6.7
+R1: 0.0788, Rint: 0.0827, FVAR: 41.2, Number of NPD's: 0.0
+Highest Diff Peak: 0.194, Deepest Hole: -0.279, One Sigma Level: 0.039
+-------------------------
+-------------------------
+Target Completeness: 91.5 %
+Resulting Completeness: 91.4 %
+Completeness of Data Filtered Away: 99.0 %
+Number of Iterations: 940
+Resulting Data Percentage: 36.97 %
+Resulting Data Count: 5314
+Remaining Unique 'asu' Counts: 802
+Resulting Average Multiplicity: 6.6
+R1: 0.0796, Rint: 0.082, FVAR: 41.1, Number of NPD's: 0.0
+Highest Diff Peak: 0.194, Deepest Hole: -0.275, One Sigma Level: 0.039
+-------------------------
+-------------------------
+Target Completeness: 91.0 %
+Resulting Completeness: 91.0 %
+Completeness of Data Filtered Away: 99.1 %
+Number of Iterations: 952
+Resulting Data Percentage: 36.47 %
+Resulting Data Count: 5242
+Remaining Unique 'asu' Counts: 798
+Resulting Average Multiplicity: 6.6
+R1: 0.0791, Rint: 0.0808, FVAR: 42.9, Number of NPD's: 0.0
+Highest Diff Peak: 0.211, Deepest Hole: -0.289, One Sigma Level: 0.038
+-------------------------
+-------------------------
+Target Completeness: 90.5 %
+Resulting Completeness: 90.4 %
+Completeness of Data Filtered Away: 99.2 %
+Number of Iterations: 994
+Resulting Data Percentage: 34.72 %
+Resulting Data Count: 4991
+Remaining Unique 'asu' Counts: 793
+Resulting Average Multiplicity: 6.3
+R1: 0.0757, Rint: 0.0794, FVAR: 43.6, Number of NPD's: 0.0
+Highest Diff Peak: 0.202, Deepest Hole: -0.21, One Sigma Level: 0.024
+-------------------------
+-------------------------
+Target Completeness: 90.0 %
+Resulting Completeness: 90.0 %
+Completeness of Data Filtered Away: 99.2 %
+Number of Iterations: 1045
+Resulting Data Percentage: 32.95 %
+Resulting Data Count: 4736
+Remaining Unique 'asu' Counts: 789
+Resulting Average Multiplicity: 6.0
+R1: 0.0776, Rint: 0.0775, FVAR: 43.6, Number of NPD's: 0.0
+Highest Diff Peak: 0.223, Deepest Hole: -0.218, One Sigma Level: 0.024
+-------------------------
+-------------------------

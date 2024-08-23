@@ -2,13 +2,15 @@
 
 # Standard Library Imports
 import os
+import re
 
 # File Imports
 from util.file.find_file import find_file
 
 def lock_atom_positions(directory):
     """
-    Modifies the .ins file in the specified directory by adding 10 to the x, y, and z coordinates of atom positions.
+    Modifies the .ins file in the specified directory by adding 10 to the x, y, and z coordinates of atom positions,
+    while leaving lines starting with ZERR, HKLF, or QXX (where XX is any number) untouched.
 
     Parameters:
     - directory: str, the directory containing the .ins file to be modified.
@@ -28,8 +30,8 @@ def lock_atom_positions(directory):
 
     with open(ins_file_path, 'w') as ins_file:
         for line in lines:
-            # Skip lines starting with ZERR or Q1
-            if line.strip().startswith("ZERR") or line.strip().startswith("Q1"):
+            # Skip lines starting with ZERR, HKLF, or QXX (where XX is any number)
+            if line.strip().startswith("ZERR") or line.strip().startswith("HKLF") or re.match(r'^Q\d{1,2}', line.strip()):
                 ins_file.write(line)
                 continue
 
@@ -45,7 +47,7 @@ def lock_atom_positions(directory):
                     # If the conversion fails, skip this line (this might be a non-atom line)
                     pass
 
-                 # Rebuild the line, ensuring it doesn't exceed 80 characters
+                # Rebuild the line, ensuring it doesn't exceed 80 characters
                 line = " ".join(parts)
                 if len(line) > 80:
                     line = line[:80] + "\n"

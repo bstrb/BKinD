@@ -23,7 +23,6 @@ from xray.convert_csv_to_hkl import convert_csv_to_hkl
 
 def process_filtering_results(output_folder, target_percentages, xds_directory, xray, update_progress=None):
     def process_target(target, target_directory):
-        # manage_files('move', target_directory, os.path.join(target_directory,f'solve_filtered_{target}'), 'removed_data.csv')
         manage_files('move', target_directory, os.path.join(target_directory,f'removed_data_{target}'), 'removed_data.csv')
         if xray:
             convert_csv_to_hkl(target_directory)

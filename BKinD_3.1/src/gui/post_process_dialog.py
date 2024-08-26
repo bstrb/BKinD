@@ -2,9 +2,9 @@
 
 # Standard library imports
 import os
-import shutil
-import platform
-import subprocess
+# import shutil
+# import platform
+# import subprocess
 
 # Third-party imports
 import tkinter as tk
@@ -16,6 +16,7 @@ from plot.plot_res_vs_dfm import plot_Resolution_vs_DFM
 from plot.plot_dfm_distribution import plot_DFM_distribution
 from plot.plot_r_vs_completeness import plot_R1_Rint_vs_completeness
 from plot.plot_fvar_npd_vs_completeness import plot_FVAR_NPD_vs_completeness
+from plot.interactive_plot_adp_vs_tc import interactive_plot_adp_vs_tc 
 
 # GUI Imports
 from gui.create_button import create_button
@@ -58,8 +59,9 @@ the filtering_stats.txt file located in the output folder. Please select an acti
             self.create_button("Plot DFM vs Frame Number", self.plot_data, plot_DFM_vs_Frame, "Interactive Plot of Filtered Data as DFM vs Frame Number.")
         self.create_button("Plot Resolution vs DFM", self.plot_data, plot_Resolution_vs_DFM, "Interactive Plot of Filtered Data as Resolution vs DFM.")
         self.create_button("Plot DFM Distribution", self.plot_data, plot_DFM_distribution, "Interactive Plot of Filtered Data DFM Distribution.")
-        self.create_button("Plot R1, Rint and Remaining Data Percentage vs ASU", self.plot_data, plot_R1_Rint_vs_completeness, "Plot R1 and Rint along with Remaining Data Percentage and Average Multiplicity vs Completeness.")
-        self.create_button("Plot FVAR and Number of NPD's vs ASU", self.plot_data, plot_FVAR_NPD_vs_completeness, "Plot FVAR and Number of NPDs vs Completeness.")
+        self.create_button("Plot ADP vs  Completeness", self.plot_data, interactive_plot_adp_vs_tc, "Interactive Plot of ADP of REMOVED Data vs Target Completeness.")
+        self.create_button("Plot R1, Rint and Remaining Data Percentage vs Completeness", self.plot_data, plot_R1_Rint_vs_completeness, "Plot R1 and Rint along with Remaining Data Percentage and Average Multiplicity vs Completeness.")
+        self.create_button("Plot FVAR and Number of NPD's vs Completeness", self.plot_data, plot_FVAR_NPD_vs_completeness, "Plot FVAR and Number of NPDs vs Completeness.")
         
         self.clean_output_folder_button = ttk.Button(self, text="Clean Output Folder", command=self.clean_output_folder, style="TButton")
         self.clean_output_folder_button.pack(fill='x', expand=True, padx=20, pady=5)

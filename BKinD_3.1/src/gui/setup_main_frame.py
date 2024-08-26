@@ -33,8 +33,8 @@ def setup_main_frame(self, xray=False):
             self.shelx_dir_xray = tk.StringVar(value='/Users/xiaodong/Downloads/SCXRD-DATA/SCXRDLTA')
             self.output_dir_xray = tk.StringVar(value='/Users/xiaodong/Desktop')
         else:
-            self.xds_dir = tk.StringVar(value="/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA4/xds")
-            self.shelx_dir = tk.StringVar(value='/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA4/shelx')
+            self.xds_dir = tk.StringVar(value="/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA1/xds")
+            self.shelx_dir = tk.StringVar(value='/Users/xiaodong/Downloads/3DED-DATA/LTA/LTA1/shelx')
             self.output_dir = tk.StringVar(value='/Users/xiaodong/Desktop')
     elif os_name == 'Linux' and 'microsoft' in platform.uname().release.lower():
         if xray:
@@ -50,7 +50,7 @@ def setup_main_frame(self, xray=False):
 
     # Common inputs
     self.crystal_name = tk.StringVar()
-    self.crystal_name = tk.StringVar(value='LTA1')
+    self.crystal_name = tk.StringVar(value='LTA')
     ttk.Label(input_frame, text="Crystal Name:").grid(row=0, column=0, sticky="w", padx=5, pady=(5,20))
     crystal_name_entry = ttk.Entry(input_frame, textvariable=self.crystal_name, width=40)
     crystal_name_entry.grid(row=0, column=1, columnspan=2, sticky="w", padx=5, pady=(5,20))

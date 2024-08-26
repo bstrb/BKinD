@@ -1,4 +1,4 @@
-('/Users/xiaodong/Desktop/BKinD/BKinD_3.0/build/bkind_conda/PYZ-00.pyz',
+('/Users/xiaodong/Desktop/BKinD/BKinD_3.1/src/util/test/icon_macos/build/bkind_conda/PYZ-00.pyz',
  [('_compat_pickle',
    '/opt/anaconda3/lib/python3.12/_compat_pickle.py',
    'PYMODULE'),

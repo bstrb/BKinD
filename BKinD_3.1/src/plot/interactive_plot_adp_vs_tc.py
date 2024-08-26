@@ -5,6 +5,10 @@ import re
 import plotly.graph_objs as go
 from collections import defaultdict
 
+
+# Plot Imports
+from plot.open_plot import open_plot
+
 def extract_values_from_res(file_path):
     values = {}
     with open(file_path, 'r') as file:
@@ -16,7 +20,7 @@ def extract_values_from_res(file_path):
                 values[atom_name] = last_value
     return values
 
-def plot_results(data):
+def plot_results(data, folder_path):
     fig = go.Figure()
     
     for atom_name, values in data.items():
@@ -35,7 +39,13 @@ def plot_results(data):
         hovermode='closest'
     )
 
-    fig.show()
+    plotname="ADP_vs_TC.html"
+
+    # Save the plot as an HTML file
+    plot_filename = os.path.join(os.path.dirname(folder_path), plotname)
+    fig.write_html(plot_filename)
+
+    open_plot(fig, plot_filename)
 
 def interactive_plot_adp_vs_tc(folder_path):
     data = defaultdict(lambda: {'completeness': [], 'values': []})
@@ -52,5 +62,5 @@ def interactive_plot_adp_vs_tc(folder_path):
                     data[atom_name]['completeness'].append(completeness)
                     data[atom_name]['values'].append(value)
     
-    plot_results(data)
+    plot_results(data, folder_path)
 

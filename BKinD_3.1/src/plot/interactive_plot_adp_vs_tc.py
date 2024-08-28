@@ -42,7 +42,8 @@ def plot_results(data, folder_path):
     plotname="ADP_vs_TC.html"
 
     # Save the plot as an HTML file
-    plot_filename = os.path.join(os.path.dirname(folder_path), plotname)
+    # plot_filename = os.path.join(os.path.dirname(folder_path), plotname)
+    plot_filename = os.path.join(folder_path, plotname)
     fig.write_html(plot_filename)
 
     open_plot(fig, plot_filename)

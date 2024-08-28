@@ -9,7 +9,7 @@ def read_hkl_file(hkl_filepath, iset_value):
     with open(hkl_filepath, 'r') as file:
         header = True
         for line in file:
-            if header:
+            if header: 
                 header_lines.append(line)
                 if line.startswith('!END_OF_HEADER'):
                     header = False

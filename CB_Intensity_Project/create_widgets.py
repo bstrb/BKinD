@@ -16,7 +16,7 @@ def create_widgets(self):
     self.sigma_level_label.pack(pady=5)
     self.sigma_level_entry = tk.Entry(self.root)
     self.sigma_level_entry.pack(pady=10)
-    self.sigma_level_entry.insert(0, "1")  # Default value of 1 sigma
+    self.sigma_level_entry.insert(0, "2")  # Default value of 2 sigma
 
     # Button to display the image with the Gaussian area
     self.display_image_button = tk.Button(self.root, text="Display Image with Gaussian Area", command=self.load_and_display_image, state=tk.DISABLED)

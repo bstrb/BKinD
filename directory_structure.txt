@@ -1,4 +1,26 @@
-|-- BKinD_3.0
+|-- CB_Intensity_Project
+|   |-- track_gaussian.py
+|   |-- add_cbi.py
+|   |-- smooth_intensity_values.py
+|   |-- plot_intensities.py
+|   |-- output_filename.tif
+|   |-- calculate_gaussian_region_intensity.py
+|   |-- browse_image.py
+|   |-- gaussian_2d.py
+|   |-- toggle_smoothing.py
+|   |-- load_and_display_image.py
+|   |-- create_widgets.py
+|   |-- fit_gaussian.py
+|   |-- normalize_intensities.py
+|   |-- remove_duplicates.py
+|-- output_filename.tif
+|-- 3DED_ML_Project
+|   |-- feature_engineering.py
+|   |-- ML_learn.py
+|   |-- parse_xds_ascii.py
+|   |-- main.py
+|   |-- prepare_dataframe.py
+|-- BKinD_3.1
 |   |-- run_bkind.sh
 |   |-- run_script.bat
 |   |-- setup_and_run.sh
@@ -22,18 +44,75 @@
 |   |   |   |-- plot_res_vs_dfm.py
 |   |   |   |-- append_percentage.py
 |   |   |   |-- plot_fvar_npd_vs_completeness.py
+|   |   |   |-- interactive_plot_adp_vs_tc.py
 |   |   |   |-- plot_r_vs_completeness.py
 |   |   |-- util
 |   |   |   |-- misc
 |   |   |   |   |-- create_percentage_list.py
 |   |   |   |   |-- round_up.py
+|   |   |   |-- test
+|   |   |   |   |-- icon_macos
+|   |   |   |   |   |-- bkind_conda.spec
+|   |   |   |   |   |-- BkinD.icns
+|   |   |   |   |   |-- dist
+|   |   |   |   |   |   |-- bkind_conda
+|   |   |   |   |   |-- bkind_conda.py
+|   |   |   |   |   |-- build
+|   |   |   |   |   |   |-- bkind_conda
+|   |   |   |   |   |   |   |-- Analysis-00.toc
+|   |   |   |   |   |   |   |-- PKG-00.toc
+|   |   |   |   |   |   |   |-- localpycs
+|   |   |   |   |   |   |   |   |-- pyimod02_importers.pyc
+|   |   |   |   |   |   |   |   |-- pyimod03_ctypes.pyc
+|   |   |   |   |   |   |   |   |-- struct.pyc
+|   |   |   |   |   |   |   |   |-- pyimod01_archive.pyc
+|   |   |   |   |   |   |   |-- warn-bkind_conda.txt
+|   |   |   |   |   |   |   |-- xref-bkind_conda.html
+|   |   |   |   |   |   |   |-- PYZ-00.toc
+|   |   |   |   |   |   |   |-- base_library.zip
+|   |   |   |   |   |   |   |-- bkind_conda.pkg
+|   |   |   |   |   |   |   |-- EXE-00.toc
+|   |   |   |   |   |   |   |-- PYZ-00.pyz
+|   |   |   |   |-- compare_molecules.py
+|   |   |   |   |-- subtract_and_sum_matrix_groups.py
+|   |   |   |   |-- compare_matrices.py
+|   |   |   |   |-- compare_atom_pos.py
+|   |   |   |   |-- read_coordinates.py
+|   |   |   |   |-- generate_permutations.py
+|   |   |   |   |-- compare_atomic_positions
+|   |   |   |   |   |-- cap_util.py
+|   |   |   |   |   |-- cap_gui.py
+|   |   |   |   |-- min_cost_atom_positions.py
+|   |   |   |   |-- generate_column_permutations.py
+|   |   |   |   |-- icon_wsl
+|   |   |   |   |   |-- bkind_conda_wsl.spec
+|   |   |   |   |   |-- dist
+|   |   |   |   |   |   |-- bkind_conda_wsl
+|   |   |   |   |   |-- bkind_conda_wsl.py
+|   |   |   |   |   |-- build
+|   |   |   |   |   |   |-- bkind_conda_wsl
+|   |   |   |   |   |   |   |-- xref-bkind_conda_wsl.html
+|   |   |   |   |   |   |   |-- Analysis-00.toc
+|   |   |   |   |   |   |   |-- PKG-00.toc
+|   |   |   |   |   |   |   |-- warn-bkind_conda_wsl.txt
+|   |   |   |   |   |   |   |-- PYZ-00.toc
+|   |   |   |   |   |   |   |-- base_library.zip
+|   |   |   |   |   |   |   |-- EXE-00.toc
+|   |   |   |   |   |   |   |-- PYZ-00.pyz
+|   |   |   |   |   |   |   |-- bkind_conda_wsl.pkg
+|   |   |   |   |-- find_best_permutation.py
+|   |   |   |   |-- generate_row_permutations.py
+|   |   |   |   |-- generate_complementary_matrices.py
 |   |   |   |-- file
 |   |   |   |   |-- aggregate.py
 |   |   |   |   |-- create_subfolder.py
 |   |   |   |   |-- find_file.py
+|   |   |   |   |-- rem_anis.py
 |   |   |   |   |-- rem_merg_zero.py
 |   |   |   |   |-- clean_aggregate.py
 |   |   |   |   |-- manage_files.py
+|   |   |   |   |-- isotropic_refinement.py
+|   |   |   |   |-- lock_atom_positions.py
 |   |   |   |   |-- remove_macos_artifacts.py
 |   |   |   |   |-- modify_ins_file.py
 |   |   |   |   |-- get_subfolder.py
@@ -68,10 +147,9 @@
 |   |   |   |-- create_xdsconv.py
 |   |   |   |-- create_xdsconv_nem.py
 |   |   |-- data_processing
+|   |   |   |-- solve_structure.py
 |   |   |   |-- refine_wght_progress.py
 |   |   |   |-- process_sample_data.py
-|   |   |   |-- solve_remaining.py
-|   |   |   |-- solve_removed.py
 |   |   |   |-- filter.py
 |   |   |   |-- process_filtering_results.py
 |   |   |   |-- extract.py
@@ -98,3 +176,164 @@
 |   |   |-- xray
 |   |   |   |-- convert_csv_to_hkl.py
 |   |   |   |-- calculate_asu_and_resolution.py
+|-- .gitignore
+|-- XDS_ASCII.HKL
+|-- .git
+|   |-- ORIG_HEAD
+|   |-- config
+|   |-- objects
+|   |   |-- 95
+|   |   |   |-- cc2c9719e148ed7f663bdd54b049d0acbe78a2
+|   |   |-- 92
+|   |   |   |-- 94d292cb94b999167e288a9abc0c696f179193
+|   |   |-- 50
+|   |   |   |-- 0e1b72439cb72cefc71c1f1a7056807284b8cb
+|   |   |-- 6f
+|   |   |   |-- a7bd984f9146095fe3135899e52b626dd29e2d
+|   |   |-- 03
+|   |   |   |-- e8f007b350b72823a3da72482c5e7aba63a7b2
+|   |   |-- 9e
+|   |   |   |-- 74b611eed619321f5722c5c59bcf3c9e5344f6
+|   |   |-- 04
+|   |   |   |-- 5d61c7ac96f4ce3639d4570f50f4eb946325ee
+|   |   |-- 5f
+|   |   |   |-- 462ad28073970993aed79c3c535cde8895333c
+|   |   |-- 33
+|   |   |   |-- 510a550f82caa42a2c9f6403ab7bcd73513745
+|   |   |-- 02
+|   |   |   |-- 5a88ff620f86bf838e8160a5bdfaec7f56c184
+|   |   |   |-- c98682c3b2d42ea31bcfc0cb2fee0cf9d73806
+|   |   |   |-- e7de959cc6b60786b3079e66fa17fea28a548c
+|   |   |-- ad
+|   |   |   |-- c2496ae5a5e5626825b9338fb3c8f85ad33769
+|   |   |-- b3
+|   |   |   |-- a9a7c4c70ea9704909f64c8b793919bd529335
+|   |   |-- df
+|   |   |   |-- d7e88c08b4ee02d1e70095c6067fc54077132c
+|   |   |-- d1
+|   |   |   |-- 6416f575f4444906ec18954b29627495659ff5
+|   |   |-- f3
+|   |   |   |-- a5e0a996445277dc99e494106a789ee06906ed
+|   |   |-- eb
+|   |   |   |-- 4b963f19560caaae9681c9c8506baf25b30add
+|   |   |-- c7
+|   |   |   |-- 120f2d62e3f4893aea6467fe4f61b30ffc2fba
+|   |   |-- fc
+|   |   |   |-- 28939a89e239cf96c00062a6cc81509b4d2c27
+|   |   |-- ec
+|   |   |   |-- c35240763de8246ed1743b0b6ce38e4af37b4e
+|   |   |-- pack
+|   |   |   |-- pack-1c6977947d2012f52c5e1a27d208e11f92b02dc4.idx
+|   |   |   |-- pack-1c6977947d2012f52c5e1a27d208e11f92b02dc4.pack
+|   |   |-- 7d
+|   |   |   |-- 64487917de58c27754a77658ad0abb625f926d
+|   |   |-- 7c
+|   |   |   |-- 8c871e9a64899aca939b9af514c9fe6a3ed140
+|   |   |-- 80
+|   |   |   |-- 76d1889788c4e748821d79139d0fd26a0596c2
+|   |   |   |-- 9433e083442a4d35862d5b20fee3f15ee00dc2
+|   |   |-- 7b
+|   |   |   |-- e3fded8a827a554cd67e3b084c5d964cf9ac3d
+|   |   |-- 8a
+|   |   |   |-- f37961dd50abb0ebf2c0aa919fce11d59add63
+|   |   |-- 19
+|   |   |   |-- 938c3dc01c0769a45dd4d61b443d0ad1f0e64b
+|   |   |-- 36
+|   |   |   |-- b57ee60fed115c017b41d8c5354ba5e650f189
+|   |   |-- 5c
+|   |   |   |-- 40c4e54519ed4807234cfb75284a8219d3e490
+|   |   |-- 31
+|   |   |   |-- c9654dc3e13d084ab510d6bdb5e28116f8e521
+|   |   |-- info
+|   |   |-- 5b
+|   |   |   |-- 540a3968146edeb6aa929f93f36845353b78b9
+|   |   |-- 37
+|   |   |   |-- b0f5a50965d21ba2a905942ddcfd67b0e36fb4
+|   |   |-- 01
+|   |   |   |-- 5ba1cf2a623e5a33e4607b320a4301386af328
+|   |   |-- 55
+|   |   |   |-- 5bb51dda888a01b482cc9cb0e7ac1c360c68c1
+|   |   |-- 90
+|   |   |   |-- efe3a6cde845fbd08c184bafe2648a095dd137
+|   |   |-- a9
+|   |   |   |-- 9f8d6ccc7698a4a0f041510296d4bd280cf9a8
+|   |   |   |-- e3e987be74195f64e5a2986da23e33d27fa726
+|   |   |-- db
+|   |   |   |-- 70e39ad1624d91d003c469569d924d62d52176
+|   |   |-- a8
+|   |   |   |-- 7ed145c2da17af05f4327b55f3c9fe3e3966a8
+|   |   |-- e1
+|   |   |   |-- 7828c758a52c0ffcd06ae30a9409fcdbe65aba
+|   |   |-- fa
+|   |   |   |-- 642ea5b2dca5e808bdbce7ede62600023d1c08
+|   |   |-- ff
+|   |   |   |-- 0d8920979267a831da48f15af13d65accfca0b
+|   |   |-- e0
+|   |   |   |-- 8043468b35ff63ccecb7ede5c9a8b05c4130c2
+|   |   |-- 79
+|   |   |   |-- 952ae69124719ea267339b4666f08c799734af
+|   |   |-- 41
+|   |   |   |-- c0b329ac993d1913194bd0f5850a5c2c85a098
+|   |   |-- 70
+|   |   |   |-- 82e8477a6683a790354c51104b5b8c6f9a353a
+|   |   |-- 4a
+|   |   |   |-- df2a9e18e28dc3d3044c9b4c7ee280e7603b77
+|   |   |-- 12
+|   |   |   |-- 1395b52660cb566df133acf3cfb0f34ba062bb
+|   |   |-- 85
+|   |   |   |-- e6473582d01485e9778db2ddbc314b0c6f1d0e
+|   |   |   |-- 6b700512b6403c95f1656e8b0933525b8f770e
+|   |   |-- 1d
+|   |   |   |-- d7dadcd889b4362f34def6a3301c5330e3678c
+|   |   |-- 71
+|   |   |   |-- 31fd5db5302c8c001c911ecd0afef820e00ec5
+|   |   |-- 49
+|   |   |   |-- 333823ac7a5d4823c5db7b798a9728c64c4f4d
+|   |   |-- 47
+|   |   |   |-- 81c3a84689ced35587a8886f2d4f1f5267035c
+|   |   |   |-- 0e9322ee152f91f5122453db8a4cdbe1c0f7a9
+|   |   |-- 8b
+|   |   |   |-- ffc1c44fb2bfad6ef42be9f50e9081cf4e1c68
+|   |   |-- 7a
+|   |   |   |-- 5a16a60b641f3934ea921a782ebaa8a5fbd248
+|   |   |-- 25
+|   |   |   |-- 07a1f512b59c09f54940ee1ffb2b0282b62c6b
+|   |-- HEAD
+|   |-- info
+|   |   |-- exclude
+|   |-- logs
+|   |   |-- HEAD
+|   |   |-- refs
+|   |   |   |-- heads
+|   |   |   |   |-- main
+|   |   |   |-- remotes
+|   |   |   |   |-- origin
+|   |   |   |   |   |-- HEAD
+|   |   |   |   |   |-- main
+|   |-- description
+|   |-- hooks
+|   |   |-- commit-msg.sample
+|   |   |-- pre-rebase.sample
+|   |   |-- pre-commit.sample
+|   |   |-- applypatch-msg.sample
+|   |   |-- fsmonitor-watchman.sample
+|   |   |-- pre-receive.sample
+|   |   |-- prepare-commit-msg.sample
+|   |   |-- post-update.sample
+|   |   |-- pre-merge-commit.sample
+|   |   |-- pre-applypatch.sample
+|   |   |-- pre-push.sample
+|   |   |-- update.sample
+|   |   |-- push-to-checkout.sample
+|   |-- refs
+|   |   |-- heads
+|   |   |   |-- main
+|   |   |-- tags
+|   |   |-- remotes
+|   |   |   |-- origin
+|   |   |   |   |-- HEAD
+|   |   |   |   |-- main
+|   |-- index
+|   |-- packed-refs
+|   |-- COMMIT_EDITMSG
+|   |-- FETCH_HEAD

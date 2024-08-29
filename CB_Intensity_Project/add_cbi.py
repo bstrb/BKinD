@@ -1,31 +1,25 @@
 # add_cbi.py
 
-# %%
-
-import fabio
+import tkinter as tk
+from tkinter import filedialog, messagebox
+import csv
 import numpy as np
 import os
-import glob
 
-def process_images(img_list, row, column, sqr):
-    sum_list = []
+def read_cbi_from_csv(csv_file_path):
+    """Reads CBI values from a CSV file and returns them as a dictionary with frame numbers as keys."""
+    cbi_dict = {}
+    with open(csv_file_path, mode='r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip the header
+        for row in reader:
+            frame = int(row[0])
+            cbi = float(row[1])
+            cbi_dict[frame] = cbi
+    return cbi_dict
 
-    for img_file in img_list:
-        img = fabio.open(img_file)
-        img_data = np.array(img.data)
-
-        cut = img_data[row - sqr:row + sqr + 1, column - sqr:column + sqr + 1]
-        sum_list.append(cut.sum())
-
-    if len(sum_list) == 0:
-        print("No images processed or sum_list is empty. Please check your input files and coordinates.")
-        return None
-
-    average = sum(sum_list) / len(sum_list)
-    sum_list = np.array(sum_list / average)
-
-    return sum_list
-def update_hkl_file(hkl_filepath, cbi):
+def update_hkl_file_with_cbi(hkl_filepath, cbi_dict):
+    """Updates the XDS_ASCII.HKL file with CBI values based on z_obs."""
     updated_lines = []
     with open(hkl_filepath, 'r') as file:
         header = True
@@ -34,6 +28,7 @@ def update_hkl_file(hkl_filepath, cbi):
                 updated_lines.append(line)
                 if line.startswith('!END_OF_HEADER'):
                     header = False
+                    updated_lines.append("!ITEM_CBI=13\n")  # Adding the CBI header
             else:
                 if line.strip() and not line.startswith('!'):  # Process only data lines
                     parts = line.split()
@@ -47,7 +42,9 @@ def update_hkl_file(hkl_filepath, cbi):
                     psi = float(parts[11])
                     z_obs = float(parts[7])  # zd as z_obs
                     z_obs_index = int(round(z_obs))  # Round to the nearest integer
-                    cbi_value = cbi[z_obs_index - 1] if z_obs_index - 1 < len(cbi) else np.nan
+
+                    # Get the closest CBI value based on z_obs_index
+                    cbi_value = cbi_dict.get(z_obs_index, np.nan)
 
                     # Reconstruct the line with all original parts and append the CBI
                     updated_line = (
@@ -64,48 +61,65 @@ def update_hkl_file(hkl_filepath, cbi):
 
     return output_filepath
 
-
-def main(img_directories, center, square_size, hkl_files):
-    # Parse center coordinates
-    center = center.split()
-    row = int(center[1])
-    column = int(center[0])
-    sqr = square_size // 2
-
-    for img_directory, hkl_file in zip(img_directories, hkl_files):
-        print(f"Processing directory: {img_directory}")
+class AddCBIGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Add CBI to XDS_ASCII.HKL")
         
-        # List of all .img files in the directory
-        img_list = glob.glob(os.path.join(img_directory, '*.img'))
+        # Initialize file paths
+        self.hkl_file_path = ""
+        self.cbi_csv_path = ""
+        
+        # Create GUI components
+        self.create_widgets()
 
-        if not img_list:
-            print(f"No .img files found in the directory {img_directory}.")
-            continue
+    def create_widgets(self):
+        # Button to browse and select the HKL file
+        self.browse_hkl_button = tk.Button(self.root, text="Browse HKL File", command=self.browse_hkl_file)
+        self.browse_hkl_button.pack(pady=10)
 
-        # Process images to get center beam intensity
-        cbi = process_images(img_list, row, column, sqr)
+        # Label to display the selected HKL file name
+        self.hkl_file_label = tk.Label(self.root, text="No HKL file selected", fg="blue")
+        self.hkl_file_label.pack(pady=5)
 
-        if cbi is None:
-            continue
+        # Button to browse and select the CSV file
+        self.browse_csv_button = tk.Button(self.root, text="Browse CSV File", command=self.browse_csv_file)
+        self.browse_csv_button.pack(pady=10)
 
-        # Update the corresponding XDS_ASCII.HKL file
-        print(f"Updating {hkl_file}...")
-        update_hkl_file(hkl_file, cbi)
+        # Label to display the selected CSV file name
+        self.csv_file_label = tk.Label(self.root, text="No CSV file selected", fg="blue")
+        self.csv_file_label.pack(pady=5)
+
+        # Button to add CBI to the HKL file
+        self.add_cbi_button = tk.Button(self.root, text="Add CBI to HKL", command=self.add_cbi_to_hkl, state=tk.DISABLED)
+        self.add_cbi_button.pack(pady=20)
+
+    def browse_hkl_file(self):
+        """Browse and select the HKL file."""
+        self.hkl_file_path = filedialog.askopenfilename(filetypes=[("HKL files", "*.HKL")])
+        if self.hkl_file_path:
+            self.hkl_file_label.config(text=os.path.basename(self.hkl_file_path))
+            self.check_ready_to_add_cbi()
+
+    def browse_csv_file(self):
+        """Browse and select the CSV file."""
+        self.cbi_csv_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+        if self.cbi_csv_path:
+            self.csv_file_label.config(text=os.path.basename(self.cbi_csv_path))
+            self.check_ready_to_add_cbi()
+
+    def check_ready_to_add_cbi(self):
+        """Enable the 'Add CBI' button if both files are selected."""
+        if self.hkl_file_path and self.cbi_csv_path:
+            self.add_cbi_button.config(state=tk.NORMAL)
+
+    def add_cbi_to_hkl(self):
+        """Add CBI values to the HKL file."""
+        cbi_dict = read_cbi_from_csv(self.cbi_csv_path)
+        updated_hkl_path = update_hkl_file_with_cbi(self.hkl_file_path, cbi_dict)
+        messagebox.showinfo("Success", f"Updated HKL file saved to {updated_hkl_path}")
 
 if __name__ == "__main__":
-    img_directories = [
-        '/mnt/c/Users/bubl3932/Desktop/3DED-DATA/FeAcAc/FeAcAC_crushed_11/SMV',
-        '/mnt/c/Users/bubl3932/Desktop/3DED-DATA/FeAcAc/FeAcAC_crushed_12/SMV',
-        '/mnt/c/Users/bubl3932/Desktop/3DED-DATA/FeAcAc/FeAcAC_crushed_13/SMV'
-    ]
-    center = '1124 1124'  # Example center coordinates
-    square_size = 100  # Example square size
-    hkl_files = [
-        '/mnt/c/Users/bubl3932/Desktop/3DED-DATA/FeAcAc/FeAcAC_crushed_11/XDS_ASCII.HKL',
-        '/mnt/c/Users/bubl3932/Desktop/3DED-DATA/FeAcAc/FeAcAC_crushed_12/XDS_ASCII.HKL',
-        '/mnt/c/Users/bubl3932/Desktop/3DED-DATA/FeAcAc/FeAcAC_crushed_13/XDS_ASCII.HKL'
-    ]
-
-    main(img_directories, center, square_size, hkl_files)
-
-# %%
+    root = tk.Tk()
+    app = AddCBIGUI(root)
+    root.mainloop()

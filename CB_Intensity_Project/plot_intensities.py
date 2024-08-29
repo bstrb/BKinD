@@ -6,10 +6,13 @@ import plotly.graph_objects as go
 
 from open_plot import open_plot
 
-def plot_intensities(self, folder_path, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values, sigma_level):
+def plot_intensities(self, folder_path, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values):
     """Plot the selected intensity values."""
     fig = go.Figure()
 
+    # Retrieve the sigma level entered by the user
+    sigma_level = float(self.sigma_level_entry.get())
+    
     # Plot based on selected checkboxes
     if self.plot_inside_var.get():
         fig.add_trace(go.Scatter(x=list(range(1, len(inside_intensity_values) + 1)), y=inside_intensity_values,

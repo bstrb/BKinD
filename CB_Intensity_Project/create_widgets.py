@@ -23,7 +23,7 @@ def create_widgets(self):
     self.display_image_button.pack(pady=10)
 
     # Dropdown to select the normalization method
-    self.normalization_var = tk.StringVar(value="sum")  # Default value
+    self.normalization_var = tk.StringVar(value="z_score")  # Default value
     self.normalization_label = tk.Label(self.root, text="Normalization Method:")
     self.normalization_label.pack(pady=5)
     self.normalization_menu = tk.OptionMenu(self.root, self.normalization_var, "sum", "min_max", "z_score", "total", "log")

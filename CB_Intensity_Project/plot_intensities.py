@@ -1,8 +1,12 @@
 # plot_intensities.py
 
+import os
+
 import plotly.graph_objects as go
 
-def plot_intensities(self, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values, sigma_level):
+from open_plot import open_plot
+
+def plot_intensities(self, folder_path, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values, sigma_level):
     """Plot the selected intensity values."""
     fig = go.Figure()
 
@@ -29,3 +33,11 @@ def plot_intensities(self, inside_intensity_values, outside_intensity_values, to
     )
 
     fig.show()
+
+    plotname="DFM_vs_Frame.html"
+
+    # Save the plot as an HTML file
+    plot_filename = os.path.join(os.path.dirname(folder_path), plotname)
+    fig.write_html(plot_filename)
+
+    open_plot(fig, plot_filename)

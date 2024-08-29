@@ -245,7 +245,7 @@ class CenterBeamIntensityApp:
             absolute_difference_values = self.smooth_intensity_values(absolute_difference_values, window_size)
 
         # Create and display the plot
-        self.plot_intensities(inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values, sigma_level)
+        self.plot_intensities(img_directory,inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values, sigma_level)
 
 
 if __name__ == "__main__":

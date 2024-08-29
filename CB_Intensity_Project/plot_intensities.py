@@ -32,7 +32,7 @@ def plot_intensities(self, folder_path, inside_intensity_values, outside_intensi
         hovermode='x unified'
     )
 
-    fig.show()
+    # fig.show()
 
     plotname="DFM_vs_Frame.html"
 

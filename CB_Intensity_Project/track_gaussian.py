@@ -101,6 +101,13 @@ class CenterBeamIntensityApp:
         # Normalize the intensity values based on the selected normalization method
         self.normalize_intensities(inside_intensity_values, outside_intensity_values, total_intensity_values)
 
+        # Save the normalized CBI values to a CSV file
+        output_csv_path = os.path.join(os.path.dirname(img_directory), "frame_cbi.csv")
+        with open(output_csv_path, 'w', newline='') as csvfile:
+            csvfile.write("Frame,CBI\n")
+            for frame, cbi in zip(frame_numbers, inside_intensity_values):
+                csvfile.write(f"{frame},{cbi}\n")
+
         absolute_difference_values = np.abs(inside_intensity_values - outside_intensity_values)
 
         # Apply smoothing if the checkbox is selected
@@ -110,15 +117,6 @@ class CenterBeamIntensityApp:
             outside_intensity_values = self.smooth_intensity_values(outside_intensity_values, window_size)
             total_intensity_values = self.smooth_intensity_values(total_intensity_values, window_size)
             absolute_difference_values = self.smooth_intensity_values(absolute_difference_values, window_size)
-
-        # Save the normalized CBI values to a CSV file
-        output_csv_path = os.path.join(os.path.dirname(img_directory), "frame_cbi.csv")
-        with open(output_csv_path, 'w', newline='') as csvfile:
-            csvfile.write("Frame,CBI\n")
-            for frame, cbi in zip(frame_numbers, inside_intensity_values):
-                csvfile.write(f"{frame},{cbi}\n")
-
-        # messagebox.showinfo("Success", f"CBI values saved to {output_csv_path}")
 
         # Create and display the plot
         self.plot_intensities(img_directory, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values)

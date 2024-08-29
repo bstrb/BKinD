@@ -34,7 +34,7 @@ def plot_intensities(self, folder_path, inside_intensity_values, outside_intensi
 
     # fig.show()
 
-    plotname="DFM_vs_Frame.html"
+    plotname="CBI_vs_Frame.html"
 
     # Save the plot as an HTML file
     plot_filename = os.path.join(os.path.dirname(folder_path), plotname)

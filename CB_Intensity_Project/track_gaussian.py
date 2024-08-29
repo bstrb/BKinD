@@ -1,5 +1,3 @@
-# track_gaussian.py
-
 import tkinter as tk
 from tkinter import messagebox
 import fabio
@@ -7,19 +5,19 @@ import numpy as np
 import os
 import glob
 
+# Import all functions from other modules
+from create_widgets import create_widgets
+from browse_image import browse_image
+from load_and_display_image import load_and_display_image
+from gaussian_2d import gaussian_2d
+from fit_gaussian import fit_gaussian
+from calculate_gaussian_region_intensity import calculate_gaussian_region_intensity
+from plot_intensities import plot_intensities
+from normalize_intensities import normalize_intensities
+from toggle_smoothing import toggle_smoothing
+from smooth_intensity_values import smooth_intensity_values
 
 class CenterBeamIntensityApp:
-    
-    from create_widgets import create_widgets
-    from browse_image import browse_image
-    from load_and_display_image import load_and_display_image
-    from gaussian_2d import gaussian_2d
-    from fit_gaussian import fit_gaussian
-    from calculate_gaussian_region_intensity import calculate_gaussian_region_intensity
-    from plot_intensities import plot_intensities
-    from normalize_intensities import normalize_intensities
-    from toggle_smoothing import toggle_smoothing
-    from smooth_intensity_values import smooth_intensity_values
     
     def __init__(self, root):
         self.root = root
@@ -32,6 +30,29 @@ class CenterBeamIntensityApp:
 
         # Create GUI components
         self.create_widgets()
+
+    def __getattr__(self, item):
+        """Fallback for missing attributes to dynamically add them."""
+        if item in self.__function_map__:
+            func = self.__function_map__[item]
+            setattr(self, item, func.__get__(self))
+            return getattr(self, item)
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+
+    @property
+    def __function_map__(self):
+        return {
+            'create_widgets': create_widgets,
+            'browse_image': browse_image,
+            'load_and_display_image': load_and_display_image,
+            'gaussian_2d': gaussian_2d,
+            'fit_gaussian': fit_gaussian,
+            'calculate_gaussian_region_intensity': calculate_gaussian_region_intensity,
+            'plot_intensities': plot_intensities,
+            'normalize_intensities': normalize_intensities,
+            'toggle_smoothing': toggle_smoothing,
+            'smooth_intensity_values': smooth_intensity_values
+        }
 
     def calculate_intensities(self):
         # Get the directory containing the selected file

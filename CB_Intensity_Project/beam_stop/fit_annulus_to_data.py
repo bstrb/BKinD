@@ -1,12 +1,14 @@
 # fit_annulus_to_data.py
+
 import numpy as np
 from scipy.optimize import minimize
 
 def dark_circle_mask(shape, center, radius):
-    """Create a binary mask for the dark circular region (beam stopper)."""
+    """Create a binary mask for the dark circular region."""
     y, x = np.ogrid[:shape[0], :shape[1]]
     dist_from_center = np.sqrt((x - center[0])**2 + (y - center[1])**2)
-    return dist_from_center <= radius
+    mask = dist_from_center <= radius
+    return mask
 
 def gaussian_tail_mask(shape, center, inner_radius):
     """Create a binary mask for the Gaussian tail region outside the dark circle."""

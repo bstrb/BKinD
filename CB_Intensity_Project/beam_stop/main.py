@@ -1,3 +1,5 @@
+# main.py
+
 import tkinter as tk
 from tkinter import messagebox
 import os
@@ -10,8 +12,8 @@ import numpy as np
 from create_widgets import create_widgets
 from browse_image import browse_image
 from load_and_display_image import load_and_display_image
-from fit_annulus_to_data import fit_annulus_to_data, dark_circle_mask, gaussian_tail_mask
 from fit_gaussian_tail import fit_gaussian_tail
+from fit_annulus_to_data import fit_annulus_to_data, dark_circle_mask, gaussian_tail_mask
 from calculate_annular_region_intensity import calculate_annular_region_intensity
 from plot_intensities import plot_intensities
 from normalize_intensities import normalize_intensities
@@ -27,7 +29,7 @@ class AnnularBeamIntensityApp:
         self.file_path = ""
         self.center = None
         self.inner_radius = None
-        self.outer_radius = None
+        self.sigma = None  # Store sigma for the Gaussian tail
 
         # Create GUI components
         self.create_widgets()
@@ -47,9 +49,9 @@ class AnnularBeamIntensityApp:
             'browse_image': browse_image,
             'load_and_display_image': load_and_display_image,
             'fit_annulus_to_data': fit_annulus_to_data,
+            'fit_gaussian_tail': fit_gaussian_tail,
             'dark_circle_mask': dark_circle_mask,
             'gaussian_tail_mask': gaussian_tail_mask,
-            'fit_gaussian_tail': fit_gaussian_tail,
             'calculate_annular_region_intensity': calculate_annular_region_intensity,
             'plot_intensities': plot_intensities,
             'normalize_intensities': normalize_intensities,
@@ -78,21 +80,18 @@ class AnnularBeamIntensityApp:
         total_intensity_values = []
         frame_numbers = []
 
-        # Load the first image and fit the annulus to it
-        first_img_data = fabio.open(img_files[0]).data
-        self.fit_annulus_to_data(first_img_data)  # Fit annular region using the first image
-
-        # Use the fitted annular region to sum intensities in all images
+        # Use the fitted dark circle and Gaussian tail from the first image to process all images
         for idx, img_file in enumerate(img_files, start=1):
             img_data = fabio.open(img_file).data
             
-            # Create the mask for the fitted annular region
-            mask = self.dark_circle_mask(img_data.shape, self.center, self.inner_radius)
-            mask = mask | self.gaussian_tail_mask(img_data.shape, self.center, self.inner_radius)
-            
+            # Create the mask for the fitted annular region using the pre-calculated parameters
+            dark_mask = dark_circle_mask(img_data.shape, self.center, self.inner_radius)
+            tail_mask = gaussian_tail_mask(img_data.shape, self.center, self.inner_radius)
+            combined_mask = dark_mask | tail_mask
+
             # Calculate sum of intensities inside and outside the annular region
-            inside_intensity = np.sum(img_data[mask])
-            outside_intensity = np.sum(img_data[~mask])
+            inside_intensity = np.sum(img_data[combined_mask])
+            outside_intensity = np.sum(img_data[~combined_mask])
             total_intensity = np.sum(img_data)  # Calculate the sum of all pixel intensities in the image
 
             # Append the calculated values to their respective lists
@@ -121,7 +120,6 @@ class AnnularBeamIntensityApp:
 
         # Create and display the plot
         self.plot_intensities(img_directory, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values)
-
 
 if __name__ == "__main__":
     root = tk.Tk()

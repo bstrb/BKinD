@@ -25,10 +25,12 @@ def update_hkl_file_with_cbi(hkl_filepath, cbi_dict):
         header = True
         for line in file:
             if header:
-                updated_lines.append(line)
                 if line.startswith('!END_OF_HEADER'):
+                    updated_lines.append("!ITEM_CBI=13\n")  # Adding the CBI header before the end of the header
+                    updated_lines.append(line)  # Add the !END_OF_HEADER line
                     header = False
-                    updated_lines.append("!ITEM_CBI=13\n")  # Adding the CBI header
+                else:
+                    updated_lines.append(line)
             else:
                 if line.strip() and not line.startswith('!'):  # Process only data lines
                     parts = line.split()

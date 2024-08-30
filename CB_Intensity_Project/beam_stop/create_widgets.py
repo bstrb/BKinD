@@ -11,19 +11,12 @@ def create_widgets(self):
     self.file_name_label = tk.Label(self.root, text="", fg="blue")
     self.file_name_label.pack(pady=5)
 
-    # Entry to input the sigma level
-    self.sigma_level_label = tk.Label(self.root, text="Sigma Level:")
-    self.sigma_level_label.pack(pady=5)
-    self.sigma_level_entry = tk.Entry(self.root)
-    self.sigma_level_entry.pack(pady=10)
-    self.sigma_level_entry.insert(0, "2")  # Default value of 2 sigma
-
-    # Button to display the image with the Gaussian area
-    self.display_image_button = tk.Button(self.root, text="Display Image with Gaussian Area", command=self.load_and_display_image, state=tk.DISABLED)
+    # Button to display the image with the fitted annular region
+    self.display_image_button = tk.Button(self.root, text="Display Image with Annular Region", command=self.load_and_display_image, state=tk.DISABLED)
     self.display_image_button.pack(pady=10)
 
     # Dropdown to select the normalization method
-    self.normalization_var = tk.StringVar(value="z_score")  # Default value
+    self.normalization_var = tk.StringVar(value="sum")  # Default value
     self.normalization_label = tk.Label(self.root, text="Normalization Method:")
     self.normalization_label.pack(pady=5)
     self.normalization_menu = tk.OptionMenu(self.root, self.normalization_var, "sum", "min_max", "z_score", "total", "log")
@@ -31,11 +24,11 @@ def create_widgets(self):
 
     # Checkboxes for selecting which intensities to plot
     self.plot_inside_var = tk.BooleanVar(value=True)
-    self.plot_inside_checkbox = tk.Checkbutton(self.root, text="Inside Gaussian Region", variable=self.plot_inside_var)
+    self.plot_inside_checkbox = tk.Checkbutton(self.root, text="Inside Annular Region", variable=self.plot_inside_var)
     self.plot_inside_checkbox.pack(pady=5)
 
     self.plot_outside_var = tk.BooleanVar(value=False)
-    self.plot_outside_checkbox = tk.Checkbutton(self.root, text="Outside Gaussian Region", variable=self.plot_outside_var)
+    self.plot_outside_checkbox = tk.Checkbutton(self.root, text="Outside Annular Region", variable=self.plot_outside_var)
     self.plot_outside_checkbox.pack(pady=5)
 
     self.plot_total_var = tk.BooleanVar(value=False)

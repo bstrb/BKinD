@@ -1,61 +1,38 @@
 # fit_annulus_to_data.py
-
 import numpy as np
 from scipy.optimize import minimize
 
-def annular_mask(shape, center, inner_radius, outer_radius):
-    """Create a binary mask with an annular region."""
+def dark_circle_mask(shape, center, radius):
+    """Create a binary mask for the dark circular region (beam stopper)."""
     y, x = np.ogrid[:shape[0], :shape[1]]
     dist_from_center = np.sqrt((x - center[0])**2 + (y - center[1])**2)
-    mask = (dist_from_center >= inner_radius) & (dist_from_center <= outer_radius)
-    return mask
+    return dist_from_center <= radius
 
-def circular_mask(shape, center, radius):
-    """Create a binary mask with a circular region."""
+def gaussian_tail_mask(shape, center, inner_radius):
+    """Create a binary mask for the Gaussian tail region outside the dark circle."""
     y, x = np.ogrid[:shape[0], :shape[1]]
     dist_from_center = np.sqrt((x - center[0])**2 + (y - center[1])**2)
-    mask = dist_from_center <= radius
-    return mask
+    return dist_from_center > inner_radius
 
 def objective_function(params, data):
-    """Objective function to minimize: fit the inner circle and outer Gaussian tail."""
-    x0, y0, inner_radius, amplitude, sigma = params
-
-    # Create a mask for the inner circle (dark region)
-    circle_mask = circular_mask(data.shape, (x0, y0), inner_radius)
-    
-    # Create a mask for the Gaussian tail (outer region)
-    tail_mask = ~circle_mask  # everything outside the inner circle
-
-    # Calculate the Gaussian model on the outer region
-    y, x = np.indices(data.shape)
-    gaussian_model = amplitude * np.exp(-((x - x0)**2 + (y - y0)**2) / (2 * sigma**2))
-
-    # Calculate the difference between the data and model in the outer region
-    residual = data[tail_mask] - gaussian_model[tail_mask]
-
-    # Return the sum of squared differences
-    return np.sum(residual**2)
+    """Objective function to minimize: fits the dark circular region."""
+    x0, y0, radius = params
+    mask = dark_circle_mask(data.shape, (x0, y0), radius)
+    return np.sum(data[mask])  # Minimize the sum of intensities inside the dark region
 
 def fit_annulus_to_data(self, img_data):
-    """Fit the inner circle to the dark area and the outer Gaussian tail to the beam spot."""
-    # Initial guess for center, inner radius, amplitude of Gaussian, and sigma of Gaussian
-    initial_guess = (img_data.shape[1] / 2, img_data.shape[0] / 2, 10, np.max(img_data), 50)
-    bounds = [
-        (0, img_data.shape[1]),  # x0 bounds
-        (0, img_data.shape[0]),  # y0 bounds
-        (0, None),  # inner_radius bounds
-        (0, None),  # amplitude bounds
-        (0, None)   # sigma bounds
-    ]
+    """Fit the dark circular region first, then fit a 2D Gaussian to the region outside."""
+    
+    # Initial guess for the dark circular region
+    initial_guess = (img_data.shape[1] / 2, img_data.shape[0] / 2, 50)  # Example guess
+    bounds = [(0, img_data.shape[1]), (0, img_data.shape[0]), (20, 100)]  # Constrain radius between 20 and 100
 
-    # Minimize the objective function
+    # Fit the dark circle (beam stopper)
     result = minimize(objective_function, initial_guess, args=(img_data,), bounds=bounds)
     self.center = (result.x[0], result.x[1])
     self.inner_radius = result.x[2]
-    self.amplitude = result.x[3]
-    self.sigma = result.x[4]
 
-    # print(f"Fitted Annulus: Center = {self.center}, Inner Radius = {self.inner_radius:.2f}, "
-    #       f"Amplitude = {self.amplitude:.2f}, Sigma = {self.sigma:.2f}")
+    print(f"Fitted Dark Circle: Center=({self.center[0]:.2f}, {self.center[1]:.2f}), Radius={self.inner_radius:.2f}")
 
+    # Now fit the Gaussian tail outside the dark circle
+    self.fit_gaussian_tail(img_data, self.center, self.inner_radius)

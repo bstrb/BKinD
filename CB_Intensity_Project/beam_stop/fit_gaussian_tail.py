@@ -1,5 +1,4 @@
 # fit_gaussian_tail.py
-
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -18,10 +17,23 @@ def fit_gaussian_tail(self, img_data, center, inner_radius):
     y = y[mask]
     data = img_data[mask]
 
-    initial_guess = (np.max(data), center[0], center[1], 50, np.min(data))
-    params, _ = curve_fit(gaussian_tail, (x, y), data, p0=initial_guess)
+    # Initial guess based on the provided constraints
+    initial_guess = (np.max(data) - np.min(data), center[0], center[1], 50, np.min(data))
+
+    # Define bounds based on the constraints
+    bounds = (
+        [0, center[0] - 20, center[1] - 20, 20, np.min(data)],  # Lower bounds
+        [np.inf, center[0] + 20, center[1] + 20, 100, np.max(data)]  # Upper bounds
+    )
+
+    # Fit the Gaussian tail
+    params, _ = curve_fit(
+        gaussian_tail, (x, y), data, p0=initial_guess, bounds=bounds
+    )
 
     amplitude, x0, y0, sigma, offset = params
     self.center = (x0, y0)
     self.amplitude = amplitude
     self.sigma = sigma
+
+    print(f"Fitted Gaussian Tail: Center=({x0:.2f}, {y0:.2f}), Amplitude={amplitude:.2f}, Sigma={sigma:.2f}, Offset={offset:.2f}")

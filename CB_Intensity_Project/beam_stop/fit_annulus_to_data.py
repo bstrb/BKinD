@@ -34,7 +34,7 @@ def fit_annulus_to_data(self, img_data):
     self.center = (result.x[0], result.x[1])
     self.inner_radius = result.x[2]
 
-    print(f"Fitted Dark Circle: Center=({self.center[0]:.2f}, {self.center[1]:.2f}), Radius={self.inner_radius:.2f}")
+    # print(f"Fitted Dark Circle: Center=({self.center[0]:.2f}, {self.center[1]:.2f}), Radius={self.inner_radius:.2f}")
 
     # Now fit the Gaussian tail outside the dark circle
     self.fit_gaussian_tail(img_data, self.center, self.inner_radius)

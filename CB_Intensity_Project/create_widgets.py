@@ -11,11 +11,14 @@ def create_widgets(self):
     self.file_name_label = tk.Label(self.root, text="", fg="blue")
     self.file_name_label.pack(pady=5)
 
+
+    # ANNULAR MODEL
     # Add a dropdown or radio buttons to select the fitting method
     self.fitting_method = tk.StringVar(value="Gaussian")  # Default to Gaussian fitting
     tk.Label(self.root, text="Fitting Method:").pack(pady=5)
     tk.Radiobutton(self.root, text="Gaussian", variable=self.fitting_method, value="Gaussian").pack()
     tk.Radiobutton(self.root, text="Annular", variable=self.fitting_method, value="Annular").pack()
+    # ANNULAR MODEL
     
     # Entry to input the sigma level
     self.sigma_level_label = tk.Label(self.root, text="Sigma Level:")

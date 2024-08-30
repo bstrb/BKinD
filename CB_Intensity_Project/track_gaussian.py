@@ -121,6 +121,7 @@ class CenterBeamIntensityApp:
     #     # Create and display the plot
     #     self.plot_intensities(img_directory, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values)
     
+    # ANNULAR MODEL
     from annular_model import calculate_annular_region_intensity, fit_annulus_to_data
 
     def calculate_intensities(self):
@@ -189,6 +190,7 @@ class CenterBeamIntensityApp:
             absolute_difference_values = self.smooth_intensity_values(absolute_difference_values, window_size)
 
         self.plot_intensities(img_directory, inside_intensity_values, outside_intensity_values, total_intensity_values, absolute_difference_values)
+    # ANNULAR MODEL
 
 if __name__ == "__main__":
     root = tk.Tk()

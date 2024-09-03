@@ -12,6 +12,6 @@ def filter_reflections_randomly(header_lines, df, num_to_remove, random_folder):
     filtered_df = df.drop(index=random_indices)
 
     # Save the filtered data to a new file
-    output_file_path = os.path.join(random_folder, 'XDS_ASCII_filtered_random.HKL')
+    output_file_path = os.path.join(random_folder, 'XDS_ASCII_filtered.HKL')
     save_filtered_data(header_lines, filtered_df, output_file_path)
-    print(f"Randomly filtered data saved to {output_file_path}")
+    # print(f"Randomly filtered data saved to {output_file_path}")

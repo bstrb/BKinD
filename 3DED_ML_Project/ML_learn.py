@@ -1,44 +1,57 @@
 # ML_learn.py
 
 import pandas as pd
-
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
-from parse_xds_ascii import parse_xds_ascii
-from feature_engineering import feature_engineering
-from prepare_dataframe import prepare_dataframe
+def create_labels(df, cbi_threshold=-0.6, resolution_threshold=4, snr_threshold=None, asu_groups=None):
+    """
+    Create labels based on CBI values, resolution, I_obs/Sigma_obs (SNR), and ASU groups.
+    
+    Parameters:
+    - cbi_threshold: Rows with CBI below this value are more likely to be dynamical (default=-2.0).
+    - resolution_threshold: Rows with resolution above this value are more likely to be dynamical.
+    - snr_threshold: Rows with SNR above this value are more likely to be dynamical.
+    - asu_groups: List of ASU groups that are more likely to be dynamical (default=None).
+    
+    Returns:
+    - DataFrame with a new 'label' column where 1 indicates dynamical effects and 0 indicates non-dynamical.
+    """
+    # Initial labeling based on CBI threshold
+    df['label'] = (df['cbi'] < cbi_threshold).astype(int)
 
-def create_labels(df):
-    # Group by frames to calculate the total number of reflections and sum of intensities per frame
-    frame_stats = df.groupby('zd').agg({
-        'iobs': ['sum', 'count'],
-    })
-    frame_stats.columns = ['total_intensity', 'reflection_count']
-    
-    # Merge these stats back into the original DataFrame
-    df = df.merge(frame_stats, left_on='zd', right_index=True)
-    
-    # Define a threshold for labeling
-    intensity_threshold = df['total_intensity'].quantile(0.75)  # Top 25% in intensity
-    reflection_count_threshold = df['reflection_count'].quantile(0.75)  # Top 25% in count
+    # Additional labeling based on resolution if provided
+    if resolution_threshold is not None:
+        df['label'] = df.apply(
+            lambda row: 1 if row['resolution'] > resolution_threshold else row['label'], axis=1
+        )
 
-    # Create a label: 1 if both intensity and reflection count are high, otherwise 0
-    df['labels'] = ((df['total_intensity'] > intensity_threshold) & 
-                    (df['reflection_count'] > reflection_count_threshold)).astype(int)
-    
+    # Additional labeling based on SNR (I_obs / Sigma_obs) if provided
+    if snr_threshold is not None:
+        df['label'] = df.apply(
+            lambda row: 1 if row['snr'] > snr_threshold else row['label'], axis=1
+        )
+
+    # Additional labeling based on specific ASU groups if provided
+    if asu_groups is not None:
+        df['label'] = df.apply(
+            lambda row: 1 if (row['asu_h'], row['asu_k'], row['asu_l']) in asu_groups else row['label'], axis=1
+        )
+
     return df
+
+
 def train_and_evaluate_model(df):
-    # Create labels before training
+    # Create labels based on CBI values
     df = create_labels(df)
     
     # Print label distribution for inspection
-    print("Label distribution:", df['labels'].value_counts())
+    print("Label distribution:", df['label'].value_counts())
     
     # Split data into features and target
-    X = df.drop('labels', axis=1)
-    y = df['labels']
+    X = df.drop('label', axis=1)
+    y = df['label']
     
     # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
@@ -64,7 +77,7 @@ def train_and_evaluate_model(df):
     df_results = pd.DataFrame({'Actual': y_test, 'Predicted_Prob': y_prob})
     
     # Optionally, set a custom threshold for classification
-    threshold = 0.95  # Default is 0.5, but you can adjust it
+    threshold = 0.8  # Adjust this threshold as needed
     df_results['Predicted_Label'] = (df_results['Predicted_Prob'] >= threshold).astype(int)
     
     # Print the first few rows of the results
@@ -72,11 +85,5 @@ def train_and_evaluate_model(df):
     
     # You can also print how the new predicted labels compare to the actual labels
     print(classification_report(df_results['Actual'], df_results['Predicted_Label']))
-
-if __name__ == "__main__":
-    # Example DataFrame creation or loading
-    df = prepare_dataframe(parse_xds_ascii('XDS_ASCII.HKL'))
-    df = feature_engineering(df)
     
-    # Train and evaluate the model
-    train_and_evaluate_model(df)
+    return clf  # Return the trained model for further use

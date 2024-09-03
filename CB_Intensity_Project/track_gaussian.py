@@ -9,16 +9,16 @@ import glob
 import re
 
 # Import all functions from other modules
-from create_widgets import create_widgets
 from browse_image import browse_image
-from load_and_display_image import load_and_display_image
-from gaussian_2d import gaussian_2d
-from fit_gaussian import fit_gaussian
 from calculate_gaussian_region_intensity import calculate_gaussian_region_intensity
-from plot_intensities import plot_intensities
+from create_widgets import create_widgets
+from fit_gaussian import fit_gaussian
+from gaussian_2d import gaussian_2d
+from load_and_display_image import load_and_display_image
 from normalize_intensities import normalize_intensities
-from toggle_smoothing import toggle_smoothing
+from plot_intensities import plot_intensities
 from smooth_intensity_values import smooth_intensity_values
+from toggle_smoothing import toggle_smoothing
 
 class CenterBeamIntensityApp:
     

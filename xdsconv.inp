@@ -1,0 +1,9 @@
+! UNIT_CELL_CONSTANTS= 11.909    11.909    11.909  90.000  90.000  90.000
+! SPACE_GROUP_NUMBER= 221
+
+INPUT_FILE= /mnt/c/Users/bubl3932/Desktop/BKinD/XDS_ASCII_CBI.HKL
+OUTPUT_FILE=ml_shelx.hkl SHELX
+FRIEDEL'S_LAW=FALSE
+MERGE=FALSE
+
+! further options see http://xds.mpimf-heidelberg.mpg.de/~kabsch/xds/html_doc/xdsconv_parameters.html

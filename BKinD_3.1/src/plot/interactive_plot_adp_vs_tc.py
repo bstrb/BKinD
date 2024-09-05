@@ -27,7 +27,7 @@ def plot_results(data, folder_path):
         fig.add_trace(go.Scatter(
             x=values['completeness'],
             y=values['values'],
-            mode='markers',
+            mode='lines+markers',
             name=atom_name
         ))
 

@@ -1,4 +1,4 @@
-# gui.py
+# main.py
 
 import shutil
 
@@ -14,7 +14,7 @@ from filter_reflections_randomly import filter_reflections_randomly
 
 
 from extract_data_from_file import extract_data_from_file
-from create_xdsconv_inp import create_xdsconv_inp
+from create_xdsconv import create_xdsconv
 from run_process import run_process
 from extract_r1_value import extract_r1_value
 
@@ -77,15 +77,28 @@ class DynaML:
         # Create the DynaML_OUTPUT folder with two subfolders
         output_folder = os.path.join(output_dir, "DynaML_OUTPUT")
         os.makedirs(output_folder, exist_ok=True)
-        predicted_folder = os.path.join(output_folder, "predicted")
-        random_folder = os.path.join(output_folder, "random")
 
+        predicted_folder = os.path.join(output_folder, "predicted")
         os.makedirs(predicted_folder, exist_ok=True)
+
+        random_folder = os.path.join(output_folder, "random")
         os.makedirs(random_folder, exist_ok=True)
 
         # Copy the .ins file to both the predicted and random folders with the name 'dynaml.ins'
         shutil.copy(ins_file, os.path.join(predicted_folder, 'dynaml.ins'))
         shutil.copy(ins_file, os.path.join(random_folder, 'dynaml.ins'))
+        
+        # Extract data from the .HKL file
+        unit_cell_constants, space_group_number = extract_data_from_file(hkl_file)
+
+        if not unit_cell_constants or not space_group_number:
+            return  # Exit if data extraction fails
+        
+        # Create xdsconv.inp in the predicted folder
+        create_xdsconv(unit_cell_constants, space_group_number, predicted_folder)   
+
+        # Create xdsconv.inp in the random folder
+        create_xdsconv(unit_cell_constants, space_group_number, random_folder)     
 
         # Prepare data
         df, header_lines = prepare_data(hkl_file)
@@ -105,38 +118,6 @@ class DynaML:
 
         # Filter random reflections, removing the same amount as predicted
         filter_reflections_randomly(header_lines, df, num_removed, random_folder)
-                
-        # Extract data from the .ins file
-        unit_cell_constants, space_group_number = extract_data_from_file(os.path.join(predicted_folder, 'XDS_ASCII_filtered.HKL'))
-
-        if not unit_cell_constants or not space_group_number:
-            return  # Exit if data extraction fails
-        
-        # Create xdsconv.inp in the predicted folder
-        create_xdsconv_inp(
-            file_path=os.path.join(predicted_folder, 'XDS_ASCII_filtered.HKL'),
-            unit_cell_constants=unit_cell_constants,
-            space_group_number=space_group_number,
-            output_file_type="HKL",  # Example, adjust based on your application's logic
-            friedel_var=False,       # Example, adjust based on your application's logic
-            merge_var=False          # Example, adjust based on your application's logic
-        )
-        
-        # Move the generated xdsconv.inp to the predicted folder
-        shutil.move("xdsconv.inp", os.path.join(predicted_folder, "xdsconv.inp"))
-
-        # Create xdsconv.inp in the random folder
-        create_xdsconv_inp(
-            file_path=os.path.join(random_folder, 'XDS_ASCII_filtered.HKL'),
-            unit_cell_constants=unit_cell_constants,
-            space_group_number=space_group_number,
-            output_file_type="HKL",  # Example, adjust based on your application's logic
-            friedel_var=False,       # Example, adjust based on your application's logic
-            merge_var=False          # Example, adjust based on your application's logic
-        )
-
-        # Move the generated xdsconv.inp to the random folder
-        shutil.move("xdsconv.inp", os.path.join(random_folder, "xdsconv.inp"))
 
         # After moving the generated xdsconv.inp to the predicted folder
         run_process(command=["xdsconv"], directory=predicted_folder, suppress_output=True)
@@ -156,11 +137,14 @@ class DynaML:
 
         if predicted_r1 is not None and random_r1 is not None:
             # Compare the R1 values
-            comparison = "lower" if predicted_r1 < random_r1 else "higher" if predicted_r1 > random_r1 else "equal"
-            messagebox.showinfo("R1 Comparison", f"Predicted R1 (all data): {predicted_r1}\nRandom R1 (all data): {random_r1}\n\nThe R1 for the predicted data is {comparison} than the R1 for the random data.")
+            comparison = "lower than" if predicted_r1 < random_r1 else "higher than" if predicted_r1 > random_r1 else "equal to"
+            messagebox.showinfo("R1 Comparison", f"Predicted R1 (all data): {predicted_r1}\nRandom R1 (all data): {random_r1}\n\nThe R1 for the predicted data is {comparison} the R1 for the random data.")
         else:
             messagebox.showerror("Error", "Failed to extract R1 values from the .res files.")
-            
+        
+        if comparison == "lower than":
+            print('predicted data points are likely dynamical')
+
         # Additional steps can be added here, such as further analysis or validation
         messagebox.showinfo("Success", "Processing completed!")
 

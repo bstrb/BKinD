@@ -4,19 +4,45 @@ Welcome to BKinD! This guide will walk you through the steps necessary to set up
 
 This guide is divided into the following sections:
 
-System Requirements (These must be manually installed by the user prior to running the script; otherwise, the script will terminate and display an error message)
+System Requirements
 
-   1. Instructions to Install Conda
-   2. Instructions to Install SHELXL
-   3. Instructions for Setting Up XDS
+The following must be manually installed by the user before running the script. If these are not installed, the script will terminate and display an error message.
 
-When these are installed you can run the application by navigating to BKinD folder (using your preferred conda environment and making sure that shelxl and xds are runnable)
+   1. Install Conda (see instructions below)
+   2. Install SHELXL (see instructions below)
+   3. Set Up XDS (see instructions below)
 
-	cd path/to/BKinD
+Once these are installed, you can run the BKinD application in two ways:
 
-and run the application using
+Via Command Line:
+Navigate to the BKinD folder:
 
-	python bkind.py (python3 bkind.py for python versions 3.X.X)
+cd path/to/BKinD
+
+Ensure that your Conda environment is activated and both SHELXL and XDS are runnable. Then run the application:
+
+python bkind.py
+
+For Python 3.x versions:
+
+python3 bkind.py
+
+Via run_script.bat:
+You can also run the application by double-clicking the pre-configured batch script run_script.bat, which will activate the Conda environment and run the BKinD application.
+
+To run it:
+
+Double-click run_script.bat in the BKinD folder.
+Creating a Shortcut for run_script.bat:
+To make launching BKinD easier, you can create a desktop shortcut for run_script.bat and customize it with an icon from the assets folder:
+
+Right-click run_script.bat and select Create Shortcut.
+Right-click the newly created shortcut and select Properties.
+In the Shortcut tab, click Change Icon....
+Browse to the assets folder and select an icon (e.g., assets/icon.ico).
+Click OK and Apply to set the new icon.
+Now you can double-click the shortcut on your desktop to run BKinD.
+
 
 The script will then update python to necessary version and install/update necessary packages.
 

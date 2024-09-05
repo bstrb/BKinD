@@ -1,13 +1,11 @@
-# modify_xds_inp.py
-
 # Standard library imports
 import os
 
 def modify_xds_inp(target_directory):
     """
     Modifies the XDS.INP file to ensure that the only active JOB line is 'JOB= CORRECT'.
-    All other JOB lines are commented out, and the line starting with 'NAME_TEMPLATE_OF_DATA_FRAMES'
-    is also commented out.
+    All other JOB lines are commented out, the line starting with 'NAME_TEMPLATE_OF_DATA_FRAMES'
+    is also commented out, and the line starting with 'STRONG_PIXEL' is commented out.
     """
     
     file_path = os.path.join(target_directory, 'xds.inp')
@@ -32,10 +30,14 @@ def modify_xds_inp(target_directory):
             new_line = '!' + stripped_line.lstrip('!') + '\n'  # Comment out this line
             new_lines.append(new_line)
         
+        # Check for STRONG_PIXEL line
+        elif stripped_line.startswith('STRONG_PIXEL'):
+            new_line = '!' + stripped_line.lstrip('!') + '\n'  # Comment out STRONG_PIXEL line
+            new_lines.append(new_line)
+
         else:
             new_lines.append(line)  # Return the original line if it doesn't match conditions
 
     # Write the modified lines back to the file
     with open(file_path, 'w') as file:
         file.writelines(new_lines)
-

@@ -1,6 +1,6 @@
 # gaussian_2d.py
 
-import numpy as np
+import numpy as np 
 
 def gaussian_2d(self, xy, x0, y0, sigma_x, sigma_y, amplitude, offset):
     """2D Gaussian function."""

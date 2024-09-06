@@ -18,4 +18,7 @@ def browse_image(self):
     self.file_name_label.config(text=f"Selected File: {file_name}")
 
     # Enable the display image button after an image is selected
-    self.display_image_button.config(state=tk.NORMAL)
+    self.display_gaussian_button.config(state=tk.NORMAL)
+
+    # Enable the display image button after an image is selected
+    self.display_voigt_button.config(state=tk.NORMAL)

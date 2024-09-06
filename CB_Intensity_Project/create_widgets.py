@@ -8,7 +8,6 @@ from calculate_intensities import calculate_intensities
 
 def create_widgets(self):
     # Button to browse and select the initial .img file
-    # self.browse_button = tk.Button(self.root, text="Browse Image", command=self.browse_image)
     self.browse_button = tk.Button(self.root, text="Browse Image", command=lambda: browse_image(self))
     self.browse_button.pack(pady=10)
 

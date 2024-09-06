@@ -14,7 +14,7 @@ def load_and_display_image(self, method='gaussian'):
     if method == 'gaussian':
         # Fit a Gaussian to the image to determine the center and spread
         center, sigma_x, sigma_y, amplitude, offset = fit_gaussian(img_data)
-        print(f"Gaussian Fitted Center: {self.center} and Amplitude: {amplitude}")
+        print(f"Gaussian Fitted Center: {center} and Amplitude: {amplitude}")
         print(f"Offset: {offset}, Sigma X: {sigma_x}, Sigma Y: {sigma_y}")
     elif method == 'pseudo_voigt':
         # Fit a pseudo-Voigt to the image to determine the center and spread
@@ -42,9 +42,6 @@ def load_and_display_image(self, method='gaussian'):
     ax.add_patch(ellipse)
     plt.title(f'Fitted {method.capitalize()} Center and Spread (Sigma Level = {sigma_level})')
     plt.show()
-
-    print(f"Fitted Center: {self.center}")
-    print(f"Sigma X: {self.sigma_x}, Sigma Y: {self.sigma_y}")
 
     # Enable the calculate button after displaying the image with the Gaussian or pseudo-Voigt area
     self.calculate_button.config(state=tk.NORMAL)

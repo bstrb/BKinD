@@ -28,7 +28,7 @@ def plot_intensities(self, folder_path, inside_intensity_values, outside_intensi
                                 mode='lines', name='|Inside - Outside|', line=dict(color='magenta')))
 
     fig.update_layout(
-        title=f'Normalized Sum of Intensities vs. Frame (CB Gaussian Sigma = {sigma_level})',
+        title=f'Normalized Sum of Intensities vs. Frame (Sigma level = {sigma_level})',
         xaxis_title='Frame Number',
         yaxis_title='Normalized Sum of Intensity',
         legend_title='Intensity Types',

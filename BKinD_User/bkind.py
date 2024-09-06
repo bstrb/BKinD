@@ -124,9 +124,9 @@ def apply_theme(root):
 
 def main():
     # update_repo()
-    ensure_conda_environment()
-    ensure_python_version()
-    check_requirements()
+    # ensure_conda_environment()
+    # ensure_python_version()
+    # check_requirements()
     initialize_app()
 
 

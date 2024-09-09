@@ -4,7 +4,9 @@ Welcome to BKinD! This guide will walk you through the steps necessary to set up
 
 This guide is divided into the following sections:
 
-System Requirements
+#################################################################
+##################### System Requirements #######################
+#################################################################
 
 The following must be manually installed by the user before running the script. If these are not installed, the script will terminate and display an error message.
 
@@ -14,7 +16,8 @@ The following must be manually installed by the user before running the script. 
 
 Once these are installed, you can run the BKinD application in two ways:
 
-Via Command Line:
+   4.1   Via Command Line:
+
 Navigate to the BKinD folder:
 
 cd path/to/BKinD
@@ -27,32 +30,43 @@ For Python 3.x versions:
 
 python3 bkind.py
 
-Via run_script.bat:
-You can also run the application by double-clicking the pre-configured batch script run_script.bat, which will activate the Conda environment and run the BKinD application.
+Running the BKinD Application via a Clickable Icon (Different for WSL and macOS):
 
-To run it:
+   4.2a On WSL via run_script_wsl.bat:
 
-Double-click run_script.bat in the BKinD folder.
-Creating a Shortcut for run_script.bat:
-To make launching BKinD easier, you can create a desktop shortcut for run_script.bat and customize it with an icon from the assets folder:
+You can run the application by double-clicking the pre-configured batch script run_script_wsl.bat. This script will activate the Conda environment and launch the BKinD application.
 
-Right-click run_script.bat and select Create Shortcut.
+   4.2b Creating a Desktop Shortcut for run_script_wsl.bat: 
+
+To make launching BKinD easier, you can create a desktop shortcut for run_script_wsl.bat and customize it with an icon from the assets folder.
+
+Right-click run_script_wsl.bat and select Create Shortcut.
 Right-click the newly created shortcut and select Properties.
 In the Shortcut tab, click Change Icon....
 Browse to the assets folder and select an icon (e.g., assets/icon.ico).
 Click OK and Apply to set the new icon.
-Now you can double-click the shortcut on your desktop to run BKinD.
+Now, you can double-click the shortcut on your desktop to run BKinD.
 
+   4.3a On macOS via run_script_mac (Unix Executable File):
 
-The script will then update python to necessary version and install/update necessary packages.
+You can run the application by double-clicking the pre-configured script run_script_mac, which will activate the Conda environment and launch the BKinD application.
+
+   4.3b Creating a Desktop Shortcut for run_script_mac:
+
+To make launching BKinD easier, you can create a desktop shortcut (alias) for run_script_mac and customize it with an icon from the assets folder.
+
+Right-click run_script_mac and select Make Alias.
+Right-click the newly created alias and select Get Info.
+Browse to the assets folder, select the icon (e.g., assets/icon.ico), and drag and drop it onto the small icon in the upper-left corner of the Get Info window.
+Now, you can double-click the shortcut on your desktop to run BKinD.
 
 This can also be done manually using the following instructions further down in this document:
 
-   4. Instructions for Setting Up Your Conda Environment Manually using requirements.txt
+   5. Instructions for Setting Up Your Conda Environment Manually using requirements.txt
 
 There is also an explanation of the script output:
  
-   5. Explanation of Output
+   6. Explanation of Output
 
 If you encounter any issues during the installation process, please refer to the respective official documentation or seek assistance from the BKinD support team (buster.blomberg@mmk.su.se).
 
@@ -109,9 +123,9 @@ If you encounter any issues during the installation process, please refer to the
 
 1. **Create a New Conda Environment** (optional but recommended):
 
-   - Open your terminal and run the following command to create a new Conda environment named `bkind-env` (you can choose a different name if you prefer):
+   - Open your terminal and run the following command to create a new Conda environment named `bkind` (you can choose a different name if you prefer):
 
-     conda create -n bkind-env
+     conda create -n bkind
 
 
 2. **Activate the Conda Environment**:
@@ -248,30 +262,18 @@ By following these instructions, you will successfully set up XDS on your system
 ## Instructions for Setting Up Your Conda Environment
 
 1. **Create a New Conda Environment** (optional but recommended):
-   Open your terminal and run the following command to create a new Conda environment with required python version(3.12.2) named `bkind-env` (you can choose a different name if you prefer):
-   conda create -n bkind-env python=3.12.2 -y
+   Open your terminal and run the following command to create a new Conda environment with required python version(3.12.2) named `bkind` (you can choose a different name if you prefer):
+   conda create -n bkind -c conda-forge cctbx-base python=3.12.2 numpy==1.26.4 pandas==2.2.1 plotly==5.19.0 tqdm==4.66.4 pillow==10.3.0 -y
 
 2. **Activate the Conda Environment**:
    Once the environment is created, activate it with the following command:
-   conda activate bkind-env
+   conda activate bkind
 
-3. **Install `cctbx-base` from `conda-forge`**:
-   Finally, install `cctbx-base` from the `conda-forge` channel by running:
-   conda install -c conda-forge cctbx-base -y
-
-4. **Change Directory to the BKinD Folder**:
-   Navigate to the BKinD setup folder where your `requirements.txt` file is located. Use the `cd` command to change the directory:
-   cd path/to/BKinD/setup
-
-5. **Install Packages from `requirements.txt`**:
-   Run the following command to install all specified packages from the `requirements.txt` file:
-   conda install --file requirements.txt -y
-
-6. **Install `tkinter`** (for Ubuntu users with limited installations):
+3. **Install `tkinter`** (for Ubuntu users with limited installations):
    If you are using Ubuntu, you might need to install `tkinter` separately using the following command:
    sudo apt-get install python3-tk
 
-7. **Run BKinD**
+4. **Run BKinD**
    You're now set to run the application using
 	python bkind.py
 

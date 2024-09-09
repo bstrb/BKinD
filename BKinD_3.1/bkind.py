@@ -113,7 +113,7 @@ def update_repo():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Run the update_repo.sh script
-    update_script = os.path.join(script_dir, '/setup/update_repo.sh')
+    update_script = os.path.join(script_dir, 'setup/update_repo.sh')
     
     try:
         result = subprocess.run(['bash', update_script], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)

@@ -1,4 +1,4 @@
-@echo off 
+@echo off
 set SCRIPT_DIR=%~dp0
 rem Remove trailing backslash
 set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%

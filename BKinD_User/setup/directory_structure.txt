@@ -1,12 +1,15 @@
 
 |-- BKinD_User
-|   |-- run_script.bat
-|   |-- setup_and_run.sh
+|   |-- run_bkind.sh
+|   |-- run_bkind_mac
 |   |-- setup
 |   |   |-- requirements.txt
+|   |   |-- setup_and_run.sh
 |   |   |-- setup_check.py
+|   |   |-- README.md
+|   |   |-- directory_structure.txt
 |   |-- bkind.py
-|   |-- README.md
+|   |-- run_bkind_wsl.bat
 |   |-- assets
 |   |   |-- bkind_logo.ico
 |   |   |-- bkind_logo.png
@@ -99,4 +102,3 @@
 |   |   |-- xray
 |   |   |   |-- convert_csv_to_hkl.py
 |   |   |   |-- calculate_asu_and_resolution.py
-|-----------|

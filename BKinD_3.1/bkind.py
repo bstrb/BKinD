@@ -36,7 +36,7 @@ folder_name = os.path.basename(script_directory)
 
 # Extract the decimal number from the folder name
 folder_number = re.search(r'\d+\.\d+', folder_name)
-version = folder_number.group(0)
+version = folder_number.group(0) if folder_number else ''
 
 # Add the src directory to the Python path
 sys.path.append(os.path.join(script_directory, 'src'))

@@ -10,7 +10,7 @@ echo "Running run_bkind.sh script"
 source /opt/anaconda3/etc/profile.d/conda.sh
 
 # Activate the Conda environment
-conda activate bkind_env
+conda activate bkind
 
 # Run the Python script
 python bkind.py

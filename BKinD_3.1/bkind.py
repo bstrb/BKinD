@@ -18,11 +18,11 @@ except ImportError:
 # Custom module imports
 from setup.setup_check import (
     is_conda_environment,
-    check_python_version,
-    is_cctbx_installed,
-    check_and_install_packages,
-    check_and_install_package_versions,
-    check_and_install_pillow,
+    # check_python_version,
+    # is_cctbx_installed,
+    # check_and_install_packages,
+    # check_and_install_package_versions,
+    # check_and_install_pillow,
     check_xds_installed,
     check_shelx_installed,
 )
@@ -49,20 +49,20 @@ def ensure_conda_environment():
         show_error_and_exit("Environment Error", "This application must be run within a Conda environment.")
 
 
-def ensure_python_version():
-    """Ensure the correct Python version is being used."""
-    if not check_python_version():
-        root = tk.Tk()
-        root.withdraw()
-        if messagebox.askyesno("Version Error", "This application requires Python 3.12.2. Install it now?"):
-            root.destroy()
-            try:
-                subprocess.run(["conda", "install", "python==3.12.2", "-y"], check=True)
-                messagebox.showinfo("Installation Successful", "Python 3.12.2 installed successfully. Please restart the application with 'python bkind.py' using conda python version 3.12.2.")
-            except subprocess.CalledProcessError:
-                show_error_and_exit("Installation Failed", "Failed to install Python 3.12.2.")
-        else:
-            show_error_and_exit("Version Error", "Exiting: Incorrect Python version.")
+# def ensure_python_version():
+#     """Ensure the correct Python version is being used."""
+#     if not check_python_version():
+#         root = tk.Tk()
+#         root.withdraw()
+#         if messagebox.askyesno("Version Error", "This application requires Python 3.12.2. Install it now?"):
+#             root.destroy()
+#             try:
+#                 subprocess.run(["conda", "install", "python==3.12.2", "-y"], check=True)
+#                 messagebox.showinfo("Installation Successful", "Python 3.12.2 installed successfully. Please restart the application with 'python bkind.py' using conda python version 3.12.2.")
+#             except subprocess.CalledProcessError:
+#                 show_error_and_exit("Installation Failed", "Failed to install Python 3.12.2.")
+#         else:
+#             show_error_and_exit("Version Error", "Exiting: Incorrect Python version.")
 
 
 def show_error_and_exit(title, message):
@@ -76,14 +76,14 @@ def show_error_and_exit(title, message):
 
 def check_requirements():
     """Check all necessary requirements and installations."""
-    if not is_cctbx_installed():
-        sys.exit("CCTBX installation required.")
-    if not check_and_install_packages():
-        sys.exit("Exiting: Application setup incomplete.")
-    if not check_and_install_package_versions():
-        sys.exit("Exiting: Required package versions are not installed.")
-    if not check_and_install_pillow():
-        sys.exit("Exiting: pillow package needed for image display.")
+    # if not is_cctbx_installed():
+    #     sys.exit("CCTBX installation required.")
+    # if not check_and_install_packages():
+    #     sys.exit("Exiting: Application setup incomplete.")
+    # if not check_and_install_package_versions():
+    #     sys.exit("Exiting: Required package versions are not installed.")
+    # if not check_and_install_pillow():
+    #     sys.exit("Exiting: pillow package needed for image display.")
     if not check_xds_installed():
         sys.exit("XDS installation required.")
     if not check_shelx_installed():
@@ -124,10 +124,9 @@ def update_repo():
 def main():
     update_repo()
     ensure_conda_environment()
-    ensure_python_version()
+    # ensure_python_version()
     check_requirements()
     initialize_app()
-
 
 if __name__ == "__main__":
     main()

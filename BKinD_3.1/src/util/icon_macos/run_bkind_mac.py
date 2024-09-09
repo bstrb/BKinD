@@ -21,17 +21,11 @@ def conda_env_exists(env_name):
     envs = [line.split()[0] for line in output.splitlines() if line]
     return env_name in envs
 
-# def create_conda_env(env_name):
-#     """Create a new Conda environment with Python 3.12.2 and cctbx-base."""
-#     command = f"conda create --name {env_name} python=3.12.2 cctbx-base -c conda-forge -y"
-#     print(f"Creating conda environment: {env_name}")
-#     run_command(command)
-
 def create_conda_env(env_name):
     """Create a new Conda environment with Python 3.12.2, cctbx-base, and specific versions of other packages."""
     command = (
         f"conda create --name {env_name} python=3.12.2 cctbx-base "
-        f"numpy=1.26.4 pandas=2.2.1 plotly=5.19.0 tqdm=4.66.2 pillow=10.3.0 "
+        f"numpy=1.26.4 pandas=2.2.1 plotly=5.19.0 tqdm=4.66.4 pillow=10.3.0 "
         "-c conda-forge -y"
     )
     print(f"Creating conda environment: {env_name}")

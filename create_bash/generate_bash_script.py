@@ -1,14 +1,40 @@
-def generate_bash_script(bash_file_name, bash_file_directory, process_output_name, process_file_directory, num_threads):
+import os
+
+def find_first_file(directory, extension):
+    # Find the first file in the directory with the specified extension
+    for file_name in os.listdir(directory):
+        if file_name.endswith(extension):
+            return os.path.join(directory, file_name)
+    return None
+
+def generate_bash_script(bash_file_name, bash_file_directory,
+                        process_output_name, process_file_directory, 
+                        num_threads, geom_file=None, lst_file=None, 
+                        cell_file=None, input_sol_file='best_results.sol'
+                        ):
     # Generate the full path for the bash file
     bash_file_path = f"{bash_file_directory}/{bash_file_name}.sh"
+
+    # If no geom_file, lst_file, or cell_file is provided, find the first one in the directory
+    geom_file_path = geom_file or find_first_file(bash_file_directory, ".geom")
+    lst_file_path = lst_file or find_first_file(bash_file_directory, ".lst")
+    cell_file_path = cell_file or find_first_file(bash_file_directory, ".cell")
+
+    # Error if any of the required files are not found
+    if not geom_file_path:
+        raise FileNotFoundError("No .geom file found in the directory.")
+    if not lst_file_path:
+        raise FileNotFoundError("No .lst file found in the directory.")
+    if not cell_file_path:
+        raise FileNotFoundError("No .cell file found in the directory.")
 
     # Create the content of the bash file
     bash_script_content = f"""#!/bin/bash
 export HDF5_PLUGIN_PATH=$HOME/anaconda3/envs/diffractem2/lib/python3.10/site-packages/hdf5plugin/plugins
 
-indexamajig -g UOX.geom -i list.lst -o {process_file_directory}/{process_output_name}.stream -j {num_threads} -p UOX.cell \\
+indexamajig -g {geom_file_path} -i {lst_file_path} -o {process_file_directory}/{process_output_name}.stream -j {num_threads} -p {cell_file_path} \\
 --indexing=file --no-revalidate --no-retry --integration=rings --no-refine \\
---fromfile-input-file=best_results.sol --no-half-pixel-shift --no-check-cell \\
+--fromfile-input-file={input_sol_file} --no-half-pixel-shift --no-check-cell \\
 --pinkIndexer-max-refinement-disbalance=1 --peaks=cxi --max-indexer-threads=1 \\
 --min-peaks=25 --camera-length-estimate=1.17 --xgandalf-tolerance=0.02 --xgandalf-sampling-pitch=5 \\
 --xgandalf-min-lattice-vector-length=2 --xgandalf-max-lattice-vector-length=40 --xgandalf-grad-desc-iterations=2 \\
@@ -22,7 +48,6 @@ indexamajig -g UOX.geom -i list.lst -o {process_file_directory}/{process_output_
         bash_file.write(bash_script_content)
 
     # Make the bash file executable
-    import os
     os.chmod(bash_file_path, 0o755)
 
     # Output the full path of the generated bash file

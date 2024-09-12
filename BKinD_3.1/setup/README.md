@@ -1,74 +1,102 @@
-# BKinD readme.txt with Setup Instructions
 
-Welcome to BKinD! This guide will walk you through the steps necessary to set up the required environment and install all necessary software to use BKinD effectively. BKinD (BKinD Kernel in Diffraction) is a tool designed for filtering and analyzing Diffraction Data. Please follow the instructions to ensure a successful setup.
+Welcome to BKinD!
+
+This guide will help you set up the required environment and install all necessary software to effectively use BKinD, a tool designed for filtering and analyzing diffraction data. Follow the instructions below to ensure a smooth setup and optimal use of the BKinD application.
+
+## Guide Overview
 
 This guide is divided into the following sections:
+1. **System Requirements**: Essential components you need to install manually beforehand.
+2. **Running BKinD**: Instructions for running the application on different platforms (WSL and macOS) or via the command line.
+3. **Setting Up Conda Environment**: Steps to manually configure your Conda environment.
+4. **Explanation of Output**: A breakdown of the application's output.
 
-#################################################################
-##################### System Requirements #######################
-#################################################################
+---
 
-The following must be manually installed by the user before running the script. If these are not installed, the script will terminate and display an error message.
+## System Requirements
 
-   1. Install Conda (see instructions below)
-   2. Install SHELXL (see instructions below)
-   3. Set Up XDS (see instructions below)
+Before running BKinD, the following components must be installed manually. If any of these are missing, the application will terminate and display an error message:
 
-Once these are installed, you can run the BKinD application in two ways:
+1. **Conda**: See installation instructions below.
+2. **SHELXL**: See installation instructions below.
+3. **XDS**: Set up as per the instructions provided.
 
-   4.1   Via Command Line:
+---
 
-Navigate to the BKinD folder:
+## Running the BKinD Application
 
+Once the necessary software is installed, you can run the BKinD application in the following ways:
+
+### 1. Running via Clickable Icons (WSL and macOS)
+
+#### a) On WSL using `run_script_wsl.bat`:
+You can run BKinD by double-clicking the pre-configured `run_script_wsl.bat`. This will automatically create and/or activate a Conda environment with the necessary dependencies and launch the BKinD application.
+
+#### b) Creating a Desktop Shortcut for `run_script_wsl.bat`:
+To make it easier to launch BKinD, you can create a desktop shortcut for `run_script_wsl.bat` and customize it with an icon from the assets folder:
+
+- Right-click `run_script_wsl.bat` and select **Create Shortcut**.
+- Right-click the newly created shortcut and select **Properties**.
+- In the **Shortcut** tab, click **Change Icon...**.
+- Browse to the **assets** folder and select an icon (e.g., `assets/icon.ico`).
+- Click **OK** and **Apply** to set the new icon.
+
+Now, you can double-click the shortcut on your desktop to run BKinD.
+
+---
+
+### 2. Running on macOS using `run_script_mac`
+
+#### a) Running via `run_script_mac`:
+Double-click the pre-configured `run_script_mac` Unix executable file. This script will create and/or activate a Conda environment with the necessary requirements and launch the BKinD application.
+
+#### b) Creating a Desktop Shortcut for `run_script_mac`:
+To simplify launching BKinD, you can create a desktop shortcut (alias) for `run_script_mac` and assign an icon from the assets folder:
+
+- Right-click `run_script_mac` and select **Make Alias**.
+- Right-click the newly created alias and select **Get Info**.
+- Browse to the **assets** folder, select the icon (e.g., `assets/icon.ico`), and drag it onto the small icon in the upper-left corner of the **Get Info** window.
+
+Now, you can double-click the alias on your desktop to run BKinD.
+
+---
+
+### 3. Running via Command Line
+
+You can also run BKinD from the command line. First, navigate to the BKinD directory:
+
+```bash
 cd path/to/BKinD
+```
 
-Ensure that your Conda environment is activated and both SHELXL and XDS are runnable. Then run the application:
+Ensure that your Conda environment (with the requirements specified in `setup/requirements.txt`) is activated, and both SHELXL and XDS are accessible. Then run the application using:
 
+```bash
 python bkind.py
+```
 
-For Python 3.x versions:
-
+For systems with Python 3.x installed as `python3`:
+```bash
 python3 bkind.py
+```
 
-Running the BKinD Application via a Clickable Icon (Different for WSL and macOS):
+---
 
-   4.2a On WSL via run_script_wsl.bat:
+## Manual Setup Instructions
 
-You can run the application by double-clicking the pre-configured batch script run_script_wsl.bat. This script will activate the Conda environment and launch the BKinD application.
+If you prefer to manually set up the environment, follow the detailed instructions provided further down in this document for configuring your Conda environment with all necessary dependencies.
 
-   4.2b Creating a Desktop Shortcut for run_script_wsl.bat: 
+---
 
-To make launching BKinD easier, you can create a desktop shortcut for run_script_wsl.bat and customize it with an icon from the assets folder.
+## Explanation of Output
 
-Right-click run_script_wsl.bat and select Create Shortcut.
-Right-click the newly created shortcut and select Properties.
-In the Shortcut tab, click Change Icon....
-Browse to the assets folder and select an icon (e.g., assets/icon.ico).
-Click OK and Apply to set the new icon.
-Now, you can double-click the shortcut on your desktop to run BKinD.
+A detailed explanation of BKinD’s output is provided in the **Explanation of Output** section below. This will help you understand the results generated by the application.
 
-   4.3a On macOS via run_script_mac (Unix Executable File):
+---
 
-You can run the application by double-clicking the pre-configured script run_script_mac, which will activate the Conda environment and launch the BKinD application.
+## Need Help?
 
-   4.3b Creating a Desktop Shortcut for run_script_mac:
-
-To make launching BKinD easier, you can create a desktop shortcut (alias) for run_script_mac and customize it with an icon from the assets folder.
-
-Right-click run_script_mac and select Make Alias.
-Right-click the newly created alias and select Get Info.
-Browse to the assets folder, select the icon (e.g., assets/icon.ico), and drag and drop it onto the small icon in the upper-left corner of the Get Info window.
-Now, you can double-click the shortcut on your desktop to run BKinD.
-
-This can also be done manually using the following instructions further down in this document:
-
-   5. Instructions for Setting Up Your Conda Environment Manually using requirements.txt
-
-There is also an explanation of the script output:
- 
-   6. Explanation of Output
-
-If you encounter any issues during the installation process, please refer to the respective official documentation or seek assistance from the BKinD support team (buster.blomberg@mmk.su.se).
+If you encounter any issues during the installation or setup process, refer to the official documentation or contact the BKinD support team at [buster.blomberg@mmk.su.se](mailto:buster.blomberg@mmk.su.se).
 
 
 #####################################################################
@@ -77,207 +105,339 @@ If you encounter any issues during the installation process, please refer to the
 
 ## Installing Conda
 
-1. **Download the Conda Installer**:
+### 1. Download the Conda Installer
 
-   - Visit the official Conda download page: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
-   - Choose the appropriate installer (Anaconda or Miniconda) for your operating system (Windows, Mac, Linux).
+- Visit the official Conda download page: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
+- Choose the appropriate installer (Anaconda or Miniconda) for your operating system (Windows, macOS, Linux).
 
-2. **Run the Installer**:
+### 2. Run the Installer
 
-   - For **Windows**:
-     1. Download the `.exe` installer.
-     2. Double-click the installer to launch it.
-     3. Follow the on-screen instructions to complete the installation.
-   
-   - For **Mac**:
+- **For Windows**:
+  1. Download the `.exe` installer.
+  2. Double-click the installer to launch it.
+  3. Follow the on-screen instructions to complete the installation.
 
-     1. Download the `.sh` installer.
-     2. Open a terminal and run the following command to execute the installer:
+- **For macOS**:
+  1. Download the `.sh` installer.
+  2. Open a terminal and execute the installer with the following command:
 
-        bash Miniconda3-latest-MacOSX-x86_64.sh
+```bash
+bash Miniconda3-latest-MacOSX-x86_64.sh
+```
 
-     3. Follow the on-screen instructions to complete the installation.
+  3. Follow the on-screen instructions to complete the installation.
 
-   - For **Linux**:
+- **For Linux**:
+  1. Download the `.sh` installer.
+  2. Open a terminal and execute the installer with the following command:
 
-     1. Download the `.sh` installer.
-     2. Open a terminal and run the following command to execute the installer:
+```bash
+bash Miniconda3-latest-Linux-x86_64.sh
+```
 
-        bash Miniconda3-latest-Linux-x86_64.sh
+  3. Follow the on-screen instructions to complete the installation.
 
-     3. Follow the on-screen instructions to complete the installation.
+### 3. Restart Your Terminal
 
-3. **Restart Your Terminal**:
+Close and reopen your terminal to apply the changes.
 
-   - Close and reopen your terminal to apply the changes.
+### 4. Verify the Installation
 
-4. **Verify the Installation**:
+To verify that Conda was installed correctly, run the following command:
 
-   - To ensure Conda is installed correctly, run the following command:
+```bash
+conda --version
+```
 
-     conda --version
+You should see the Conda version information displayed.
 
-   - You should see the Conda version information displayed.
+---
 
 ## Using Conda
 
-1. **Create a New Conda Environment** (optional but recommended):
+### 1. Create a New Conda Environment (Recommended)
 
-   - Open your terminal and run the following command to create a new Conda environment named `bkind` (you can choose a different name if you prefer):
+Open your terminal and create a new Conda environment named `bkind` (or choose another name) with the following command:
 
-     conda create -n bkind
+```bash
+conda create -n bkind
+```
 
+### 2. Activate the Conda Environment
 
-2. **Activate the Conda Environment**:
+Activate your newly created environment using the command:
 
-   - Once the environment is created, activate it with the following command:
+```bash
+conda activate bkind-env
+```
 
-     conda activate bkind-env
+### 3. Install Packages
 
+To install packages in your environment, use the following command, replacing `package_name` with the package you wish to install:
 
-3. **Install Packages**:
+```bash
+conda install package_name
+```
 
-   - To install packages in your environment, use the following command:
+You can also install multiple packages at once:
 
-     conda install package_name
+```bash
+conda install numpy pandas
+```
 
-   - Replace `package_name` with the name of the package you want to install. You can install multiple packages at once:
+### 4. List Installed Packages
 
-     conda install numpy pandas
+To view a list of all installed packages in your environment, use:
 
+```bash
+conda list
+```
 
-4. **List Installed Packages**:
+### 5. Update Packages
 
-   - To see a list of all packages installed in your environment, use:
+To update a specific package to the latest version, run:
 
-     conda list
+```bash
+conda update package_name
+```
 
+### 6. Remove Packages
 
-5. **Update Packages**:
-   - To update a specific package to the latest version, use:
+To remove a package from your environment, use:
 
-     conda update package_name
+```bash
+conda remove package_name
+```
 
+### 7. Deactivate the Conda Environment
 
-6. **Remove Packages**:
-   - To remove a specific package from your environment, use:
+To deactivate your current environment and return to the base environment, use:
 
-     conda remove package_name
+```bash
+conda deactivate
+```
 
+### 8. Delete a Conda Environment
 
-7. **Deactivate the Conda Environment**:
-   - To deactivate your current environment and return to the base environment, use:
+To delete a Conda environment, run:
 
-     conda deactivate
+```bash
+conda env remove -n environment_name
+```
 
+Replace `environment_name` with the name of the environment you wish to delete.
 
-8. **Delete a Conda Environment**:
-   - To delete a Conda environment, use:
+---
 
-     conda env remove -n environment_name
+By following these instructions, you will successfully install Conda on your system and manage your Conda environments and packages efficiently.
 
-   - Replace `environment_name` with the name of the environment you want to delete.
-
-By following these instructions, you will successfully install Conda on your system and be able to manage your Conda environments and packages effectively.
 
 ########################################################
 ############ Instructions to Install SHELXL ############
 ########################################################
 
-1. **Register as an Academic User**:
+## Instructions for Installing SHELXL
 
-   - Visit the website: http://shelx.uni-goettingen.de/register.html
-   - Complete the registration form. The answer to the "Xtal" question is P212121.
+### 1. Register as an Academic User
 
-2. **Download the SHELXL Software**:
+- Visit the website: http://shelx.uni-goettingen.de/register.html
+- Complete the registration form. The answer to the "Xtal" question is: **P212121**.
 
-   - Visit the website: http://shelx.uni-goettingen.de/
-   - Download the appropriate version for your system (Windows, Mac, Linux) from: https://shelx.uni-goettingen.de/bin/
+### 2. Download the SHELXL Software
 
-3. **Extract the Downloaded Package**:
+- Visit the SHELXL homepage: http://shelx.uni-goettingen.de/
+- Download the appropriate version for your operating system (Windows, macOS, Linux) from: https://shelx.uni-goettingen.de/bin/
 
-   - Extract the contents of the downloaded package.
+### 3. Extract the Downloaded Package
 
-4. **Move the SHELXL Executable to a Directory Included in Your System's PATH**:
+- Once downloaded, extract the contents of the package to a directory of your choice.
 
-   - For **Linux and Mac**:
+### 4. Move the SHELXL Executable to a Directory Included in Your System's PATH
 
-     sudo mv shelxl /usr/local/bin
+- For **Linux and macOS**:
+  
+  Open a terminal and use the following command to move the `shelxl` executable to a directory in your system's PATH:
 
-   - For **Windows**:
+```bash
+sudo mv shelxl /usr/local/bin
+```
 
-     - Move the extracted `shelxl.exe` file to a directory included in your PATH, such as `C:\Windows\System32`.
+- For **Windows**:
+  
+Move the `shelxl.exe` file to a directory included in your PATH, such as `C:\Windows\System32`.
 
-5. **Verify the Installation**:
-   - Run the following command(in the terminal) to verify the installation:
+### 5. Verify the Installation
 
-     shelxl
+- To verify that SHELXL is installed correctly, open a terminal and run the following command:
 
-   - If the installation is successful, you should see the SHELXL version information.
+```bash
+shelxl
+```
+
+- If the installation is successful, the terminal should display the SHELXL version information.
+
+By following these steps, you should be able to install SHELXL on your system and verify its successful installation.
+
 
 #########################################################
 ############ Instructions for Setting Up XDS ############
 #########################################################
 
+
 ## Instructions for Setting Up XDS on Linux
 
-1. **Become root** (on Ubuntu, use `sudo -i`, it will ask for password):
-   sudo -i
+### 1. Become root (on Ubuntu, use `sudo -i`)
 
-2. **Change directory to `/usr/local/bin`**:
-   cd /usr/local/bin
+Run the following command to switch to the root user:
 
-3. **Download and extract the XDS software**:
-   wget -O- https://xds.mr.mpg.de/XDS-INTEL64_Linux_x86_64.tar.gz | tar xzvf -
+```bash
+sudo -i
+```
+You will be prompted to enter your password.
 
-4. **Create symbolic links for the extracted files**:
-   ln -sf XDS-INTEL64_Linux_x86_64/* .
+### 2. Change directory to `/usr/local/bin`
 
-## Instructions for Setting Up XDS on Mac with Intel/Apple M Processors
+Navigate to the directory where XDS will be installed:
 
-1. **Obtain root privileges** (it will ask for your password):
-   sudo su
+```bash
+cd /usr/local/bin
+```
 
-2. **Change directory to `/usr/local/bin`**:
-   cd /usr/local/bin
+### 3. Download and extract the XDS software
 
-3. **Download and extract the XDS software**:
-   curl -L -o - https://xds.mr.mpg.de/XDS-OSX_64.tar.gz | tar xzvf -
+Download the XDS software and extract it in one command:
 
-4. **Create symbolic links for the extracted files**:
-   - For Intel:
-     ln -sf XDS-OSX_64/* .
-   - For Apple M:
-     ln -sf XDS-Apple_M1/* .
+```bash
+wget -O- https://xds.mr.mpg.de/XDS-INTEL64_Linux_x86_64.tar.gz | tar xzvf -
+```
 
-5. **Release root permissions**:
-   exit
+### 4. Create symbolic links for the extracted files
 
-By following these instructions, you will successfully set up XDS on your system. If you encounter any issues or need further assistance, please refer to the official XDS documentation or reach out for help. See https://wiki.uni-konstanz.de/xds/index.php/Installation from where these instructions are taken.
+Link the extracted XDS files to the `/usr/local/bin` directory:
+
+```bash
+ln -sf XDS-INTEL64_Linux_x86_64/* .
+```
+
+---
+
+## Instructions for Setting Up XDS on macOS (Intel and Apple M Processors)
+
+### 1. Obtain root privileges
+
+Switch to the root user by running the following command:
+
+```bash
+sudo su
+```
+You will be prompted to enter your password.
+
+### 2. Change directory to `/usr/local/bin`
+
+Navigate to the directory where XDS will be installed:
+```bash
+cd /usr/local/bin
+```
+
+### 3. Download and extract the XDS software
+
+Use the following command to download and extract the XDS software:
+
+```bash
+curl -L -o - https://xds.mr.mpg.de/XDS-OSX_64.tar.gz | tar xzvf -
+```
+
+### 4. Create symbolic links for the extracted files
+
+- **For Intel processors**:
+
+```bash
+ln -sf XDS-OSX_64/* .
+```
+
+- **For Apple M processors**:
+
+```bash
+ln -sf XDS-Apple_M1/* .
+```
+
+### 5. Release root permissions
+
+Exit the root user by running:
+
+```bash
+exit
+```
+
+---
+
+By following these instructions, you will successfully set up XDS on your system. If you encounter any issues or need further assistance, please refer to the official XDS documentation or check https://wiki.uni-konstanz.de/xds/index.php/Installation for additional details.
 
 #####################################################################################
 ############ Instructions for Setting Up Your Conda Environment MANUALLY ############
 #####################################################################################
 
-## Instructions for Setting Up Your Conda Environment
+# Instructions for Manually Setting Up Your Conda Environment
 
-1. **Create a New Conda Environment** (optional but recommended):
-   Open your terminal and run the following command to create a new Conda environment with required python version(3.12.2) named `bkind` (you can choose a different name if you prefer):
-   conda create -n bkind -c conda-forge cctbx-base python=3.12.2 numpy==1.26.4 pandas==2.2.1 plotly==5.19.0 tqdm==4.66.4 pillow==10.3.0 -y
+To ensure BKinD runs smoothly, follow these steps to manually set up your Conda environment with all necessary dependencies.
 
-2. **Activate the Conda Environment**:
-   Once the environment is created, activate it with the following command:
-   conda activate bkind
+## Step-by-Step Guide
 
-3. **Install `tkinter`** (for Ubuntu users with limited installations):
-   If you are using Ubuntu, you might need to install `tkinter` separately using the following command:
-   sudo apt-get install python3-tk
+### 1. Create a New Conda Environment (Recommended)
 
-4. **Run BKinD**
-   You're now set to run the application using
-	python bkind.py
+Open your terminal and run the following command to create a new Conda environment with the required Python version (3.12.2). You can name the environment `bkind`, or choose a different name if you prefer:
 
-By following these instructions, you will set up your Conda environment with all the required packages specified in your `requirements.txt` file. If you have any issues or questions, please feel free to reach out for further assistance.
+```bash
+conda create -n bkind -c conda-forge cctbx-base python=3.12.2 numpy==1.26.4 pandas==2.2.1 plotly==5.19.0 tqdm==4.66.4 pillow==10.3.0 -y
+```
+
+This command will:
+- Create a Conda environment named `bkind`
+- Install Python 3.12.2 along with essential packages like `numpy`, `pandas`, `plotly`, `tqdm`, `pillow`, and `cctbx-base`. It will also ensure the correct version of each package.
+
+### 2. Activate the Conda Environment
+
+Once the environment has been created, activate it using the following command:
+
+```bash
+conda activate bkind
+```
+
+This will switch your terminal to use the newly created environment.
+
+### 3. Install `tkinter` (For Ubuntu Users)
+
+If you're using Ubuntu, you might need to install `tkinter` separately to enable GUI support for BKinD. Run this command to install `tkinter`:
+
+```bash
+sudo apt-get install python3-tk
+```
+
+This step is essential if you're working on an Ubuntu machine without `tkinter` pre-installed.
+
+### 4. Run BKinD
+
+Now that your environment is set up, you can run the BKinD application using the following command:
+
+```bash
+python bkind.py
+```
+
+### 5. Verify Package Installation (Optional)
+
+To ensure all required packages are installed in your environment, you can list the installed packages by running:
+
+```bash
+conda list
+```
+
+This will display all installed packages along with their versions, allowing you to verify that everything is in place.
+
+---
+
+## Troubleshooting & Support
+
+By following these steps, your Conda environment should be correctly set up with all the required dependencies for running BKinD. 
 
 #######################################################################
 ############ Output Folder Contents and Their Descriptions ############

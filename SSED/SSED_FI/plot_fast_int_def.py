@@ -127,7 +127,7 @@ def process_and_plot_all_files(base_path, output_filename):
     # Update and save the plot
     fig.update_layout(
         title='Rf_free vs Resolution',
-        xaxis_title='sqrt(1/Resolution) (Å)',
+        xaxis_title='Resolution (Å)',
         yaxis_title='Rf_free',
         template='plotly_dark',
         showlegend=True

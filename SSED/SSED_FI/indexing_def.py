@@ -10,10 +10,11 @@ def generate_xy_pairs(x, y, step=0.01, layers=1): #1 layer means 2 layers i.e 5x
             if abs(dx) == layer or abs(dy) == layer:
                 yield (center[0] + dx * step, center[1] + dy * step)
 
-def run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_base, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance):
+def run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_base, output_dir, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance):
 
     output_file = f"{output_file_base}_{x}_{y}.stream"
-    output_path = os.path.join(input_path, output_file)
+    # output_path = os.path.join(input_path, output_file)
+    output_path = os.path.join(output_dir, output_file)
     listfile_path = os.path.join(input_path, 'list.lst')
 
     base_command = (
@@ -56,7 +57,7 @@ def list_h5_files(input_path):
             if file.endswith('.h5'):
                 list_file.write(os.path.join(input_path, file) + '\n')
 
-def gandalf_iterator(geomfile_path, cellfile_path, input_path, output_file_base, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance):
+def gandalf_iterator(geomfile_path, cellfile_path, input_path, output_file_base, output_dir, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance):
     list_h5_files(input_path)
 
     xdefault = -512
@@ -69,7 +70,7 @@ def gandalf_iterator(geomfile_path, cellfile_path, input_path, output_file_base,
         
         #modify_geometry_file(-512, -512)
         modify_geometry_file(geomfile_path, geomfile_path, xdefault, ydefault)
-        run_indexamajig(xdefault, ydefault, geomfile_path, cellfile_path, input_path, output_file_base, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance)
+        run_indexamajig(xdefault, ydefault, geomfile_path, cellfile_path, input_path, output_file_base, output_dir, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance)
     except KeyboardInterrupt:
         print("Process interrupted by user.")
         exit()
@@ -87,7 +88,7 @@ def gandalf_iterator(geomfile_path, cellfile_path, input_path, output_file_base,
         print(f"Running for x={x}, y={y}")
         try:
             modify_geometry_file(geomfile_path, geomfile_path, x, y)
-            run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_base, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance)
+            run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_base, output_dir, num_threads, indexing_method, resolution_push, integration_method, int_radius, min_peaks, xgandalf_tolerance, xgandalf_sampling_pitch, xgandalf_min_vector_length, xgandalf_max_vector_length, xgandalf_iterations, tolerance)
 
         except KeyboardInterrupt:
             print("Process interrupted by user.")

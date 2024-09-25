@@ -93,16 +93,15 @@ def plot_data(fig, data, label=None):
     ))
 
 def process_and_plot_all_files(base_path, output_filename):
-    """
-    Process all files named output_filename in subfolders of base_path and plot their data.
-    """
-    # Create a global figure object
     fig = go.Figure()
 
     for root, dirs, files in os.walk(base_path):
         if output_filename in files:
             file_path = os.path.join(root, output_filename)
             print(f"Processing file: {file_path}")
+
+            # Extract just the folder name
+            folder_name = os.path.basename(os.path.dirname(file_path))
 
             with open(file_path, 'r') as file:
                 content = file.read()
@@ -116,7 +115,7 @@ def process_and_plot_all_files(base_path, output_filename):
                     data = format_extracted_data(numerical_section)
 
                     if data is not None:
-                        plot_data(fig, data, label=file_path)
+                        plot_data(fig, data, label=folder_name)  # Use the folder name as label
                     else:
                         print(f"No data to plot for {file_path}.")
                 else:
@@ -124,9 +123,8 @@ def process_and_plot_all_files(base_path, output_filename):
             else:
                 print(f"No last cycle found in {file_path}.")
 
-    # Update and save the plot
     fig.update_layout(
-        title='Rf_free vs Resolution',
+        title=f'Rf_free vs Resolution for data in {base_path}',
         xaxis_title='Resolution (Å)',
         yaxis_title='Rf_free',
         template='plotly_dark',
@@ -134,7 +132,6 @@ def process_and_plot_all_files(base_path, output_filename):
     )
     
     plotname = "Rfree_vs_Resolution.html"
-    # plot_filename = os.path.join(os.path.dirname(base_path), plotname)
     plot_filename = os.path.join(base_path, plotname)
     fig.write_html(plot_filename)
 

@@ -19,7 +19,8 @@ def generate_bash_script(bash_file_name, stream_files_dir,
     geom_file_path = geom_file or find_first_file(stream_files_dir, ".geom")
     lst_file_path = lst_file or find_first_file(stream_files_dir, ".lst")
     cell_file_path = cell_file or find_first_file(stream_files_dir, ".cell")
-    input_sol_file = sol_file or 'best_results.sol'
+    input_sol_file = sol_file or find_first_file(stream_files_dir, ".sol")
+    # input_sol_file = sol_file or 'best_results.sol'
 
     # Error if any of the required files are not found
     if not geom_file_path:
@@ -28,6 +29,8 @@ def generate_bash_script(bash_file_name, stream_files_dir,
         raise FileNotFoundError("No .lst file found in the directory.")
     if not cell_file_path:
         raise FileNotFoundError("No .cell file found in the directory.")
+    if not input_sol_file:
+        raise FileNotFoundError("No .sol file found in the directory.")
 
     # Create the content of the bash file
     bash_script_content = f"""indexamajig -i {lst_file_path} -g {geom_file_path} -p {cell_file_path} -j {num_threads} -o fast_integration.stream --indexing=file --fromfile-input-file={input_sol_file} --no-revalidate --no-retry --integration=rings --no-refine --no-half-pixel-shift --no-check-cell --peaks=cxi --min-peaks=25

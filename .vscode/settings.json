@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./SSED/SSED_FI",
+        "./SSED/SSED_FI"
+    ]
+}

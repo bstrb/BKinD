@@ -26,12 +26,16 @@ def parse_stream_file(file_path):
             serial_number = None
         elif linestrip == '----- End chunk -----':
             current_chunk['text'] = chunk_text + [line]
-            chunks.append(current_chunk)
+            if 'serial' in current_chunk:
+                chunks.append(current_chunk)
         else:
             chunk_text.append(line)
             if linestrip.startswith('Image serial number:'):
                 serial_number = linestrip.split(':')[-1].strip()
-                current_chunk['serial'] = serial_number
+                try:
+                    current_chunk['serial'] = int(serial_number)  # Convert to integer
+                except ValueError:
+                    print(f"Warning: Unable to convert serial number {serial_number} to integer.")
             elif linestrip.startswith('Event:'):
                 current_event = int(re.search(r'\d+', linestrip).group())
                 current_chunk['frame'] = current_event

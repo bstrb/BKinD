@@ -16,7 +16,7 @@ EOF
 """
     subprocess.run(freerflag_command, shell=True)
 
-def run_refmac5(base_dir, pdb_file, mtz_file, output_file, res_max=20, res_min=0.85, ncycles=30, bins=10):
+def run_refmac5(base_dir, pdb_file, mtz_file, output_file, res_max=20, res_min=1.5, ncycles=30, bins=10):
     refmac_command = f"""refmac5 xyzin {pdb_file} xyzout {base_dir}/output.pdb hklin {mtz_file} hklout {base_dir}/input.mtz << EOF
     ncyc {ncycles}
     bins {bins}

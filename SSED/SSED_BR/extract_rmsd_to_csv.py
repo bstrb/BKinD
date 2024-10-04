@@ -1,8 +1,14 @@
+import os
 import csv
+
+from find_stream_files import find_stream_files
 from parse_stream_file import parse_stream_file
 from find_nearest_neighbours import find_nearest_neighbours
 
-def extract_rmsd_to_csv(file_paths, n, output_csv_path):
+def extract_rmsd_to_csv(stream_dir, n):
+    file_paths = find_stream_files(stream_dir)
+    output_csv_path = os.path.join(stream_dir, "rmsd_data.csv")
+
     with open(output_csv_path, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         # Write the header row
@@ -10,7 +16,8 @@ def extract_rmsd_to_csv(file_paths, n, output_csv_path):
 
         # Loop through each stream file
         for file_path in file_paths:
-            filename = file_path.split('/')[-1]
+            # filename = file_path.split('/')[-1]
+            filename = os.path.basename(file_path) 
             
             # Check if the filename matches the expected pattern
             if filename.count('_') < 2 or not filename.endswith('.stream'):
@@ -19,7 +26,7 @@ def extract_rmsd_to_csv(file_paths, n, output_csv_path):
             
             coords = filename.split('_')[1:3]
             coords[1] = coords[1].replace('.stream', '')
-            x, y = float(coords[0]), float(coords[1])
+            x, y = abs(float(coords[0])), abs(float(coords[1]))
             
             chunks = parse_stream_file(file_path)
             

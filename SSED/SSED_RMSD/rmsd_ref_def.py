@@ -52,8 +52,8 @@ def process_folder(folder_path, pdb_filename, bins):
 import time
 
 # Adjusted function to process folders in increasing numerical order and report processing time
-def process_run_chunk_folders(base_path, pdb_filename, bins=10):
-    pattern = os.path.join(base_path, "merge_chunk_*")
+def process_run_rmsd_folders(base_path, pdb_filename, bins=10):
+    pattern = os.path.join(base_path, "merge_rmsd_*")
     folder_paths = glob.glob(pattern)  # Use glob to match folders with pattern
     
     # Extract numerical part from folder names and sort them

@@ -32,8 +32,8 @@ def create_excel(h5_files, output_file):
     df.to_excel(output_file, index=False)
 
 # Replace 'your_directory_path' with the path to the directory you want to scan
-directory_to_scan = '/home/buster'
-output_excel_file = '/mnt/c/Users/bubl3932/Desktop/UOX_h5_files_info.xlsx'
+# directory_to_scan = '/home/buster'
+# output_excel_file = '/mnt/c/Users/bubl3932/Desktop/UOX_h5_files_info.xlsx'
 
-h5_files_info = find_h5_files(directory_to_scan)
-create_excel(h5_files_info, output_excel_file)
+# h5_files_info = find_h5_files(directory_to_scan)
+# create_excel(h5_files_info, output_excel_file)

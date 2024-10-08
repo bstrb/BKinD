@@ -9,6 +9,7 @@
         "./SSED/SSED_FI",
         "./SSED/SSED_FULL",
         "./SSED/SSED_RMSD",
-        "./SSED"
+        "./SSED",
+        "./SSED/convert_h5_to_float"
     ]
 }

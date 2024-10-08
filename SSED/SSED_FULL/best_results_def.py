@@ -110,6 +110,7 @@ def rmsd_analysis(file_paths, n):
     return best_results
 
 def write_best_results_to_stream(best_results, output_file_path):
+# def write_best_results_to_stream(best_results, folder_path):
     with open(output_file_path, 'w') as outfile:
         for serial, data in sorted(best_results.items(), key=lambda x: x[1]['rmsd']):
             chunk = data['chunk']
@@ -186,12 +187,13 @@ def find_best_results(folder_path, output_path):
 
     best_results = rmsd_analysis(file_paths, n=10)
 
+    output_path = os.path.join(folder_path, "best_results.stream")
+
     write_best_results_to_stream(best_results, output_path)
 
     print_output_file_statistics(output_path, best_results)
 
     find_and_copy_header(folder_path, output_path)
-
 
 def process_block(block, output_file, lattice):
     try:

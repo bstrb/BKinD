@@ -75,6 +75,16 @@ def process_and_plot_final_rfree(base_path):
     plot_filename = os.path.join(base_path, plotname)
     fig.write_html(plot_filename)
 
+#####
+
+    fig_json = fig.to_json()
+    plotname_json = "Final_Rfree_vs_Frames.json"
+    plot_filename_json = os.path.join(base_path, plotname_json)
+    with open(plot_filename_json, 'w') as json_file:
+        json_file.write(fig_json)
+
+#####
+
     open_plot(fig, plot_filename)
 
 

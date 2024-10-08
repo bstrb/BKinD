@@ -8,6 +8,9 @@ def extract_chunk_data(chunk):
     num_reflections_match = re.search(r'num_reflections = (\d+)', chunk)
     num_reflections = int(num_reflections_match.group(1)) if num_reflections_match else 0
 
+    num_peaks_match = re.search(r'num_peaks = (\d+)', chunk)
+    num_peaks = int(num_peaks_match.group(1)) if num_peaks_match else 0
+
     cell_params_match = re.search(r'Cell parameters ([\d.]+) ([\d.]+) ([\d.]+) nm, ([\d.]+) ([\d.]+) ([\d.]+) deg', chunk)
     if cell_params_match:
         a, b, c = map(lambda x: float(x) * 10, cell_params_match.groups()[:3])  # Convert from nm to A
@@ -34,4 +37,4 @@ def extract_chunk_data(chunk):
     else:
         ref_fs_ss = []
 
-    return event_number, num_reflections, cell_params, fs_ss, intensities, ref_fs_ss
+    return event_number, num_reflections, num_peaks, cell_params, fs_ss, intensities, ref_fs_ss

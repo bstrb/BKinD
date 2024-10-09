@@ -1,15 +1,15 @@
 {
     "python.analysis.extraPaths": [
+        "./SSED",
+        "./SSED/convert_h5_to_float",
         "./SSED/generate_h5_info",
         "./SSED/merge_h5_files",
         "./SSED/remove_low_peak_frames",
-        "./SSED/SSED_APP",
         "./SSED/SSED_BR",
         "./SSED/SSED_CP",
         "./SSED/SSED_FI",
         "./SSED/SSED_FULL",
         "./SSED/SSED_RMSD",
-        "./SSED",
-        "./SSED/convert_h5_to_float"
+        "./SSED/SSED_RCIS",
     ]
 }

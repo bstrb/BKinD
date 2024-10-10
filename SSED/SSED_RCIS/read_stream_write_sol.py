@@ -22,21 +22,21 @@ def process_block(block, output_file, lattice):
                     det_shift_y = det_shifts[6]
             elif 'astar' in line:
                 astar_values = ' '.join(line.split()[2:5])
-                #print(astar_values)
             elif 'bstar' in line:
                 bstar_values = ' '.join(line.split()[2:5])
-                #print(bstar_values)
             elif 'cstar' in line:
                 cstar_values = ' '.join(line.split()[2:5])
-                #print(cstar_values)
 
         if image and event and astar_values and bstar_values and cstar_values and det_shift_x and det_shift_y:
             det_shifts = f"{det_shift_x} {det_shift_y}"
             output_line = f"{image} {event} {astar_values} {bstar_values} {cstar_values} {det_shifts} {lattice}\n"
             output_file.write(output_line)
+            return 1
+        return 0
 
     except Exception as e:
         print(f"Error processing block: {e}")
+        return 0
         
 def read_stream_write_sol(stream_file_path, lattice):
     base,streamfile_name = os.path.split(stream_file_path)
@@ -44,6 +44,7 @@ def read_stream_write_sol(stream_file_path, lattice):
     solfilename = filename_without_extension + '.sol'
     solfile_path = os.path.join(base,solfilename)
 
+    lines_written = 0
     with open(stream_file_path, 'r') as stream_file, open(solfile_path, 'w') as output_file:
         current_block = []
         for line in stream_file:
@@ -51,7 +52,7 @@ def read_stream_write_sol(stream_file_path, lattice):
             if line == '----- End chunk -----':  # End of a block
                 if current_block:
                     # Process the current block before moving to the next one
-                    process_block(current_block, output_file, lattice)
+                    lines_written += process_block(current_block, output_file, lattice)
                 current_block = []
             else:
                 # Store each line in the current block
@@ -59,4 +60,6 @@ def read_stream_write_sol(stream_file_path, lattice):
 
         # Process the last block
         if current_block:
-            process_block(current_block, output_file)
+            lines_written += process_block(current_block, output_file, lattice)
+
+    return lines_written

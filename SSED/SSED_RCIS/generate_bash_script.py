@@ -8,18 +8,19 @@ def find_first_file(directory, extension):
     return None
 
 def generate_bash_script(bash_file_name, stream_files_dir,
-                        num_threads=None, lst_file=None, geom_file=None, 
-                        cell_file=None, sol_file=None
+                        num_threads=None, sol_file=None, 
+                        lst_file=None, geom_file=None, 
+                        cell_file=None
                         ):
     # Generate the full path for the bash file
     bash_file_path = f"{stream_files_dir}/{bash_file_name}.sh"
 
     # If no geom_file, lst_file, or cell_file is provided, find the first one in the directory
     num_threads = num_threads or 23
+    input_sol_file = sol_file or find_first_file(stream_files_dir, ".sol")
     lst_file_path = lst_file or find_first_file(stream_files_dir, ".lst")
     geom_file_path = geom_file or find_first_file(stream_files_dir, ".geom")
     cell_file_path = cell_file or find_first_file(stream_files_dir, ".cell")
-    input_sol_file = sol_file or find_first_file(stream_files_dir, ".sol")
     # input_sol_file = sol_file or 'best_results.sol'
 
     # Error if any of the required files are not found

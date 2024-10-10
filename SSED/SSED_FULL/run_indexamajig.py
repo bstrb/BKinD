@@ -12,7 +12,7 @@ def run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_
     base_command = (
         f"indexamajig -g {geomfile_path} -i {listfile_path} -o {output_path} "
         f"-j {num_threads} -p {cellfile_path} --indexing={indexing_method} "
-        f"--push-res={resolution_push} --no-retry --no-revalidate --multi "
+        f"--push-res={resolution_push} --no-retry --no-revalidate "
         f"--integration={integration_method} --no-half-pixel-shift "
         f"--int-radius={int_radius} --no-refine --peaks=cxi "
         f"--max-indexer-threads=1 --min-peaks={min_peaks} "

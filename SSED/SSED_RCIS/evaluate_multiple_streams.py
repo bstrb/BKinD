@@ -44,7 +44,8 @@ def evaluate_multiple_streams(stream_file_folder, wrmsd_weight, cd_weight, rpr_w
                             reflection_to_peak_ratio = num_reflections / num_peaks if num_peaks > 0 else 0
 
                             # Combine metrics (weights can be adjusted as needed)
-                            combined_metric = (wrmsd_weight * weighted_rmsd) + (cd_weight * cell_deviation) - (rpr_weight * reflection_to_peak_ratio)
+                            # combined_metric = (wrmsd_weight * weighted_rmsd) + (cd_weight * cell_deviation) - (rpr_weight * reflection_to_peak_ratio)
+                            combined_metric = (weighted_rmsd ** wrmsd_weight) * (cell_deviation ** cd_weight) * (reflection_to_peak_ratio ** rpr_weight)
                             all_metrics.append((event_number, combined_metric, chunk))
                 except Exception as e:
                     tqdm.write(f"Error processing stream file {stream_file_path}: {e}")

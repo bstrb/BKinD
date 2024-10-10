@@ -11,5 +11,7 @@
         "./SSED/SSED_FULL",
         "./SSED/SSED_RMSD",
         "./SSED/SSED_RCIS",
+        "./SSED/SSED_RCIS",
+        "./SSED/SSED_RCIS"
     ]
 }

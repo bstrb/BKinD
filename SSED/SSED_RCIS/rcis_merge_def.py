@@ -1,9 +1,13 @@
 import os
 import glob
-import re
 import subprocess
+import time
+from tqdm import tqdm
 
-def run_partialator(stream_file, output_dir, num_threads, pointgroup):
+from find_first_file import find_first_file
+from convert_hkl_to_mtz import convert_hkl_to_mtz
+
+def run_partialator(stream_file, output_dir, num_threads, pointgroup, iterations):
     """Run the partialator command to process a stream file."""
     merging_cmd = [
         'partialator',
@@ -19,40 +23,42 @@ def run_partialator(stream_file, output_dir, num_threads, pointgroup):
         '--push-res=inf',
         '--no-Bscale',
         '--no-logs',
-        '--iterations=3',
+        f'--iterations={iterations}',
         '--harvest-file=' + os.path.join(output_dir, "parameters.json"),
         '--log-folder=' + os.path.join(output_dir, "pr-logs")
     ]
 
+    stderr_path = os.path.join(output_dir, "stderr.log")
+    total_residuals = iterations + 2
+
     try:
-        with open(os.path.join(output_dir, "stdout.log"), "a") as stdout, open(os.path.join(output_dir, "stderr.log"), "a") as stderr:
+        with open(os.path.join(output_dir, "stdout.log"), "w") as stdout, open(stderr_path, "w") as stderr:
             print(f"Running partialator for stream file: {stream_file}")
-            subprocess.run(merging_cmd, stdout=stdout, stderr=stderr, check=True)
+            progress = tqdm(total=total_residuals, desc="Partialator Progress", unit="Residuals")
+            process = subprocess.Popen(merging_cmd, stdout=stdout, stderr=stderr)
+            
+            # Track progress based on "Residuals:" in stderr.log
+            while process.poll() is None:
+                time.sleep(1)  # Wait for a few seconds before checking
+                if os.path.exists(stderr_path):
+                    with open(stderr_path, "r") as f:
+                        residual_count = sum(1 for line in f if line.startswith("Residuals:"))
+                        progress.n = min(residual_count, total_residuals)
+                        progress.refresh()
+
+            process.communicate()  # Ensure the process has completed
+            progress.n = total_residuals
+            progress.refresh()
+            progress.close()
             print(f"Partialator completed for stream file: {stream_file}")
+
     except subprocess.CalledProcessError as e:
         print(f"Error during partialator execution for {stream_file}: {e}")
         raise
-
-def convert_hkl_to_mtz(output_dir, cellfile_path):
-    """Convert the crystfel.hkl file to output.mtz using get_hkl."""
-    hkl2mtz_cmd = [
-        'get_hkl',
-        '-i', os.path.join(output_dir, "crystfel.hkl"),
-        '-o', os.path.join(output_dir, "output.mtz"),
-        '-p', f'{cellfile_path}',
-        '--output-format=mtz'
-    ]
-
-    try:
-        with open(os.path.join(output_dir, "stdout.log"), "a") as stdout, open(os.path.join(output_dir, "stderr.log"), "a") as stderr:
-            print(f"Converting crystfel.hkl to output.mtz in directory: {output_dir}")
-            subprocess.run(hkl2mtz_cmd, stdout=stdout, stderr=stderr, check=True)
-            print(f"Conversion to output.mtz completed for directory: {output_dir}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error during conversion to MTZ in {output_dir}: {e}")
-        raise
+    finally:
+        progress.close()
     
-def merge_and_write_mtz(stream_dir, cellfile_path, pointgroup, num_threads):
+def merge_and_write_mtz(stream_dir, cellfile_path, pointgroup, num_threads, iterations):
     stream_files = glob.glob(f'{stream_dir}/*.stream')
     total_files = len(stream_files)
 
@@ -60,22 +66,33 @@ def merge_and_write_mtz(stream_dir, cellfile_path, pointgroup, num_threads):
         print(f"No stream files found in directory: {stream_dir}")
         return
 
-    for index, stream_file in enumerate(stream_files):
-        ring_sizes_match = re.search(r'_rings_([0-9-]+)\.stream', stream_file)
-        if not ring_sizes_match:
-            continue
-
-        ring_sizes = ring_sizes_match.group(1)
-        output_dir = os.path.join(stream_dir, f'merge-{ring_sizes}')
+    for stream_file in stream_files:
+        stream_file_name = os.path.basename(stream_file).replace('.stream', '')
+        output_dir = os.path.join(stream_dir, f'merge_{iterations}_iter_{stream_file_name}')
 
         # Create output directory and handle existing directories
-        os.makedirs(os.path.join(output_dir, "pr-logs"), exist_ok=True)
+        if not os.path.exists(output_dir):
+            os.makedirs(os.path.join(output_dir, "pr-logs"), exist_ok=True)
+        else:
+            print(f"Output directory {output_dir} already exists. Skipping re-processing.")
+            continue
 
         # Execute the merging and conversion commands
         try:
-            run_partialator(stream_file, output_dir, num_threads, pointgroup)
+            run_partialator(stream_file, output_dir, num_threads, pointgroup, iterations)
             convert_hkl_to_mtz(output_dir, cellfile_path)
-            print(f"Merging Complete")
+            print(f"Merging Complete for {stream_file_name}")
         except subprocess.CalledProcessError:
-            print(f"Skipping further steps for {stream_file} due to error.")
+            print(f"Skipping further steps for {stream_file_name} due to error.")
             continue
+
+# Example usage
+if __name__ == "__main__":
+    base_path = "/home/buster/UOX1/3x3/fast_int_RCIS_2_1_-1"  # Replace with the actual stream files directory
+    stream_file_folder = "/home/buster/UOX1/3x3"
+    cellfile_path = find_first_file(stream_file_folder, ".cell")
+    pointgroup = "mmm"
+    num_threads = 23
+    iterations = 3
+
+    merge_and_write_mtz(base_path, cellfile_path, pointgroup, num_threads, iterations)

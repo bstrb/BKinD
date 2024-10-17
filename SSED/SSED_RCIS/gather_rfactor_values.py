@@ -2,22 +2,22 @@ import os
 import re
 import pandas as pd
 
-def extract_final_rfree_from_txt(file_path):
+def extract_final_rfactor_from_txt(file_path):
     """
-    Extracts the final Rfree value from a text file.
+    Extracts the final Rfactor value from a text file.
     """
     with open(file_path, 'r') as file:
         content = file.read()
-        match = re.search(r'R free\s+\d+\.\d+\s+(\d+\.\d+)', content)
+        match = re.search(r'R factor\s+\d+\.\d+\s+(\d+\.\d+)', content)
         if match:
             return float(match.group(1))
     return None
 
-def gather_rfree_values(directory):
+def gather_rfactor_values(directory):
     """
-    Gathers the final Rfree values from all relevant folders and files.
+    Gathers the final Rfactor values from all relevant folders and files.
     """
-    rfree_data = []
+    rfactor_data = []
 
     # Iterate through each folder in the given directory
     for root, dirs, files in os.walk(directory):
@@ -32,22 +32,22 @@ def gather_rfree_values(directory):
                 for file_name in os.listdir(merge_folder_path):
                     if file_name.endswith(".txt"):
                         txt_file_path = os.path.join(merge_folder_path, file_name)
-                        rfree_value = extract_final_rfree_from_txt(txt_file_path)
+                        rfactor_value = extract_final_rfactor_from_txt(txt_file_path)
 
-                        if rfree_value is not None:
-                            rfree_data.append({
+                        if rfactor_value is not None:
+                            rfactor_data.append({
                                 'Head Folder': head_folder,
-                                'Rfree': rfree_value
+                                'Rfactor': rfactor_value
                             })
 
-    # Convert the gathered data to a DataFrame and sort by 'Rfree'
-    rfree_df = pd.DataFrame(rfree_data)
-    rfree_df = rfree_df.sort_values(by='Rfree')  # Sort by 'Rfree' value
-    print(rfree_df)
-    return rfree_df
+    # Convert the gathered data to a DataFrame and sort by 'Rfactor'
+    rfactor_df = pd.DataFrame(rfactor_data)
+    rfactor_df = rfactor_df.sort_values(by='Rfactor')  # Sort by 'Rfactor' value
+    print(rfactor_df)
+    return rfactor_df
 
 # Example usage
 directory = "/home/buster/UOXm/5x5_0-01"
-csv_output = os.path.join(directory, "rfree_values.csv")
-rfree_table = gather_rfree_values(directory)
-rfree_table.to_csv(csv_output, index=False)  # Save the table to a CSV file
+csv_output = os.path.join(directory, "rfactor_values.csv")
+rfactor_table = gather_rfactor_values(directory)
+rfactor_table.to_csv(csv_output, index=False)  # Save the table to a CSV file

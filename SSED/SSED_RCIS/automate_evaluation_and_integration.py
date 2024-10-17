@@ -7,20 +7,20 @@ from tqdm import tqdm
 from evaluate_multiple_streams_v4 import evaluate_multiple_streams
 from read_stream_write_sol import read_stream_write_sol
 from rcis_int_def_v3 import fast_integration
-from generate_bash_script import generate_bash_script
+from generate_bash_script import generate_bash_script 
 from rcis_merge_def import merge_and_write_mtz
 from rcis_ref_def import process_run_folders
 
-def automate_evaluation_and_integration(stream_file_folder, weights_list, lattice, ring_size, cellfile_path, pointgroup, num_threads, bins, pdb_file, iterations = 3):
-    for weights in weights_list:
+def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, ring_size, cellfile_path, pointgroup, num_threads, bins, pdb_file, iterations = 3):
+    for exp in exp_list:
         try:
-            wrmsd_weight, cd_weight, rpr_weight = weights
+            wrmsd_exp, cd_exp, rpr_exp = exp
 
             # Evaluate multiple stream files
-            tqdm.write(f"Evaluating multiple stream files with weights: {weights}")
-            evaluate_multiple_streams(stream_file_folder, wrmsd_weight, cd_weight, rpr_weight)
+            tqdm.write(f"Evaluating multiple stream files with exponents: {exp}")
+            evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cd_exp, rpr_exp)
 
-            RCIS = f"RCIS_{wrmsd_weight}_{cd_weight}_{rpr_weight}"
+            RCIS = f"RCIS_{wrmsd_exp}_{cd_exp}_{rpr_exp}"
 
             # Write stream file to .sol file
             best_results_stream = f"{stream_file_folder}/best_results_{RCIS}.stream"
@@ -50,7 +50,7 @@ def automate_evaluation_and_integration(stream_file_folder, weights_list, lattic
             process_run_folders(integration_output_folder, pdb_file, bins)
 
             #  Completion message
-            print(f"Automation process completed successfully for weights: {weights}")
+            print(f"Automation process completed successfully for exponents: {exp}")
         except Exception as e:
-            tqdm.write(f"An error occurred during processing of weights {weights}: {e}")
+            tqdm.write(f"An error occurred during processing of exponents {exp}: {e}")
             traceback.print_exc()

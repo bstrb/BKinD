@@ -5,7 +5,7 @@ from calculate_cell_deviation import calculate_cell_deviation
 from calculate_weighted_rmsd import calculate_weighted_rmsd
 
 # Function to parse a single stream file and evaluate its indexing
-def process_stream_file(stream_file_path, wrmsd_weight, cd_weight, rpr_weight, progress_queue):
+def process_stream_file(stream_file_path, wrmsd_exp, cd_exp, rpr_exp, progress_queue):
     try:
         current_header, chunks = parse_stream_file(stream_file_path)
         target_params = extract_target_cell_params(current_header)
@@ -26,7 +26,7 @@ def process_stream_file(stream_file_path, wrmsd_weight, cd_weight, rpr_weight, p
             reflection_to_peak_ratio = num_reflections / num_peaks if num_peaks > 0 else 0
 
             # Combine metrics (weights can be adjusted as needed)
-            combined_metric = (weighted_rmsd ** wrmsd_weight) * (cell_deviation ** cd_weight) * (reflection_to_peak_ratio ** rpr_weight)
+            combined_metric = (weighted_rmsd ** wrmsd_exp) * (cell_deviation ** cd_exp) * (reflection_to_peak_ratio ** rpr_exp)
             metrics.append((event_number, combined_metric, chunk))
 
             # Update progress for each processed chunk

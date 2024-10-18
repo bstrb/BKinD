@@ -6,7 +6,7 @@ def main():
     stream_file_folder = "/home/buster/UOX1/5x5"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
     pdb_file = "/home/buster/UOX1/5x5/UOX.pdb"
-    weights_list = [(1,2,0),(1,3,0),(3,5,1)]
+    weights_list = [(1,2,0,0,0,0)]
     lattice = "oI"  # Pearson Symbol read from .cell file first letter for lattice type and second for centering
     ring_size = [(3, 4, 7)]
     pointgroup = "mmm"

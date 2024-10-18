@@ -14,13 +14,13 @@ from rcis_ref_def import process_run_folders
 def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, ring_size, cellfile_path, pointgroup, num_threads, bins, pdb_file, min_res = 2, iterations = 3):
     for exp in exp_list:
         try:
-            wrmsd_exp, cd_exp, rpr_exp = exp
+            wrmsd_exp, cd_exp, np_exp, nr_exp, pr_exp, nit_exp = exp
 
             # Evaluate multiple stream files
             tqdm.write(f"Evaluating multiple stream files with exponents: {exp}")
-            evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cd_exp, rpr_exp)
+            evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_exp, nit_exp)
 
-            RCIS = f"RCIS_{wrmsd_exp}_{cd_exp}_{rpr_exp}"
+            RCIS = f"RCIS_{wrmsd_exp}_{cd_exp}_{np_exp}_{nr_exp}_{pr_exp}_{nit_exp}"
 
             # Write stream file to .sol file
             best_results_stream = f"{stream_file_folder}/best_results_{RCIS}.stream"

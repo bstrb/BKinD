@@ -7,12 +7,12 @@ from parse_stream_file import parse_stream_file
 from process_stream_file import process_stream_file
 
 # Function to parse multiple stream files, evaluate indexing, and create a combined output file
-def evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cd_exp, rpr_exp):
+def evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_exp, nit_exp):
     try:
         stream_file_paths = [path for path in find_stream_files(stream_file_folder) if not os.path.basename(path).startswith("best_results")]
         all_metrics = []
         header = None
-        output_file_path = os.path.join(stream_file_folder, f'best_results_RCIS_{wrmsd_exp}_{cd_exp}_{rpr_exp}.stream')
+        output_file_path = os.path.join(stream_file_folder, f'best_results_RCIS_{wrmsd_exp}_{cd_exp}_{np_exp}_{nr_exp}_{pr_exp}_{nit_exp}.stream')
 
         # Remove existing best_results.stream if it exists
         if os.path.exists(output_file_path):
@@ -38,7 +38,7 @@ def evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cd_exp, rpr_exp):
 
             # Process stream files in parallel
             with ProcessPoolExecutor() as executor:
-                futures = {executor.submit(process_stream_file, path, wrmsd_exp, cd_exp, rpr_exp, progress_queue): path for path in stream_file_paths}
+                futures = {executor.submit(process_stream_file, path, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_exp, nit_exp, progress_queue): path for path in stream_file_paths}
                 for future in futures:
                     try:
                         current_header, metrics = future.result()

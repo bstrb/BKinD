@@ -150,5 +150,5 @@ def process_and_plot_all_files(base_path):
 
     open_plot(fig, plot_filename)
 
-directory = "/home/buster/UOXm/5x5_0-01"
+directory = "/home/buster/UOX1/5x5"
 process_and_plot_all_files(directory)

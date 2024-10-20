@@ -3,7 +3,6 @@ from extract_target_cell_params import extract_target_cell_params
 from extract_chunk_data import extract_chunk_data
 from calculate_cell_deviation import calculate_cell_deviation
 from calculate_weighted_rmsd import calculate_weighted_rmsd
-import numpy as np
 
 # Function to parse a single stream file and evaluate its indexing
 def process_stream_file(stream_file_path, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_exp, nit_exp, progress_queue):
@@ -17,8 +16,7 @@ def process_stream_file(stream_file_path, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_
             event_number, num_reflections, num_peaks, cell_params, fs_ss, intensities, ref_fs_ss, profile_radius, n_indexing_tries = extract_chunk_data(chunk)
 
             if event_number is None or cell_params is None or not fs_ss or not ref_fs_ss or num_peaks == 0:
-                if i % 100 == 0:
-                    progress_queue.put(100)  # Update progress every 100 chunks
+                progress_queue.put(1)
                 continue
 
             cell_deviation = calculate_cell_deviation(cell_params, target_params)
@@ -27,10 +25,9 @@ def process_stream_file(stream_file_path, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_
             # Append raw metrics for normalization
             metrics.append((event_number, weighted_rmsd, cell_deviation, num_reflections, num_peaks, profile_radius, n_indexing_tries, chunk))
 
-            # Update progress every 100 chunks
-            if i % 100 == 0:
-                progress_queue.put(100)
-
+            # Update progress every chunk
+            progress_queue.put(1)
+            
         # Normalize metrics
         if metrics:
             weighted_rmsds = [metric[1] for metric in metrics]
@@ -57,7 +54,7 @@ def process_stream_file(stream_file_path, wrmsd_exp, cd_exp, np_exp, nr_exp, pr_
                 normalized_nit = (n_indexing_tries - min_nit) / (max_nit - min_nit) if max_nit > min_nit else 0
 
                 # Combine normalized metrics (weights can be adjusted as needed)
-                combined_metric = (normalized_rmsd ** wrmsd_exp) * (normalized_cd ** cd_exp) * (normalized_np ** np_exp) * (normalized_nr ** nr_exp) * (normalized_pr ** pr_exp) * (normalized_nit ** nit_exp)
+                combined_metric = ((1 + normalized_rmsd) ** wrmsd_exp) * ((1 + normalized_cd) ** cd_exp) * ((1 + normalized_np) ** np_exp) * ((1 + normalized_nr) ** nr_exp) * ((1 + normalized_pr) ** pr_exp) * ((1 + normalized_nit) ** nit_exp)
                 normalized_metrics.append((event_number, combined_metric, chunk))
 
             return current_header, normalized_metrics

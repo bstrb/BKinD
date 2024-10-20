@@ -68,8 +68,8 @@ def process_run_folders(base_path, pdb_file, bins, min_res):
 
 # Example usage
 if __name__ == "__main__":
-    base_path = "/home/buster/UOXm/5x5_0-01/fast_int_RCIS_3_3_1"  # Replace with your actual base directory path
-    pdb_file = "/home/buster/UOXm/5x5_0-01/UOX.pdb"  # Replace with your actual pdb file path
+    base_path = "/home/buster/UOX1/5x5/fast_int_RCIS_1_2_0_0_0_0"  # Replace with your actual base directory path
+    pdb_file = "/home/buster/UOX1/5x5/UOX.pdb"  # Replace with your actual pdb file path
     bins = 20
     min_res = 2
     process_run_folders(base_path, pdb_file, bins, min_res)

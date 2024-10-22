@@ -3,9 +3,9 @@ from find_first_file import find_first_file
 from automate_evaluation_and_integration import automate_evaluation_and_integration
 
 def main():
-    stream_file_folder = "/home/buster/UOX3"
+    stream_file_folder = "/home/buster/UOX1/0-05-step-indexing/41x41_0-05_indexing"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
-    pdb_file = "/home/buster/UOX3/UOX.pdb"
+    pdb_file = "/home/buster/UOX1/0-05-step-indexing/41x41_0-05_indexing/UOX.pdb"
     weights_list = [(1,2,0)]
     lattice = "oI"  # Pearson Symbol read from .cell file first letter for lattice type and second for centering
     ring_size = [(3, 4, 7)]

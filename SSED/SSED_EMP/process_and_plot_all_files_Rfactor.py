@@ -150,5 +150,5 @@ def process_and_plot_all_files(base_path):
 
     open_plot(fig, plot_filename)
 
-directory = "/home/buster/UOX3"
+directory = "/home/buster/UOX1/0-05-step-indexing/RMSD"
 process_and_plot_all_files(directory)

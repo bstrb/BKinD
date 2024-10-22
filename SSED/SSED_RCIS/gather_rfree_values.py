@@ -47,7 +47,7 @@ def gather_rfree_values(directory):
     return rfree_df
 
 # Example usage
-directory = "/home/buster/UOX1/5x5"
+directory = "/home/buster/UOXm/5x5_0-01"
 csv_output = os.path.join(directory, "rfree_values.csv")
 rfree_table = gather_rfree_values(directory)
 rfree_table.to_csv(csv_output, index=False)  # Save the table to a CSV file

@@ -47,3 +47,21 @@ def generate_bash_script(bash_file_name, stream_files_dir,
     # Output the full path of the generated bash file
     print(f"Bash script generated: {bash_file_path}")
 
+
+# Example usage
+if __name__ == "__main__":
+    # Directory where stream files and other required files (.sol, .lst, .geom, .cell) are stored
+    stream_files_dir = '/home/buster/UOXm/5x5_0-01'  # Update this with your actual directory
+
+    # Name for the generated bash script (without the extension)
+    bash_file_name = 'EMP_1_2_3_-1_1_1'
+
+    # Optional parameters (you can specify them or leave them to be auto-found by the script)
+    num_threads = 23  # Optional, default is 23 if not specified
+    sol_file = None  # Optional, will find the first .sol file in the directory if not specified
+    lst_file = None  # Optional, will find the first .lst file in the directory if not specified
+    geom_file = None  # Optional, will find the first .geom file in the directory if not specified
+    cell_file = None  # Optional, will find the first .cell file in the directory if not specified
+
+    # Generate the bash script
+    generate_bash_script(bash_file_name, stream_files_dir, num_threads, sol_file, lst_file, geom_file, cell_file)

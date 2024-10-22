@@ -12,6 +12,7 @@
         "./SSED/SSED_RMSD",
         "./SSED/SSED_RCIS",
         "./SSED/SSED_RCIS",
-        "./SSED/SSED_RCIS"
+        "./SSED/SSED_RCIS",
+        "./SSED/merge_h5_files"
     ]
 }

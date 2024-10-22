@@ -16,11 +16,13 @@ def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, r
         try:
             wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp = exp
 
+            EMP = f"EMP_{wrmsd_exp}_{cld_exp}_{cad_exp}_{np_exp}_{nr_exp}_{pr_exp}"
+
             # Evaluate multiple stream files
             tqdm.write(f"Evaluating multiple stream files with exponents: {exp}")
-            evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp)
+            evaluate_multiple_streams(stream_file_folder, exp, EMP)
+            # evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp)
 
-            EMP = f"EMP_{wrmsd_exp}_{cld_exp}_{cad_exp}_{np_exp}_{nr_exp}_{pr_exp}"
 
             # Write stream file to .sol file
             best_results_stream = f"{stream_file_folder}/best_results_{EMP}.stream"

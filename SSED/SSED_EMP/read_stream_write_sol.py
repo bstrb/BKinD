@@ -63,3 +63,13 @@ def read_stream_write_sol(stream_file_path, lattice):
             lines_written += process_block(current_block, output_file, lattice)
 
     return lines_written
+
+# Example usage
+if __name__ == "__main__":
+    # Example input stream file path and lattice value
+    stream_file_path = '/home/buster/UOXm/5x5_0-01/best_results_RCIS_1_2_3_-1_1_1.stream'  # Update this with your actual file path
+    lattice = 'oI'  # Example lattice value, replace with the appropriate lattice for your data
+
+    # Process the stream file and write output to the .sol file
+    lines_written = read_stream_write_sol(stream_file_path, lattice)
+    print(f"Finished processing. Total lines written to .sol file: {lines_written}")

@@ -76,7 +76,7 @@ def run_script(bash_file_path, num_indexed_frames, updated_output_file):
         print("An exception occurred:", e)
 
 
-def update_bash_file(file_path, integration="rings", int_radius=(4, 5, 7)):
+def update_bash_file(file_path, integration="rings", int_radius=(3, 4, 7)):
     if integration == "rings":
         inner, middle, outer = int_radius
         integrationext = f"{integration}_{inner}-{middle}-{outer}"
@@ -161,9 +161,9 @@ def fast_integration(bash_file_path, output_stream_format, num_indexed_frames, i
 
 # Example usage
 def example_usage():
-    bash_file_path = "/home/buster/UOX1/5x5/fast_int_RCIS_1_1_-1.sh"
-    output_stream_format = "/home/buster/UOX1/5x5/fast_int_RCIS_1_1_-1/fast_int.stream"
-    num_indexed_frames = 4673
+    bash_file_path = "/home/buster/UOX3/EMP_1_2_3_-1_1_1.sh"
+    output_stream_format = "/home/buster/UOX3/EMP_1_2_3_-1_1_1/fast_int.stream"
+    num_indexed_frames = 13334
     integration = "rings"
     ring_sizes = [(3, 4, 7)]
 

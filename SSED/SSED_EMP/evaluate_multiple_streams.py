@@ -7,12 +7,15 @@ from parse_stream_file import parse_stream_file
 from process_stream_file import process_stream_file
 
 # Function to parse multiple stream files, evaluate indexing, and create a combined output file
-def evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp):
+# def evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp):
+def evaluate_multiple_streams(stream_file_folder, exp, EMP):
     try:
+        wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp = exp
         stream_file_paths = [path for path in find_stream_files(stream_file_folder) if not os.path.basename(path).startswith("best_results")]
         all_metrics = []
         header = None
-        output_file_path = os.path.join(stream_file_folder, f'best_results_RCIS_{wrmsd_exp}_{cld_exp}_{cad_exp}_{np_exp}_{nr_exp}_{pr_exp}.stream')
+        # output_file_path = os.path.join(stream_file_folder, f'best_results_RCIS_{wrmsd_exp}_{cld_exp}_{cad_exp}_{np_exp}_{nr_exp}_{pr_exp}.stream')
+        output_file_path = os.path.join(stream_file_folder, f'best_results_{EMP}.stream')
 
         # Remove existing best_results.stream if it exists
         if os.path.exists(output_file_path):

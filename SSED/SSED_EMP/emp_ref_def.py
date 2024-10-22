@@ -44,21 +44,27 @@ def run_refmac5(base_dir, pdb_file, mtz_file, output_file, res_max=20, res_min=1
             f.write(line)
         pbar.close()
 
+import os
 
 def process_folder(folder_path, pdb_file, bins, min_res):
     print(f"Processing folder: {folder_path}")
 
+    # Extract the parent folder name
+    parent_folder = os.path.basename(os.path.dirname(folder_path))
+
     mtz_file = os.path.join(folder_path, "output.mtz")
     ctruncate_mtz_file = os.path.join(folder_path, "output_ctruncate.mtz")
     ctruncatefr_mtz_file = os.path.join(folder_path, "output_ctruncatefr.mtz")
-    output_file = os.path.join(folder_path, f"output_bins_{bins}.txt")
+
+    # Include the parent folder name in the output file name
+    output_file = os.path.join(folder_path, f"{parent_folder}_output_bins_{bins}_minres_{min_res}.txt")
 
     # Run ctruncate and freerflag
     run_ctruncate(mtz_file, ctruncate_mtz_file)
     run_freerflag(ctruncate_mtz_file, ctruncatefr_mtz_file)
 
     # Run refmac5 with the output of freerflag as input
-    run_refmac5(folder_path, pdb_file, ctruncatefr_mtz_file, output_file, res_min = min_res, bins = bins)
+    run_refmac5(folder_path, pdb_file, ctruncatefr_mtz_file, output_file, res_min=min_res, bins=bins)
 
 def process_run_folders(base_path, pdb_file, bins, min_res):
     folder_paths = [f.path for f in os.scandir(base_path) if f.is_dir()]
@@ -68,8 +74,8 @@ def process_run_folders(base_path, pdb_file, bins, min_res):
 
 # Example usage
 if __name__ == "__main__":
-    base_path = "/home/buster/UOX1/5x5/fast_int_RCIS_1_2_0_0_0_0"  # Replace with your actual base directory path
-    pdb_file = "/home/buster/UOX1/5x5/UOX.pdb"  # Replace with your actual pdb file path
+    base_path = "/home/buster/UOX3/EMP_1_2_3_-1_1_1"  # Replace with your actual base directory path
+    pdb_file = "/home/buster/UOX3/UOX.pdb"  # Replace with your actual pdb file path
     bins = 20
-    min_res = 2
+    min_res = 1.5
     process_run_folders(base_path, pdb_file, bins, min_res)

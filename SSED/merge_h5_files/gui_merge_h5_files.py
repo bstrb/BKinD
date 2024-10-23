@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, Button, Label, Listbox, Scrollbar, ttk
 import os
 
-from merge_h5_files_v2 import merge_h5_files
+from merge_h5_files import merge_h5_files
 
 def browse_folder():
     folder_path = filedialog.askdirectory()

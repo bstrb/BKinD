@@ -34,7 +34,7 @@ def generate_bash_script(bash_file_name, stream_files_dir,
         raise FileNotFoundError("No .sol file found in the directory.")
 
     # Create the content of the bash file
-    bash_script_content = f"""indexamajig -i {lst_file_path} -g {geom_file_path} -p {cell_file_path} -j {num_threads} -o fast_integration.stream --indexing=file --fromfile-input-file={input_sol_file} --no-revalidate --no-retry --integration=rings --no-refine --no-half-pixel-shift --no-check-peaks --no-check-cell --peaks=cxi --min-peaks=15
+    bash_script_content = f"""indexamajig -i {lst_file_path} -g {geom_file_path} -p {cell_file_path} -j {num_threads} -o fast_integration.stream --indexing=file --fromfile-input-file={input_sol_file} --no-revalidate --no-retry --integration=rings --no-refine --no-half-pixel-shift --no-check-peaks --no-non-hits-in-stream --no-check-cell --peaks=cxi --min-peaks=15
 """
     
     # Write the content to the bash file

@@ -1,7 +1,6 @@
 # best_results_definitions.py
 
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 
 from find_nearest_neighbours import find_nearest_neighbours
@@ -41,73 +40,6 @@ def rmsd_analysis(file_paths, n):
         'chunk_count': len(chunks),
         'indexed_patterns_count': indexed_patterns_count  # Store the count of indexed patterns
         }
-
-    # Initialize dictionaries to hold RMSD values and coordinates
-    rmsd_values = {}
-    indexed_patterns_values = {}
-    x_coords = set()
-    y_coords = set()
-
-    # Extract coordinates and RMSD values from file paths
-    for file_path, stats in stream_stats.items():
-        filename = file_path.split('/')[-1]  # Extract filename
-        # coords = filename.split('_')[1:3]  # Extract coordinates, e.g., ['-512.0', '-512.02.stream']
-        # coords[1] = coords[1].replace('.stream', '')  # Remove the ".stream" extension
-        # x, y = float(coords[0]), float(coords[1])
-    
-        if filename.count('_') < 2 or not filename.endswith('.stream'):
-            print(f"Skipping file {filename} as it doesn't match the expected naming pattern.")
-            continue
-
-        try:
-            coords = filename.split('_')[1:3]  # Extract coordinates, e.g., ['-512.0', '-512.02.stream']
-            coords[1] = coords[1].replace('.stream', '')  # Remove the ".stream" extension
-            x, y = float(coords[0]), float(coords[1])
-        except (IndexError, ValueError) as e:
-            print(f"Skipping file {filename} due to error in extracting coordinates: {e}")
-            continue
-
-
-        # Add coordinates and RMSD/indexed patterns values
-        rmsd_values[(x, y)] = stats['avg_rmsd']
-        indexed_patterns_values[(x, y)] = stats['indexed_patterns_count']
-        x_coords.add(x)
-        y_coords.add(y)
-
-    # Sort and convert coordinates to lists for consistent ordering
-    x_coords = sorted(list(x_coords))
-    y_coords = sorted(list(y_coords))
-
-    # Create 2D arrays for RMSD and indexed patterns values
-    heatmap_rmsd = np.full((len(y_coords), len(x_coords)), np.nan)  # Initialize with NaNs
-    heatmap_indexed_patterns = np.full((len(y_coords), len(x_coords)), np.nan)  # Initialize with NaNs
-
-    # Fill the heatmap arrays with RMSD and indexed patterns values
-    for (x, y), rmsd in rmsd_values.items():
-        x_index = x_coords.index(x)
-        y_index = y_coords.index(y)
-        heatmap_rmsd[y_index, x_index] = rmsd  # Note: y_index first due to row-major order
-        heatmap_indexed_patterns[y_index, x_index] = indexed_patterns_values[(x, y)]
-
-    # Plot the RMSD heatmap
-    plt.figure(figsize=(10, 8))
-    plt.imshow(heatmap_rmsd, cmap='viridis', origin='lower', extent=[min(x_coords), max(x_coords), min(y_coords), max(y_coords)])
-    plt.colorbar(label='Average RMSD')
-    plt.title('Average RMSD Heatmap')
-    plt.xlabel('X Coordinate')
-    plt.ylabel('Y Coordinate')
-    plt.tight_layout()
-    plt.show()
-
-    # Plot the indexed patterns count heatmap
-    plt.figure(figsize=(10, 8))
-    plt.imshow(heatmap_indexed_patterns, cmap='plasma', origin='lower', extent=[min(x_coords), max(x_coords), min(y_coords), max(y_coords)])
-    plt.colorbar(label='Indexed Patterns Count')
-    plt.title('Indexed Patterns Count Heatmap')
-    plt.xlabel('X Coordinate')
-    plt.ylabel('Y Coordinate')
-    plt.tight_layout()
-    plt.show()
 
     # Print statistics for each stream file, including the number of indexed patterns
     for file_path, stats in stream_stats.items():

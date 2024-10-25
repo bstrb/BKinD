@@ -161,9 +161,9 @@ def fast_integration(bash_file_path, output_stream_format, num_indexed_frames, i
 
 # Example usage
 def example_usage():
-    bash_file_path = "/home/buster/UOX3/EMP_1_2_3_-1_1_1.sh"
-    output_stream_format = "/home/buster/UOX3/EMP_1_2_3_-1_1_1/fast_int.stream"
-    num_indexed_frames = 13334
+    bash_file_path = "/home/buster/leidata/hMTH1_TH287_Serial/first-trial-process/fast_int_RMSD.sh"
+    output_stream_format = "/home/buster/leidata/hMTH1_TH287_Serial/first-trial-process/RMSD/fast_int.stream"
+    num_indexed_frames = 2965
     integration = "rings"
     ring_sizes = [(3, 4, 7)]
 

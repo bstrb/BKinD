@@ -15,7 +15,8 @@ def gandalf_iterator(geomfile_path, cellfile_path, input_path, output_file_base,
     ydefault = -512
 
     # Generate xy pairs including the default coordinates
-    xy_pairs = [(xdefault, ydefault)] + generate_xy_pairs(xdefault, ydefault, step, layers)  # Adjust the number of layers as needed
+    xy_pairs = [(xdefault, ydefault)] + list(generate_xy_pairs(xdefault, ydefault, step, layers))
+
 
     # Iterate over all xy pairs
     for x, y in tqdm(xy_pairs, desc="Processing XY pairs"):

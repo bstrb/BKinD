@@ -21,7 +21,7 @@ def rmsd_analysis_frame(file_paths, n, target_serial_number):
             print(f"Skipping file {filename} as it doesn't match the expected naming pattern.")
             continue
         
-        coords = filename.split('_')[1:3]   # Extract coordinates, e.g., ['-512.0', '-512.02.stream']
+        coords = filename.split('_')[-2:]  # Extract the last two parts as coordinates
         coords[1] = coords[1].replace('.stream', '')  # Remove the ".stream" extension
         x, y = float(coords[0]), float(coords[1])
         
@@ -64,4 +64,4 @@ def rmsd_analysis_frame(file_paths, n, target_serial_number):
     plt.tight_layout()
     plt.show()
 
-    # return rmsd_values
+    return rmsd_values

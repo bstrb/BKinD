@@ -3,13 +3,14 @@ from find_first_file import find_first_file
 from automate_evaluation_and_integration import automate_evaluation_and_integration
 
 def main():
-    stream_file_folder = "/home/buster/UOX1/0-05-step-indexing/5x5_0-05_indexing"
+    stream_file_folder = "/home/buster/leidata/hMTH1_TH287_Serial/first-trial-process"
+    # stream_file_folder = "/home/buster/UOX3"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
-    pdb_file = "/home/buster/UOX1/0-05-step-indexing/5x5_0-05_indexing/UOX.pdb"
+    pdb_file = find_first_file(stream_file_folder, ".pdb")
     weights_list = [(1, 2, 3, -1, 1, 1)] # w,l,a,p,r,g
-    lattice = "oI"  # Pearson Symbol read from .cell file first letter for lattice type and second for centering
+    lattice = "oP"  # Pearson Symbol read from .cell file first letter for lattice type and second for centering
     ring_size = [(3, 4, 7)]
-    pointgroup = "mmm"
+    pointgroup = "P222"
     num_threads = 23
     bins = 20
     min_res = 1.5

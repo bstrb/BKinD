@@ -24,7 +24,7 @@ def extract_rmsd_to_csv(stream_dir, n):
                 print(f"Skipping file {filename} as it doesn't match the expected naming pattern.")
                 continue
             
-            coords = filename.split('_')[1:3]
+            coords = filename.split('_')[-2:]  # Extract the last two parts as coordinates
             coords[1] = coords[1].replace('.stream', '')
             x, y = abs(float(coords[0])), abs(float(coords[1]))
             

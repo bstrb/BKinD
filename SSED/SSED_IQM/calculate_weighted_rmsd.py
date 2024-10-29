@@ -1,9 +1,7 @@
-# import numpy as np
-
 import numpy as np
 
 # Function to calculate weighted RMSD between peaks and reflections, with outlier rejection
-def calculate_weighted_rmsd(fs_ss, intensities, ref_fs_ss, tolerance_factor = 2.0):
+def calculate_weighted_rmsd(fs_ss, intensities, ref_fs_ss, tolerance_factor=2.0):
     distances = []
     weights = []
 

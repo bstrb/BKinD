@@ -1,15 +1,69 @@
 import os
 import csv
+import re
+
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import Manager
 from find_stream_files import find_stream_files
 from parse_stream_file import parse_stream_file
 from extract_target_cell_params import extract_target_cell_params
-from extract_chunk_data import extract_chunk_data
 from calculate_cell_deviation import calculate_cell_deviation
 from calculate_weighted_rmsd import calculate_weighted_rmsd
 
+# Function to extract relevant data from each chunk
+def extract_chunk_data(chunk):
+    # Check if the chunk is indexed
+    if "indexed_by = none" in chunk.lower():
+        return None, None, None, None, None, None, None, None
+
+    else:
+        # Extract event number
+        event_match = re.search(r'Event: //(\d+)', chunk)
+        event_number = int(event_match.group(1)) if event_match else None
+
+        # Extract number of reflections and peaks
+        num_reflections_match = re.search(r'num_reflections = (\d+)', chunk)
+        num_reflections = int(num_reflections_match.group(1)) if num_reflections_match else 0
+
+        num_peaks_match = re.search(r'num_peaks = (\d+)', chunk)
+        num_peaks = int(num_peaks_match.group(1)) if num_peaks_match else 0
+
+        # Extract cell parameters
+        cell_params_match = re.search(r'Cell parameters ([\d.]+) ([\d.]+) ([\d.]+) nm, ([\d.]+) ([\d.]+) ([\d.]+) deg', chunk)
+        if cell_params_match:
+            a, b, c = map(lambda x: float(x) * 10, cell_params_match.groups()[:3])  # Convert from nm to A
+            al, be, ga = map(float, cell_params_match.groups()[3:])
+            cell_params = (a, b, c, al, be, ga)
+        else:
+            cell_params = None
+
+        # Extract peak list
+        peak_list_match = re.search(r'Peaks from peak search\n(.*?)End of peak list', chunk, re.S)
+        if peak_list_match:
+            peaks = re.findall(r'\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+p0', peak_list_match.group(1))
+            fs_ss, intensities = [], []
+            for peak in peaks:
+                fs, ss, _, intensity = map(float, peak)
+                fs_ss.append((fs, ss))
+                intensities.append(intensity)
+        else:
+            fs_ss, intensities = [], []
+
+        # Extract reflections
+        reflections_match = re.search(r'Reflections measured after indexing\n(.*?)End of reflections', chunk, re.S)
+        if reflections_match:
+            reflections = re.findall(r'\s+-?\d+\s+-?\d+\s+-?\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+(\d+\.\d+)\s+(\d+\.\d+)\s+p0', reflections_match.group(1))
+            ref_fs_ss = [(float(fs), float(ss)) for fs, ss in reflections]
+        else:
+            ref_fs_ss = []
+
+        # Extract profile_radius
+        profile_radius_match = re.search(r'profile_radius = ([\d.]+) nm\^-1', chunk)
+        profile_radius = float(profile_radius_match.group(1)) if profile_radius_match else None
+
+        return event_number, num_reflections, num_peaks, cell_params, fs_ss, intensities, ref_fs_ss, profile_radius
+    
 # Function to parse a single stream file and evaluate its indexing
 def process_stream_file(stream_file_path, wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp, progress_queue):
     try:

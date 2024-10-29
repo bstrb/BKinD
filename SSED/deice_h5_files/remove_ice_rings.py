@@ -79,6 +79,7 @@ def remove_ice_rings(input_file, output_file, min_spots=10, inner_radius=100, ou
                 chunk_indices = valid_indices[i:i + chunk_size]
                 images_chunk = images_dset[chunk_indices].astype('float32')
                 images_out[i:i + len(chunk_indices)] = images_chunk
+                gc.collect()
                 progress_bar.update(1)
 
             progress_bar.close()
@@ -91,8 +92,8 @@ def remove_ice_rings(input_file, output_file, min_spots=10, inner_radius=100, ou
         print(f"Error processing file {input_file}: {e}")
 
 if __name__ == "__main__":
-    input_file = "/home/buster/UOX123/UOX1_minpeaks_15.h5"  # Example input file path
-    output_file = "/home/buster/UOX123/deiced_UOX1_minpeaks_15.h5"  # Example output file path
+    input_file = "/home/buster/UOX123/UOX3_minpeaks_15.h5"  # Example input file path
+    output_file = "/home/buster/UOX123/deiced_UOX3_minpeaks_15.h5"  # Example output file path
     min_spots = 5  # Set the threshold for minimum number of spots within the annulus
     inner_radius = 60  # Set the inner radius of the annulus in pixels
     outer_radius = 155  # Set the outer radius of the annulus in pixels

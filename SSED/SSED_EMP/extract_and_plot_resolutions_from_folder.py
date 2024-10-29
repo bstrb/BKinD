@@ -72,5 +72,5 @@ def extract_and_plot_resolutions_from_folder(input_folder):
 
 # Example usage
 if __name__ == "__main__":
-    input_folder = '/home/buster/UOX3/EMP_1_2_3_-1_1_1'  # Replace with your actual folder path
+    input_folder = '/home/buster/UOX123/EMP_1_2_3_-1_1_1'  # Replace with your actual folder path
     extract_and_plot_resolutions_from_folder(input_folder)

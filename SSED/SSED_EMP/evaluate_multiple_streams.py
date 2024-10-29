@@ -73,3 +73,18 @@ def evaluate_multiple_streams(stream_file_folder, exp, EMP):
         print(f'Combined metrics and selected chunks written to {output_file_path}')
     except Exception as e:
         print(f"An error occurred during evaluation: {e}")
+
+        # Example Usage
+if __name__ == "__main__":
+    # Folder containing the stream files
+    stream_file_folder = "/home/buster/UOX1/3x3"
+
+    # Exponential weights for the metrics (e.g., 0.5, 1, -1, 1, 0, 1)
+    # These values correspond to wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp
+    exp_weights = [1, 2, 3, -1, 1, 1]
+
+    # A unique identifier for the evaluation run, such as "EMP_001"
+    EMP_identifier = "EMP_test"
+
+    # Evaluate multiple stream files in the specified folder
+    evaluate_multiple_streams(stream_file_folder, exp_weights, EMP_identifier)

@@ -81,6 +81,8 @@ def remove_images_below_threshold(input_file, min_peaks):
         print(f"Error processing file {input_file}: {e}")
 
 if __name__ == "__main__":
-    input_file = "/home/buster/UOX123/UOX3.h5"  # Example input file path
+    # input_file = "/home/buster/leidata/hMTH1_TH287_Serial/0deg/0deg_merge/hMTH1_TH287_Serial_spot2_300nm_CL1350_015speed_0degree_20241019_2213.h5"  # Example input file path
+    # input_file = "/home/buster/leidata/hMTH1_TH287_Serial/0deg/0deg_merge/hMTH1_TH287_Serial_spot2_300nm_CL1350_015speed_0degree_20241019_1924.h5"  # Example input file path
+    input_file = "/home/buster/leidata/hMTH1_TH287_Serial/0deg/0deg_merge/hMTH1_TH287_Serial_merged.h5"  # Example input file path
     min_peaks = 15  # Set the threshold for minimum number of peaks
     remove_images_below_threshold(input_file, min_peaks)

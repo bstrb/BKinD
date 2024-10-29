@@ -3,7 +3,7 @@ from find_first_file import find_first_file
 from automate_evaluation_and_integration import automate_evaluation_and_integration
 
 def main():
-    stream_file_folder = "/home/buster/UOX1/0-05-step-indexing/41x41_0-05_indexing"
+    stream_file_folder = "/home/buster/UOX123"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
     pdb_file = "/home/buster/UOX1/0-05-step-indexing/41x41_0-05_indexing/UOX.pdb"
     weights_list = [(1,2,0)]

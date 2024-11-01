@@ -78,8 +78,14 @@ def plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=4):
     # Load the entire CSV data as a DataFrame
     df = pd.read_csv(csv_file_path)
     
-    # Remove the minus sign if needed (making all values positive)
-    df[['x_coord', 'y_coord']] = df['stream_file'].str.extract(r'UOX1_([\-0-9\.]+)_([\-0-9\.]+)').replace(r'\.$', '', regex=True).astype(float)
+    # # Remove the minus sign if needed (making all values positive)
+    # df[['x_coord', 'y_coord']] = df['stream_file'].str.extract(r'UOX1_([\-0-9\.]+)_([\-0-9\.]+)').replace(r'\.$', '', regex=True).astype(float)
+
+    df[['x_coord', 'y_coord']] = (
+        df['stream_file']
+        .str.extract(r'([-0-9.]+)_([-0-9.]+)\.stream$')  # Match coordinates right before ".stream"
+        .astype(float)
+)
 
     # Sort and get unique x and y coordinates once globally
     x_coords = sorted(df['x_coord'].unique())
@@ -109,5 +115,5 @@ def plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=4):
     gc.collect()
 
 # Example usage:
-csv_file_path = '/home/buster/UOX1/5x5/combined_metrics_EMP_test.csv'
+csv_file_path = "/home/buster/UOX123/combined_metrics_.csv"
 plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=23)  # Adjust max_workers based on available CPU cores

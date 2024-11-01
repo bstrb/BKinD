@@ -36,7 +36,7 @@ def create_gif_from_pngs(folder, output_filename='output.gif', duration=1000, re
     print(f"GIF created successfully: {output_filename}")
 
 # Provide the folder path
-# folder_path = '/mnt/c/Users/bubl3932/Desktop/BKinD/SSED/SSED_BR/rmsd_heatmaps'
-# output_gif = '/mnt/c/Users/bubl3932/Desktop/BKinD/SSED/SSED_BR/rmsd_heatmaps/output_optimized.gif'
+folder_path = '/home/buster/UOX1/0-05-step-indexing/41x41_0-05_indexing/cm_heatmaps_gif'
+output_gif = '/home/buster/UOX1/0-05-step-indexing/41x41_0-05_indexing/cm_heatmaps.gif'
 
-# create_gif_from_pngs(folder_path, output_filename=output_gif, duration=1000, resize_factor=0.3, reduce_colors=True, colors=128)
+create_gif_from_pngs(folder_path, output_filename=output_gif, duration=1000, resize_factor=0.3, reduce_colors=True, colors=128)

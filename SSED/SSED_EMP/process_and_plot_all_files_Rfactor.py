@@ -150,5 +150,5 @@ def process_and_plot_all_files(base_path):
 
     open_plot(fig, plot_filename)
 
-directory = "/home/buster/UOX123"
+directory = "/home/buster/UOX1/different_index_params"
 process_and_plot_all_files(directory)

@@ -3,8 +3,7 @@ from find_first_file import find_first_file
 from automate_evaluation_and_integration import automate_evaluation_and_integration
 
 def main():
-    stream_file_folder = "/home/buster/UOX1/3x3"
-    # stream_file_folder = "/home/buster/UOX3"
+    stream_file_folder = "/home/buster/UOX1/5x5_retry"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
     pdb_file = find_first_file(stream_file_folder, ".pdb")
     weights_list = [(1, 2, 3, -1, 1, 1)] # w,l,a,p,r,g

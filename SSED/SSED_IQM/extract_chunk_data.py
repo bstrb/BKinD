@@ -1,10 +1,10 @@
-import os
 import re
-import csv
-from tqdm import tqdm
 
-# Function to extract relevant data from each chunk and compute the combined metric
-def extract_chunk_data(chunk):
+from calculate_weighted_rmsd import calculate_weighted_rmsd
+from calculate_cell_deviation import calculate_cell_deviation
+
+# Function to extract relevant data from each chunk
+def extract_chunk_data(chunk, original_cell_params):
     # Extract event number
     event_match = re.search(r'Event: //(\d+)', chunk)
     event_number = int(event_match.group(1)) if event_match else None
@@ -54,6 +54,13 @@ def extract_chunk_data(chunk):
         cell_params = None
         print("No cell parameters found in chunk.")
 
+    # Calculate cell deviation if possible
+    if cell_params is not None and original_cell_params is not None:
+        length_deviation, angle_deviation = calculate_cell_deviation(cell_params, original_cell_params)
+    else:
+        length_deviation, angle_deviation = None, None
+        print("Unable to calculate cell deviation for chunk.")
+
     # Extract number of peaks and reflections
     num_peaks_match = re.search(r'num_peaks = (\d+)', chunk)
     num_peaks = int(num_peaks_match.group(1)) if num_peaks_match else 0
@@ -82,59 +89,4 @@ def extract_chunk_data(chunk):
     if profile_radius is None:
         print("No profile radius found in chunk.")
 
-    # Compute the combined metric (example formula, weights can be adjusted as needed)
-    if weighted_rmsd is not None and cell_params is not None and peak_resolution is not None and diffraction_resolution is not None:
-        a, b, c, al, be, ga = cell_params
-        combined_metric = (weighted_rmsd * 0.2) + ((a + b + c) / 3 * 0.1) + ((al + be + ga) / 3 * 0.1) + (num_peaks * 0.1) + (num_reflections * 0.1) + (peak_resolution * 0.2) + (diffraction_resolution * 0.2) + (profile_radius * 0.1 if profile_radius is not None else 0)
-    else:
-        combined_metric = None
-        print("Unable to compute combined metric for chunk.")
-
-    return event_number, combined_metric
-
-# Function to process a single stream file
-def process_stream_file(stream_file_path):
-    results = []
-
-    with open(stream_file_path, 'r') as file:
-        content = file.read()
-        chunks = re.split(r'----- Begin chunk -----', content)[1:]  # Split by chunk delimiter and ignore the header
-
-        # Iterate over each chunk with progress tracking
-        for chunk in tqdm(chunks, desc="Processing chunks", unit="chunk"):
-            if "indexed_by = none" in chunk.lower():
-                continue  # Skip unindexed chunks
-
-            event_number, combined_metric = extract_chunk_data(chunk)
-            if event_number is not None and combined_metric is not None:
-                results.append((os.path.basename(stream_file_path), event_number, combined_metric, chunk))
-
-    # Sort results by combined metric value in ascending order
-    results.sort(key=lambda x: x[2])
-
-    # Write results to CSV and stream file
-    output_csv_path = os.path.join(os.path.dirname(stream_file_path), 'combined_metrics.csv')
-    output_stream_path = os.path.join(os.path.dirname(stream_file_path), 'best_results.stream')
-
-    if results:
-        with open(output_csv_path, mode='w', newline='') as csv_file:
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(['stream_file', 'event_number', 'combined_metric'])
-            for result in results:
-                csv_writer.writerow(result[:3])
-
-        with open(output_stream_path, 'w') as stream_file:
-            for result in results:
-                stream_file.write("----- Begin chunk -----\n")
-                stream_file.write(result[3])
-                stream_file.write("----- End chunk -----\n")
-
-        print(f'Combined metrics CSV written to {output_csv_path}')
-        print(f'Best results stream file written to {output_stream_path}')
-    else:
-        print("No valid chunks found in the stream file.")
-
-# Example usage
-if __name__ == "__main__":
-    stream_file_path = "/home/buster/UOX1/3x3/UOX1_-511.99_-511.99.stream"
-    process_stream_file(stream_file_path)
+    return (event_number, weighted_rmsd, length_deviation, angle_deviation, num_peaks, num_reflections, peak_resolution, diffraction_resolution, profile_radius, chunk)

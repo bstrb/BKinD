@@ -169,5 +169,5 @@ def process_all_stream_files(folder_path, metric_weights=None):
 
 # # Example usage
 if __name__ == "__main__":
-    folder_path = "/home/buster/UOX1/different_index_params/5x5_retry"
+    folder_path = "/home/buster/UOX123/3x3_retry"
     process_all_stream_files(folder_path)

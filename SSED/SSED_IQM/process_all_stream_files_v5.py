@@ -7,7 +7,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager, Lock
 
 # Function to process a single stream file
-def process_stream_file(stream_file_path, metric_weights=None, show_progress=False):
+def process_stream_file(stream_file_path, metric_weights=None):
     if metric_weights is None:
         metric_weights = {
             'weighted_rmsd': 1,
@@ -45,9 +45,8 @@ def process_stream_file(stream_file_path, metric_weights=None, show_progress=Fal
             original_cell_params = None
             print("No original cell parameters found in header.")
 
-        # Iterate over each chunk with tqdm progress tracking if show_progress is True
-        iterator = tqdm(chunks, desc=f"Processing chunks in {os.path.basename(stream_file_path)}", unit="chunk") if show_progress else chunks
-        for chunk in iterator:
+        # Iterate over each chunk
+        for chunk in tqdm(chunks, desc=f"Processing chunks in {os.path.basename(stream_file_path)}", unit="chunk"):
             if "indexed_by = none" in chunk.lower():
                 continue  # Skip unindexed chunks
 
@@ -74,20 +73,23 @@ def process_stream_file(stream_file_path, metric_weights=None, show_progress=Fal
             max_value = max(all_metrics[key])
             all_metrics[key] = [(value - min_value) / (max_value - min_value) if max_value != min_value else 0 for value in all_metrics[key]]
 
+    # Define function for combined metric calculation using product of (1 + metric) ^ (metric weight)
+    def calculate_combined_metric(index, all_metrics, metric_weights):
+        combined_metric = 1  # Start with 1 for multiplication
+        for metric, weight in metric_weights.items():
+            combined_metric *= (1 + all_metrics[metric][index]) ** weight
+        return combined_metric
+
     # Update results with normalized metrics and compute combined metric
     for i, result in enumerate(results):
-        _, event_number, weighted_rmsd, length_deviation, angle_deviation, num_peaks, num_reflections, peak_resolution, diffraction_resolution, profile_radius, chunk_content = result
-        combined_metric = (
-            (all_metrics['weighted_rmsd'][i] * metric_weights['weighted_rmsd']) +
-            (all_metrics['length_deviation'][i] * metric_weights['length_deviation']) +
-            (all_metrics['angle_deviation'][i] * metric_weights['angle_deviation']) +
-            (all_metrics['num_peaks'][i] * metric_weights['num_peaks']) +
-            (all_metrics['num_reflections'][i] * metric_weights['num_reflections']) +
-            (all_metrics['peak_resolution'][i] * metric_weights['peak_resolution']) +
-            (all_metrics['diffraction_resolution'][i] * metric_weights['diffraction_resolution']) +
-            (all_metrics['profile_radius'][i] * metric_weights['profile_radius'])
-        )
+        _, event_number, *_ , chunk_content = result
+        
+        # Compute combined metric using the product approach
+        combined_metric = calculate_combined_metric(i, all_metrics, metric_weights)
+        
+        # Update result with computed metric
         results[i] = (os.path.basename(stream_file_path), event_number, combined_metric, chunk_content)
+
 
     # Sort results by combined metric value in ascending order
     results.sort(key=lambda x: x[2])
@@ -95,8 +97,8 @@ def process_stream_file(stream_file_path, metric_weights=None, show_progress=Fal
     return results, none_results, header
 
 # Helper function to process a file and store results
-def process_and_store(stream_file_path, metric_weights, all_results, best_results, header, lock, show_progress=False):
-    results, none_results, file_header = process_stream_file(stream_file_path, metric_weights, show_progress)
+def process_and_store(stream_file_path, metric_weights, all_results, best_results, header, lock):
+    results, none_results, file_header = process_stream_file(stream_file_path, metric_weights)
 
     if file_header and not header:
         with lock:
@@ -129,21 +131,14 @@ def process_all_stream_files(folder_path, metric_weights=None):
         if f.startswith('best_results') and f.endswith('.stream'):
             os.remove(os.path.join(folder_path, f))
 
-    # Get all stream files in the folder
+    # Iterate over all stream files in the folder
     stream_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.stream')]
 
     # Use ProcessPoolExecutor for parallel processing
     with ProcessPoolExecutor() as executor:
-        futures = {}
-        for idx, stream_file in enumerate(stream_files):
-            # Only show progress bar for the last stream file
-            show_progress = (idx == len(stream_files) - 1)
-            future = executor.submit(process_and_store, stream_file, metric_weights, all_results, best_results, header, lock, show_progress)
-            futures[future] = stream_file
-
+        futures = {executor.submit(process_and_store, stream_file, metric_weights, all_results, best_results, header, lock): stream_file for stream_file in stream_files}
         for future in as_completed(futures):
-            stream_file = futures.pop(future)
-            print(f"Completed processing for stream file: {stream_file}")
+            futures.pop(future)
 
     # Sort best_results by combined metric value in ascending order
     best_results = list(best_results)
@@ -151,8 +146,8 @@ def process_all_stream_files(folder_path, metric_weights=None):
 
     # Create a filename for the output files based on the weight combination
     weight_combination_str = '_'.join([f'{value}' for value in (metric_weights or {}).values()])
-    output_csv_path = os.path.join(folder_path, f'combined_metrics_{weight_combination_str}.csv')
-    output_stream_path = os.path.join(folder_path, f'best_results_{weight_combination_str}.stream')
+    output_csv_path = os.path.join(folder_path, f'combined_exp_metrics_{weight_combination_str}.csv')
+    output_stream_path = os.path.join(folder_path, f'best_exp_results_{weight_combination_str}.stream')
 
     # Write all results to CSV
     with open(output_csv_path, mode='w', newline='') as csv_file:
@@ -175,7 +170,7 @@ def process_all_stream_files(folder_path, metric_weights=None):
     else:
         print("No valid chunks found in any stream file.")
 
-# Example usage
+# # Example usage
 if __name__ == "__main__":
-    folder_path = "/home/buster/UOX123"
+    folder_path = "/home/buster/UOX123/3x3_retry"
     process_all_stream_files(folder_path)

@@ -52,5 +52,5 @@ def extract_resolutions_from_folder(input_folder):
 
 # Example usage
 if __name__ == "__main__":
-    input_folder = '/home/buster/UOX3/EMP_1_2_3_-1_1_1'   # Replace with your actual folder path
+    input_folder = '/home/buster/R2aOx'   # Replace with your actual folder path
     overall_min_peak_res, overall_min_diff_res = extract_resolutions_from_folder(input_folder)

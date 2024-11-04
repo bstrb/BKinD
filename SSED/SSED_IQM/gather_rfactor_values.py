@@ -47,7 +47,7 @@ def gather_rfactor_values(directory):
     return rfactor_df
 
 # Example usage
-directory = "/home/buster/UOX1/different_index_params/5x5_retry"
+directory = "/home/buster/UOX1/different_index_params/3x3_retry"
 csv_output = os.path.join(directory, "rfactor_values.csv")
 rfactor_table = gather_rfactor_values(directory)
 rfactor_table.to_csv(csv_output, index=False)  # Save the table to a CSV file

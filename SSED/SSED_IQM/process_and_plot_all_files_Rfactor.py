@@ -150,5 +150,6 @@ def process_and_plot_all_files(base_path):
 
     open_plot(fig, plot_filename)
 
-directory = "/home/buster/UOX1/different_index_params/5x5_retry"
+directory = "/home/buster/UOX1/different_index_params/3x3_retry"
+# directory = "/home/buster/UOX123/3x3_retry"
 process_and_plot_all_files(directory)

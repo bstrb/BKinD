@@ -74,7 +74,7 @@ def process_run_folders(base_path, pdb_file, bins, min_res):
 
 # Example usage
 if __name__ == "__main__":
-    integration_output_folder =  "/home/buster/UOX1/different_index_params/3x3_retry/EMP_1_2_3_-1_1_1"   
+    integration_output_folder =  "/home/buster/UOX123/3x3_retry/sum" 
     pdb_file = "/home/buster/UOX123/3x3_retry/UOX.pdb"  # Replace with your actual pdb file path
     bins = 20
     min_res = 1.5

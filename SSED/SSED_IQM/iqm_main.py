@@ -3,10 +3,19 @@ from find_first_file import find_first_file
 from automate_evaluation_and_integration import automate_evaluation_and_integration
 
 def main():
-    stream_file_folder = "/home/buster/UOX1/different_index_params/3x3_retry"
+    stream_file_folder = "/home/buster/UOX1/different_index_params/5x5_retry"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
     pdb_file = find_first_file(stream_file_folder, ".pdb")
-    weights_list = [(1, 2, 3, -1, 1, 1)] # w,l,a,p,r,g
+    weights_list = [(1, 2, 3, -1, 1, -1, -1, 1),
+                    (1, 2, 3, -1, 1, -1, 0, 1),
+                    (1, 2, 3, -1, 1, -1, 1, 1),
+                    (1, 2, 3, -1, 1, 0, -1, 1),
+                    (1, 2, 3, -1, 1, 0, 0, 1),
+                    (1, 2, 3, -1, 1, 0, 1, 1),
+                    (1, 2, 3, -1, 1, 1, -1, 1),
+                    (1, 2, 3, -1, 1, 1, 0, 1),
+                    (1, 2, 3, -1, 1, 1, 1, 1),
+                    ] # wrmsd,cld,cad,np,nr,pres,dres,pr
     lattice = "oI"  # Pearson Symbol read from .cell file first letter for lattice type and second for centering
     ring_size = [(3, 4, 7)]
     pointgroup = "mmm"

@@ -15,6 +15,7 @@
         "./SSED/SSED_RCIS",
         "./SSED/merge_h5_files",
         "./SSED/SSED_IQM",
-        "./SSED/SSED_IQM"
+        "./SSED/SSED_IQM",
+        "./SSED/SSED_IQM_v2"
     ]
 }

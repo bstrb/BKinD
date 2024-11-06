@@ -6,15 +6,15 @@ from extract_chunk_data import extract_chunk_data
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager, Lock
 
-# Function to process a single stream file
 def process_stream_file(stream_file_path, metric_weights=None):
     metric_names = [
         'weighted_rmsd', 'length_deviation', 'angle_deviation', 'num_peaks',
-        'num_reflections', 'peak_resolution', 'diffraction_resolution', 'profile_radius'
+        'num_reflections', 'peak_resolution', 'diffraction_resolution', 'profile_radius',
+        'percentage_indexed'  # New metric added
     ]
 
     # If metric_weights is an array, convert it to a dictionary
-    if isinstance(metric_weights, list) and len(metric_weights) == len(metric_names):
+    if isinstance(metric_weights, (list, tuple)) and len(metric_weights) == len(metric_names):
         metric_weights = dict(zip(metric_names, metric_weights))
     elif metric_weights is None:
         metric_weights = {
@@ -23,9 +23,10 @@ def process_stream_file(stream_file_path, metric_weights=None):
             'angle_deviation': 3,
             'num_peaks': -1,
             'num_reflections': 1,
-            'peak_resolution': 1,
+            'peak_resolution': -1,
             'diffraction_resolution': 1,
-            'profile_radius': 1
+            'profile_radius': 1,
+            'percentage_indexed': -2  # Negative weight to favor higher percentages
         }
 
     results = []
@@ -38,7 +39,8 @@ def process_stream_file(stream_file_path, metric_weights=None):
         'num_reflections': [],
         'peak_resolution': [],
         'diffraction_resolution': [],
-        'profile_radius': []
+        'profile_radius': [],
+        'percentage_indexed': []  # New metric added
     }
 
     with open(stream_file_path, 'r') as file:
@@ -54,15 +56,21 @@ def process_stream_file(stream_file_path, metric_weights=None):
             print("No original cell parameters found in header.")
 
         # Iterate over each chunk
-        for chunk in tqdm(chunks, desc=f"Processing chunks in {os.path.basename(stream_file_path)}", unit="chunk"):
+        for chunk in tqdm(chunks, desc=f"Processing chunks in {os.path.basename(stream_file_path)}", unit="chunk"): #tqdm progress bar for all chunks simultatenously
+        # for chunk in chunks:
             if "indexed_by = none" in chunk.lower():
                 continue  # Skip unindexed chunks
 
-            event_number, weighted_rmsd, length_deviation, angle_deviation, num_peaks, num_reflections, peak_resolution, diffraction_resolution, profile_radius, chunk_content = extract_chunk_data(chunk, original_cell_params)
+            (event_number, weighted_rmsd, length_deviation, angle_deviation,
+             num_peaks, num_reflections, peak_resolution, diffraction_resolution,
+             profile_radius, percentage_indexed, chunk_content) = extract_chunk_data(chunk, original_cell_params)
 
             if event_number is not None:
-                if None not in (weighted_rmsd, length_deviation, angle_deviation, peak_resolution, diffraction_resolution):
-                    results.append((os.path.basename(stream_file_path), event_number, weighted_rmsd, length_deviation, angle_deviation, num_peaks, num_reflections, peak_resolution, diffraction_resolution, profile_radius, chunk_content))
+                if None not in (weighted_rmsd, length_deviation, angle_deviation, peak_resolution, diffraction_resolution, percentage_indexed):
+                    results.append((
+                        os.path.basename(stream_file_path), event_number, weighted_rmsd, length_deviation, angle_deviation,
+                        num_peaks, num_reflections, peak_resolution, diffraction_resolution, profile_radius, percentage_indexed, chunk_content
+                    ))
                     all_metrics['weighted_rmsd'].append(weighted_rmsd)
                     all_metrics['length_deviation'].append(length_deviation)
                     all_metrics['angle_deviation'].append(angle_deviation)
@@ -71,6 +79,7 @@ def process_stream_file(stream_file_path, metric_weights=None):
                     all_metrics['peak_resolution'].append(peak_resolution)
                     all_metrics['diffraction_resolution'].append(diffraction_resolution)
                     all_metrics['profile_radius'].append(profile_radius)
+                    all_metrics['percentage_indexed'].append(percentage_indexed)  # Collect the new metric
                 else:
                     none_results.append((os.path.basename(stream_file_path), event_number, "None"))
 
@@ -79,22 +88,26 @@ def process_stream_file(stream_file_path, metric_weights=None):
         if all_metrics[key]:
             min_value = min(all_metrics[key])
             max_value = max(all_metrics[key])
-            all_metrics[key] = [(value - min_value) / (max_value - min_value) if max_value != min_value else 0 for value in all_metrics[key]]
+            if max_value != min_value:
+                all_metrics[key] = [(value - min_value) / (max_value - min_value) for value in all_metrics[key]]
+            else:
+                all_metrics[key] = [0.5 for _ in all_metrics[key]]  # If all values are the same, assign 0.5
 
     # Define function for combined metric calculation using product of (1 + metric) ^ (metric weight)
     def calculate_combined_metric(index, all_metrics, metric_weights):
         combined_metric = 1  # Start with 1 for multiplication
         for metric, weight in metric_weights.items():
-            combined_metric *= (1 + all_metrics[metric][index]) ** weight
+            metric_value = all_metrics[metric][index]
+            combined_metric *= (1 + metric_value) ** weight
         return combined_metric
 
     # Update results with normalized metrics and compute combined metric
     for i, result in enumerate(results):
-        _, event_number, *_ , chunk_content = result
-        
+        filename, event_number, weighted_rmsd, length_deviation, angle_deviation, num_peaks, num_reflections, peak_resolution, diffraction_resolution, profile_radius, percentage_indexed, chunk_content = result
+
         # Compute combined metric using the product approach
         combined_metric = calculate_combined_metric(i, all_metrics, metric_weights)
-        
+
         # Update result with computed metric
         results[i] = (os.path.basename(stream_file_path), event_number, combined_metric, chunk_content)
 
@@ -102,6 +115,7 @@ def process_stream_file(stream_file_path, metric_weights=None):
     results.sort(key=lambda x: x[2])
 
     return results, none_results, header
+
 
 # Helper function to process a file and store results
 def process_and_store(stream_file_path, metric_weights, all_results, best_results, header, lock):
@@ -180,5 +194,5 @@ def process_all_stream_files(folder_path, metric_weights=None):
 # Example usage
 if __name__ == "__main__":
     folder_path = "/home/buster/UOX1/different_index_params/3x3"
-    metric_weights = [1, 2, 3, -1, 1, 1, 1, 1]
+    metric_weights = (1, 2, 3, -1, 1, -1, 1, 1, -1)
     process_all_stream_files(folder_path, metric_weights)

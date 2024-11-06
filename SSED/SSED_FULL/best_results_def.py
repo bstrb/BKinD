@@ -179,7 +179,7 @@ def find_and_copy_header(inputfolder_path, output_path):
     
     print(f"Header copied and added to {output_path}")
 
-def find_best_results(folder_path, output_path):
+def find_best_results(folder_path):
 
     file_paths = find_stream_files(folder_path)
 

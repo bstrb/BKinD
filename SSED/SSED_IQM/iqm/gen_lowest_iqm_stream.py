@@ -126,7 +126,7 @@ def process_and_store(stream_file_path, metric_weights, all_results, best_result
         best_results[:] = list(best_results_dict.values())
 
 # Function to process all stream files in a folder using multiprocessing
-def process_all_stream_files(folder_path, metric_weights=None):
+def gen_lowest_iqm_stream(folder_path, metric_weights=None):
     manager = Manager()
     all_results = manager.list()
     best_results = manager.list()
@@ -179,6 +179,6 @@ def process_all_stream_files(folder_path, metric_weights=None):
 
 # Example usage
 if __name__ == "__main__":
-    folder_path = "/home/buster/UOX1/different_index_params/3x3"
-    metric_weights = (1, 2, 3, -1, 1, -1, 1, 1)
-    process_all_stream_files(folder_path, metric_weights)
+    folder_path = "" # Folder with index stream-files. OBSERVE: Make sure no other stream-files are in that folder or they will also be processed.
+    metric_weights = (1, 2, 3, -1, 1, -1, 1, 1) # Combination of exponential weights to individual included metrics metric ((1, 2, 3, -1, 1, -1, 1, 1) best found so far)
+    gen_lowest_iqm_stream(folder_path, metric_weights)

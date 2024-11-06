@@ -69,8 +69,8 @@ def read_stream_write_sol(stream_file_path, lattice):
 # Example usage
 if __name__ == "__main__":
     # Example input stream file path and lattice value
-    stream_file_folder = '/home/buster/UOX1/different_index_params/3x3'
-    stream_file_path = '/home/buster/UOX1/different_index_params/3x3/best_results_IQM_1_2_3_-1_1_-1_1_1.stream'  # Update this with your actual file path
+    stream_file_folder = '/home/buster/UOX123/11x11'
+    stream_file_path = '/home/buster/UOX123/11x11/best_results_IQM_1_2_3_-1_1_-1_1_1_-1.stream'  # Update this with your actual file path
     lattice = 'oI'  # Example lattice value, replace with the appropriate lattice for your data
     num_threads = 23
 
@@ -79,6 +79,6 @@ if __name__ == "__main__":
     print(f"Finished processing. Total lines written to .sol file: {num_index}")
 
     # Generate bash script for fast integration
-    bash_file_name = f"IQM_1_2_3_-1_1_-1_1_1"
+    bash_file_name = f"IQM_1_2_3_-1_1_-1_1_1_-1"
     
     generate_bash_script(bash_file_name, stream_file_folder, num_threads, best_results_sol)

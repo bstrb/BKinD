@@ -17,11 +17,10 @@ def generate_bash_script(bash_file_name, stream_files_dir,
 
     # If no geom_file, lst_file, or cell_file is provided, find the first one in the directory
     num_threads = num_threads or 23
-    input_sol_file = sol_file #or find_first_file(stream_files_dir, ".sol")
+    input_sol_file = sol_file
     lst_file_path = lst_file or find_first_file(stream_files_dir, ".lst")
     geom_file_path = geom_file or find_first_file(stream_files_dir, ".geom")
     cell_file_path = cell_file or find_first_file(stream_files_dir, ".cell")
-    # input_sol_file = sol_file or 'best_results.sol'
 
     # Error if any of the required files are not found
     if not lst_file_path:
@@ -50,15 +49,15 @@ def generate_bash_script(bash_file_name, stream_files_dir,
 
 # Example usage
 if __name__ == "__main__":
-    # Directory where required files (.sol, .lst, .geom, .cell) are stored
-    stream_files_dir = '/home/buster/UOX123/3x3_retry'  # Update this with your actual directory
+    # Directory where stream files and other required files (.sol, .lst, .geom, .cell) are stored
+    stream_files_dir = ''  # Update this with your actual directory
 
     # Name for the generated bash script (without the extension)
-    bash_file_name = 'RMSD'
+    bash_file_name = 'bash'
 
     # Optional parameters (you can specify them or leave them to be auto-found by the script)
     num_threads = 23  # Optional, default is 23 if not specified
-    sol_file = 'best_results_RMSD.sol'  # Optional, will find the first .sol file in the directory if not specified
+    sol_file = None  # Optional, will find the first .sol file in the directory if not specified
     lst_file = None  # Optional, will find the first .lst file in the directory if not specified
     geom_file = None  # Optional, will find the first .geom file in the directory if not specified
     cell_file = None  # Optional, will find the first .cell file in the directory if not specified

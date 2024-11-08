@@ -10,6 +10,7 @@ from iqm_int_def import fast_integration
 from generate_bash_script import generate_bash_script 
 from iqm_merge_def import merge_and_write_mtz
 from iqm_ref_def import process_run_folders
+from extract_final_rfactor import extract_final_rfactor
 
 def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, ring_size, cellfile_path, pointgroup, num_threads, bins, pdb_file, min_res = 2, iterations = 3):
     for exp in exp_list:
@@ -52,8 +53,13 @@ def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, r
             tqdm.write("Refining fast integration results...")
             process_run_folders(integration_output_folder, pdb_file, bins, min_res)
 
+            rfactor = extract_final_rfactor(integration_output_folder)
+
             #  Completion message
-            print(f"Automation process completed successfully for exponents: {exp}")
+            print(f"Automation process completed successfully for exponents: {exp} with a final R factor of {rfactor}")
+
+            # return rfactor
+        
         except Exception as e:
             tqdm.write(f"An error occurred during processing of exponents {exp}: {e}")
             traceback.print_exc()

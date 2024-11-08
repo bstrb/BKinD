@@ -3,22 +3,30 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import h5py
 
-# Pseudo-Voigt function definition
-def pseudo_voigt(r, A, mu, sigma, gamma, eta):
+# Pseudo-Voigt function definition with multiple components
+def multi_pseudo_voigt(r, A1, mu1, sigma1, gamma1, eta1, A2, mu2, sigma2, gamma2, eta2, A3, mu3, sigma3, gamma3, eta3):
     """
-    Pseudo-Voigt function as a background model.
+    Multi-component Pseudo-Voigt function to model background with multiple peaks.
     
     Parameters:
     - r: Radial distance array.
-    - A: Amplitude.
-    - mu: Center of the peak.
-    - sigma: Standard deviation of the Gaussian component.
-    - gamma: Scale parameter of the Lorentzian component.
-    - eta: Mixing parameter between Gaussian and Lorentzian (0 <= eta <= 1).
+    - A1, mu1, sigma1, gamma1, eta1: Parameters for the first Pseudo-Voigt component.
+    - A2, mu2, sigma2, gamma2, eta2: Parameters for the second Pseudo-Voigt component.
+    - A3, mu3, sigma3, gamma3, eta3: Parameters for the third Pseudo-Voigt component.
     """
-    gaussian = np.exp(-((r - mu) ** 2) / (2 * sigma ** 2))
-    lorentzian = gamma ** 2 / ((r - mu) ** 2 + gamma ** 2)
-    return A * (eta * lorentzian + (1 - eta) * gaussian)
+    gaussian1 = np.exp(-((r - mu1) ** 2) / (2 * sigma1 ** 2))
+    lorentzian1 = gamma1 ** 2 / ((r - mu1) ** 2 + gamma1 ** 2)
+    pv1 = A1 * (eta1 * lorentzian1 + (1 - eta1) * gaussian1)
+    
+    gaussian2 = np.exp(-((r - mu2) ** 2) / (2 * sigma2 ** 2))
+    lorentzian2 = gamma2 ** 2 / ((r - mu2) ** 2 + gamma2 ** 2)
+    pv2 = A2 * (eta2 * lorentzian2 + (1 - eta2) * gaussian2)
+    
+    gaussian3 = np.exp(-((r - mu3) ** 2) / (2 * sigma3 ** 2))
+    lorentzian3 = gamma3 ** 2 / ((r - mu3) ** 2 + gamma3 ** 2)
+    pv3 = A3 * (eta3 * lorentzian3 + (1 - eta3) * gaussian3)
+    
+    return pv1 + pv2 + pv3
 
 # Function to read the mask file
 def read_mask_file(mask_file_path):
@@ -113,26 +121,36 @@ def process_frame(h5_file_path, mask_file_path):
         radial_means = np.array(radial_means)
         radial_distances = np.array(radial_distances)
         
-        # Fit a pseudo-Voigt curve to the radial means
+        # Fit a multi-component Pseudo-Voigt curve to the radial means
         # Initial guess for the parameters (adjust as needed)
         initial_guess = [
-            np.nanmax(radial_means),      # A
-            np.nanmedian(radial_distances),  # mu
-            np.nanstd(radial_distances),     # sigma
-            np.nanstd(radial_distances),     # gamma
-            0.5                           # eta
+            np.nanmax(radial_means),      # A1
+            180,                          # mu1 (first bump position)
+            20,                           # sigma1
+            20,                           # gamma1
+            0.5,                          # eta1
+            np.nanmax(radial_means) / 2,  # A2
+            320,                          # mu2 (second bump position)
+            20,                           # sigma2
+            20,                           # gamma2
+            0.5,                          # eta2
+            np.nanmax(radial_means) / 4,  # A3
+            np.nanmedian(radial_distances),  # mu3 (center peak)
+            50,                           # sigma3
+            50,                           # gamma3
+            0.5                           # eta3
         ]
         
         # Boundaries for the parameters to ensure physical meaningfulness
         param_bounds = (
-            [0, 0, 0, 0, 0],   # Lower bounds
-            [np.inf, np.inf, np.inf, np.inf, 1]  # Upper bounds
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],   # Lower bounds
+            [np.inf, np.inf, np.inf, np.inf, 1, np.inf, np.inf, np.inf, np.inf, 1, np.inf, np.inf, np.inf, np.inf, 1]  # Upper bounds
         )
         
         # Perform the curve fitting
         try:
             popt, pcov = curve_fit(
-                pseudo_voigt,
+                multi_pseudo_voigt,
                 radial_distances,
                 radial_means,
                 p0=initial_guess,
@@ -143,7 +161,7 @@ def process_frame(h5_file_path, mask_file_path):
             popt = initial_guess  # Use initial guess if fitting fails
         
         # Generate the background model over the entire image within the radius limit
-        background = pseudo_voigt(radii, *popt)
+        background = multi_pseudo_voigt(radii, *popt)
         background[~within_radius_mask] = 0
         
         # Subtract the background from the original image
@@ -169,7 +187,7 @@ def process_frame(h5_file_path, mask_file_path):
         plt.title('Radial Intensity Profile')
         plt.plot(radial_distances, radial_means, 'bo', label='Radial Means')
         r_fit = np.linspace(0, radius_limit, 1000)
-        plt.plot(r_fit, pseudo_voigt(r_fit, *popt), 'r-', label='Fitted Background')
+        plt.plot(r_fit, multi_pseudo_voigt(r_fit, *popt), 'r-', label='Fitted Background')
         plt.xlabel('Radius (pixels)')
         plt.ylabel('Mean Intensity')
         plt.legend()

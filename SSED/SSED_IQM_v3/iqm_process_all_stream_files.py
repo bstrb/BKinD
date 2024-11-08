@@ -3,6 +3,7 @@ import re
 import csv
 from tqdm import tqdm
 from extract_chunk_data import extract_chunk_data
+from calculate_combined_metric import calculate_combined_metric
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager, Lock
 
@@ -91,15 +92,7 @@ def process_stream_file(stream_file_path, metric_weights=None):
             if max_value != min_value:
                 all_metrics[key] = [(value - min_value) / (max_value - min_value) for value in all_metrics[key]]
             else:
-                all_metrics[key] = [0.5 for _ in all_metrics[key]]  # If all values are the same, assign 0.5
-
-    # Define function for combined metric calculation using product of (1 + metric) ^ (metric weight)
-    def calculate_combined_metric(index, all_metrics, metric_weights):
-        combined_metric = 1  # Start with 1 for multiplication
-        for metric, weight in metric_weights.items():
-            metric_value = all_metrics[metric][index]
-            combined_metric *= (1 + metric_value) ** weight
-        return combined_metric
+                all_metrics[key] = [1 for _ in all_metrics[key]]  # If all values are the same, assign 0.5
 
     # Update results with normalized metrics and compute combined metric
     for i, result in enumerate(results):

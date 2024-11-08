@@ -12,18 +12,17 @@ from iqm_merge_def import merge_and_write_mtz
 from iqm_ref_def import process_run_folders
 from extract_final_rfactor import extract_final_rfactor
 
-def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, ring_size, cellfile_path, pointgroup, num_threads, bins, pdb_file, min_res = 2, iterations = 3):
-    for exp in exp_list:
+def automate_evaluation_and_integration(stream_file_folder, weight_list, lattice, ring_size, cellfile_path, pointgroup, num_threads, bins, pdb_file, min_res = 2, iterations = 3):
+    for weight in weight_list:
         try:
-            wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pres_exp, dres_exp, pr_exp, ipp_exp = exp
+            wrmsd_weight, cld_weight, cad_weight, np_weight, nr_weight, pres_weight, dres_weight, pr_weight, ipp_weight = weight
 
-            IQM = f"IQM_{wrmsd_exp}_{cld_exp}_{cad_exp}_{np_exp}_{nr_exp}_{pres_exp}_{dres_exp}_{pr_exp}_{ipp_exp}"
+            IQM = f"IQM_SUM_{wrmsd_weight}_{cld_weight}_{cad_weight}_{np_weight}_{nr_weight}_{pres_weight}_{dres_weight}_{pr_weight}_{ipp_weight}"
 
             # Evaluate multiple stream files
-            # tqdm.write(f"Evaluating multiple stream files with exponents: {exp}")
-            print(f"Evaluating multiple stream files with exponents: {exp}")
-            process_all_stream_files(stream_file_folder, exp)
-            # evaluate_multiple_streams(stream_file_folder, wrmsd_exp, cld_exp, cad_exp, np_exp, nr_exp, pr_exp)
+            print(f"Evaluating multiple stream files with weights: {weight}")
+            process_all_stream_files(stream_file_folder, weight)
+            # evaluate_multiple_streams(stream_file_folder, wrmsd_weight, cld_weight, cad_weight, np_weight, nr_weight, pr_weight)
 
 
             # Write stream file to .sol file
@@ -56,10 +55,10 @@ def automate_evaluation_and_integration(stream_file_folder, exp_list, lattice, r
             rfactor = extract_final_rfactor(integration_output_folder)
 
             #  Completion message
-            print(f"Automation process completed successfully for exponents: {exp} with a final R factor of {rfactor}")
+            print(f"Automation process completed successfully for weights: {weight} with a final R factor of {rfactor}")
 
             # return rfactor
         
         except Exception as e:
-            tqdm.write(f"An error occurred during processing of exponents {exp}: {e}")
+            tqdm.write(f"An error occurred during processing of weights {weight}: {e}")
             traceback.print_exc()

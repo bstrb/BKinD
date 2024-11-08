@@ -1,4 +1,3 @@
-
 # Define function for combined metric calculation using product of (1 + metric) ^ (metric weight)
 def calculate_combined_metric(index, all_metrics, metric_weights):
     combined_metric = 1  # Start with 1 for multiplication

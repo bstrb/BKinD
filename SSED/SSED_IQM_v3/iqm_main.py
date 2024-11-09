@@ -1,4 +1,3 @@
-# rcis_main.py
 from find_first_file import find_first_file
 from automate_evaluation_and_integration import automate_evaluation_and_integration
 
@@ -6,7 +5,11 @@ def main():
     stream_file_folder = "/home/buster/UOX1/different_index_params/3x3_retry"
     cellfile_path = find_first_file(stream_file_folder, ".cell")
     pdb_file = find_first_file(stream_file_folder, ".pdb")
-    weights_list = [(2, 2, 3, -1, 1, -1, 1, 1, -1)] 
+    weights_list = [
+    # Combination 1: Equal Contribution
+    (1, 1, 1, -1, 1, -1, 1, 1, -1)
+]
+
     lattice = "oI"  # Pearson Symbol read from .cell file first letter for lattice type and second for centering
     ring_size = [(3, 4, 7)]
     pointgroup = "mmm"

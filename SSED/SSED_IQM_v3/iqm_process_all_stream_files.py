@@ -160,8 +160,8 @@ def process_all_stream_files(folder_path, metric_weights=None):
 
     # Create a filename for the output files based on the weight combination
     weight_combination_str = '_'.join([f'{value}' for value in (metric_weights or [])])
-    output_csv_path = os.path.join(folder_path, f'combined_metrics_IQM_{weight_combination_str}.csv')
-    output_stream_path = os.path.join(folder_path, f'best_results_IQM_{weight_combination_str}.stream')
+    output_csv_path = os.path.join(folder_path, f'combined_metrics_IQM_SUM_{weight_combination_str}.csv')
+    output_stream_path = os.path.join(folder_path, f'best_results_IQM_SUM_{weight_combination_str}.stream')
 
     # Write all results to CSV
     with open(output_csv_path, mode='w', newline='') as csv_file:

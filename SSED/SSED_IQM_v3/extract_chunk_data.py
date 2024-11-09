@@ -1,5 +1,5 @@
 import re
-from calculate_weighted_rmsd import calculate_weighted_rmsd
+from calculate_weighted_rmsd_v2 import calculate_weighted_rmsd
 from calculate_cell_deviation import calculate_cell_deviation
 from match_peaks_to_reflections import match_peaks_to_reflections
 

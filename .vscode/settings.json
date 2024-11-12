@@ -13,6 +13,9 @@
         "./SSED/SSED_RCIS",
         "./SSED/merge_h5_files",
         "./SSED/SSED_IQM",
-        "./SSED/SSED_IQM_v2"
+        "./SSED/SSED_IQM_v2",
+        "./SSED/remove_bg",
+        "./SSED/remove_bg",
+        "./SSED/SSED_IQM_v4"
     ]
 }

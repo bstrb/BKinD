@@ -104,7 +104,7 @@ def process_frame(h5_file_path, mask_file_path):
         print(f"Masked image intensities - min: {masked_image.min()}, max: {masked_image.max()}, count: {len(masked_image)}")
         
         # Bin the data
-        num_bins = 100  # Adjust the number of bins as needed
+        num_bins = 1000  # Adjust the number of bins as needed
         bins = np.linspace(0, masked_radii.max(), num_bins)
         bin_indices = np.digitize(masked_radii, bins)
         

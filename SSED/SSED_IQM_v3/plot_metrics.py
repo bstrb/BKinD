@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from open_plot import open_plot
 
 # Load the CSV file
-csv_path = '/home/buster/UOX1/different_index_params/3x3_retry/rfactor_values.csv'
+csv_path = '/home/buster/UOX123/3x3_retry/rfactor_values.csv'
 df = pd.read_csv(csv_path)
 
 # Extract Rfactor and metrics
@@ -40,7 +40,7 @@ fig.update_layout(
 )
 
 # Save the plot as an HTML file and open it
-base_path = '/home/buster/UOX1/different_index_params/3x3_retry'
+base_path = '/home/buster/UOX123/3x3_retry'
 plotname = "metrics_plot.html"
 plot_filename = os.path.join(base_path, plotname)
 fig.write_html(plot_filename)

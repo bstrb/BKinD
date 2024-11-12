@@ -1,18 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from multi_pseudo_voigt import multi_pseudo_voigt
 
 
-def process_image(image, mask, center_x, center_y, n_peaks, peak_x_positions, peak_y_positions, peak_intensities):
-    # Define exclusion zones around peaks based on their intensity
-    exclusion_radius_factor = 0.05  # Reduced factor to avoid overly large exclusion zones
-    max_exclusion_radius = 5  # Set a maximum limit for the exclusion radius
-    for px, py, intensity in zip(peak_x_positions[:n_peaks], peak_y_positions[:n_peaks], peak_intensities[:n_peaks]):
-        exclusion_radius = min(max(5, intensity * exclusion_radius_factor), max_exclusion_radius)  # Set a minimum radius of 5 pixels and a maximum limit
-        y_indices, x_indices = np.ogrid[:image.shape[0], :image.shape[1]]
-        distance_from_peak = np.sqrt((x_indices - px) ** 2 + (y_indices - py) ** 2)
-        mask[distance_from_peak <= exclusion_radius] = 0
+def process_image(image, mask, center_x, center_y):
 
     # Verify the masked image after excluding peaks
     image_masked = np.where(mask, image, np.nan)
@@ -23,7 +14,7 @@ def process_image(image, mask, center_x, center_y, n_peaks, peak_x_positions, pe
     radii = np.sqrt((x_indices - center_x) ** 2 + (y_indices - center_y) ** 2)
 
     # Limit the radius to 450 pixels
-    radius_limit = 450
+    radius_limit = 500
     within_radius_mask = (radii <= radius_limit) & mask
     print(f"Number of pixels within radius and unmasked: {np.sum(within_radius_mask)}")
 
@@ -40,37 +31,37 @@ def process_image(image, mask, center_x, center_y, n_peaks, peak_x_positions, pe
     print(f"Masked image intensities - min: {masked_image.min()}, max: {masked_image.max()}, count: {len(masked_image)}")
 
     # Bin the data
-    num_bins = 1000  # Adjust the number of bins as needed
+    num_bins = 500  # Adjust the number of bins as needed
     bins = np.linspace(0, masked_radii.max(), num_bins)
     bin_indices = np.digitize(masked_radii, bins)
 
     # Compute mean intensity for each bin
-    radial_means = []
+    radial_medians = []
     radial_distances = []
     for i in range(1, len(bins)):
         bin_mask = bin_indices == i
         if np.any(bin_mask):
-            mean_intensity = masked_image[bin_mask].mean()
-            radial_means.append(mean_intensity)
+            median_intensity = np.median(masked_image[bin_mask])
+            radial_medians.append(median_intensity)
             radial_distances.append((bins[i] + bins[i - 1]) / 2)  # Use bin center
 
-    radial_means = np.array(radial_means)
+    radial_medians = np.array(radial_medians)
     radial_distances = np.array(radial_distances)
 
     # Fit a multi-component Pseudo-Voigt curve to the radial means
     # Refined initial guess for the parameters (adjust as needed)
     initial_guess = [
-        np.nanmax(radial_means),      # A1
+        np.nanmax(radial_medians),      # A1
         185,                          # mu1 (first bump position refined)
         10,                           # sigma1 (reduced to capture sharpness)
         15,                           # gamma1 (adjusted for sharper peak)
         0.5,                          # eta1
-        np.nanmax(radial_means) / 2,  # A2
+        np.nanmax(radial_medians) / 2,  # A2
         320,                          # mu2 (second bump position)
         20,                           # sigma2
         20,                           # gamma2
         0.5,                          # eta2
-        np.nanmax(radial_means) / 4,  # A3
+        np.nanmax(radial_medians) / 4,  # A3
         np.nanmedian(radial_distances),  # mu3 (center peak)
         50,                           # sigma3
         50,                           # gamma3
@@ -88,7 +79,7 @@ def process_image(image, mask, center_x, center_y, n_peaks, peak_x_positions, pe
         popt, pcov = curve_fit(
             multi_pseudo_voigt,
             radial_distances,
-            radial_means,
+            radial_medians,
             p0=initial_guess,
             bounds=param_bounds,
             maxfev=20000  # Increase max function evaluations for better convergence
@@ -106,37 +97,4 @@ def process_image(image, mask, center_x, center_y, n_peaks, peak_x_positions, pe
     corrected_image_no_mask = np.copy(image)  # Version without masking applied
     corrected_image_no_mask -= background  # Subtract background from entire image
 
-    return corrected_image, corrected_image_no_mask, radial_distances, radial_means, popt
-
-
-def plot_results(image, corrected_image, corrected_image_no_mask, radial_distances, radial_means, popt):
-    # Plot the original and corrected images
-    plt.figure(figsize=(18, 6))
-
-    plt.subplot(1, 3, 1)
-    plt.title('Original Image')
-    plt.imshow(image, cmap='gray', origin='lower')
-    plt.colorbar()
-
-    plt.subplot(1, 3, 2)
-    plt.title('Background Corrected Image (Masked Regions Excluded)')
-    plt.imshow(corrected_image, cmap='gray', origin='lower')
-    plt.colorbar()
-
-    plt.subplot(1, 3, 3)
-    plt.title('Background Corrected Image (No Mask Exclusion)')
-    plt.imshow(corrected_image_no_mask, cmap='gray', origin='lower')
-    plt.colorbar()
-
-    plt.show()
-
-    # Plot the radial means and the fitted background model
-    plt.figure()
-    plt.title('Radial Intensity Profile')
-    plt.plot(radial_distances, radial_means, 'bo', label='Radial Means')
-    r_fit = np.linspace(0, max(radial_distances), 2000)  # Increase the number of points for better resolution
-    plt.plot(r_fit, multi_pseudo_voigt(r_fit, *popt), 'r-', label='Fitted Background')
-    plt.xlabel('Radius (pixels)')
-    plt.ylabel('Mean Intensity')
-    plt.legend()
-    plt.show()
+    return corrected_image, corrected_image_no_mask, radial_distances, radial_medians, popt

@@ -24,10 +24,6 @@ def process_frame(h5_file_path, mask_file_path):
         images_dataset = h5_file['/entry/data/images']
         center_x_dataset = h5_file['/entry/data/center_x']
         center_y_dataset = h5_file['/entry/data/center_y']
-        peak_x_dataset = h5_file['/entry/data/peakXPosRaw']
-        peak_y_dataset = h5_file['/entry/data/peakYPosRaw']
-        peak_intensity_dataset = h5_file['/entry/data/peakTotalIntensity']
-        n_peaks_dataset = h5_file['/entry/data/nPeaks']
 
         # Get the number of images
         num_images = images_dataset.shape[0]
@@ -55,11 +51,7 @@ def process_frame(h5_file_path, mask_file_path):
             image,
             mask,
             center_x,
-            center_y,
-            n_peaks_dataset[image_index],
-            peak_x_dataset[image_index, :n_peaks_dataset[image_index]],
-            peak_y_dataset[image_index, :n_peaks_dataset[image_index]],
-            peak_intensity_dataset[image_index, :n_peaks_dataset[image_index]]
+            center_y
         )
 
         # Unpack processed data
@@ -79,9 +71,10 @@ def process_frame(h5_file_path, mask_file_path):
             plt.imsave(output_filename, corrected_image_uint8, cmap='gray')
             print(f"Corrected image saved as {output_filename}")
 
-# Paths to the files
-h5_file_path = '/home/buster/UOX1/UOX_His_MUA_450nm_spot4_ON_20240311_0928.h5'
-mask_file_path = '/home/buster/UOX1/mask/pxmask.h5'
+if __name__ == "__main__":
+    # Paths to the files
+    h5_file_path = '/home/buster/UOX1/UOX_His_MUA_450nm_spot4_ON_20240311_0928.h5'
+    mask_file_path = '/home/buster/mask/pxmask.h5'
 
-# Call the main processing function
-process_frame(h5_file_path, mask_file_path)
+    # Call the main processing function
+    process_frame(h5_file_path, mask_file_path)

@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from triple_pseudo_voigt import multi_pseudo_voigt
+from multi_pseudo_voigt import multi_pseudo_voigt
 
 def plot_results(image, corrected_image_no_mask, radial_distances, radial_medians, popt):
     # Determine the brightness scale based on the original image

@@ -61,5 +61,5 @@ def process_all_stream_files(folder_path):
 
 # Example usage
 if __name__ == "__main__":
-    folder_path = "/home/buster/UOX1/different_index_params/3x3"
+    folder_path = "/home/buster/hMTH1_TH287"
     process_all_stream_files(folder_path)

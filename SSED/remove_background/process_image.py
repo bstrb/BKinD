@@ -4,15 +4,11 @@ from multi_pseudo_voigt import multi_pseudo_voigt
 
 def process_image(image, mask, center_x, center_y):
 
-    # Verify the masked image after excluding peaks
-    image_masked = np.where(mask, image, np.nan)
-    print(f"Masked image stats after excluding peaks - min: {np.nanmin(image_masked) if np.sum(~np.isnan(image_masked)) > 0 else 'N/A'}, max: {np.nanmax(image_masked) if np.sum(~np.isnan(image_masked)) > 0 else 'N/A'}, count of valid pixels: {np.sum(~np.isnan(image_masked))}")
-
     # Compute radial distances from the center
     y_indices, x_indices = np.indices(image.shape)
     radii = np.sqrt((x_indices - center_x) ** 2 + (y_indices - center_y) ** 2)
 
-    # Limit the radius to 450 pixels
+    # Limit the radius to 500 pixels
     radius_limit = 500
     within_radius_mask = (radii <= radius_limit) & mask
     print(f"Number of pixels within radius and unmasked: {np.sum(within_radius_mask)}")
@@ -50,7 +46,7 @@ def process_image(image, mask, center_x, center_y):
     # Fit a multi-component Pseudo-Voigt curve to the radial means
     # Refined initial guess for the parameters (adjust as needed)
     initial_guess = [
-        np.nanmax(radial_medians),      # A1
+        np.nanmax(radial_medians),    # A1
         185,                          # mu1 (first bump position refined)
         10,                           # sigma1 (reduced to capture sharpness)
         15,                           # gamma1 (adjusted for sharper peak)
@@ -67,12 +63,7 @@ def process_image(image, mask, center_x, center_y):
         0.5                           # eta3
     ]
 
-    # Boundaries for the parameters to ensure physical meaningfulness
-    param_bounds = (
-        [0, 180, 1, 5, 0, 0, 300, 5, 5, 0, 0, 0, 10, 10, 0],   # Lower bounds (more specific)
-        [np.inf, 190, 15, 25, 1, np.inf, 340, np.inf, np.inf, 1, np.inf, np.inf, np.inf, np.inf, 1]  # Upper bounds
-    )
-
+    
     # Perform the curve fitting
     try:
         popt, pcov = curve_fit(
@@ -80,7 +71,6 @@ def process_image(image, mask, center_x, center_y):
             radial_distances,
             radial_medians,
             p0=initial_guess,
-            bounds=param_bounds,
             maxfev=20000  # Increase max function evaluations for better convergence
         )
     except RuntimeError as e:

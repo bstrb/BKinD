@@ -16,6 +16,7 @@
         "./SSED/SSED_IQM_v2",
         "./SSED/remove_bg",
         "./SSED/remove_bg",
-        "./SSED/SSED_IQM_v4"
+        "./SSED/SSED_IQM_v4",
+        "./SSED/remove_background"
     ]
 }

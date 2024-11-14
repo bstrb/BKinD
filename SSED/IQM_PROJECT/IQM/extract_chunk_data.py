@@ -4,7 +4,8 @@ from calculate_cell_deviation import calculate_cell_deviation
 from match_peaks_to_reflections import match_peaks_to_reflections
 def extract_chunk_data(chunk, original_cell_params, tolerance=1.0):
     # Extract event number
-    event_match = re.search(r'Event: //(\d+)', chunk)
+    # event_match = re.search(r'Event: //(\d+)', chunk)
+    event_match = re.search(r'Image serial number: (\d+)', chunk)
     event_number = int(event_match.group(1)) if event_match else None
     if event_number is None:
         print("No event number found in chunk.")

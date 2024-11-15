@@ -79,28 +79,31 @@ def process_image(image, center_x, center_y):
     radial_distances_filtered = radial_distances_filtered[ex_points:]
     radial_stds_filtered = radial_stds_filtered[ex_points:]
 
+    # Define weights based on intensity - higher intensity means higher weight
+    weights = 1 / np.sqrt((radial_medians_filtered + np.min(radial_medians_filtered)))  # Adding a small value to avoid division by zero
+
     # Adjust initial guesses based on data
-    A_initial = np.max(radial_medians_filtered)*2
+    A_initial = np.max(radial_medians_filtered)
     mu_initial = 0
-    alpha_initial = (np.max(radial_distances_filtered) - np.min(radial_distances_filtered)) / 10
-    beta_initial = 3  # Start with a value greater than 2 for a sharper peak
+    alpha_initial = (np.max(radial_distances_filtered) - np.min(radial_distances_filtered)) 
+    beta_initial = 10  # Start with a value greater than 2 for a sharper peak
     C_initial = np.min(radial_medians_filtered)
 
     initial_guess_gg = [A_initial, mu_initial, alpha_initial, beta_initial, C_initial]
 
-    # Fit the generalized Gaussian function
+    # Fit the generalized Gaussian function using weights
     try:
         popt_gg, _ = curve_fit(
             generalized_gaussian,
             radial_distances_filtered,
             radial_medians_filtered,
             p0=initial_guess_gg,
-            sigma=radial_stds_filtered,
+            sigma=weights,  # Use weights for higher emphasis on higher intensity values
             absolute_sigma=True,
             maxfev=100000,
             bounds=(
                 [0, 0, 0, 1, -np.inf],    # Lower bounds for A, mu, alpha, beta, C
-                [np.inf, np.max(radial_distances_filtered), np.inf, np.inf, np.inf]  # Upper bounds
+                [np.inf, 2, np.inf, np.inf, np.inf]  # Upper bounds
             )
         )
         print("Generalized Gaussian fitting successful.")

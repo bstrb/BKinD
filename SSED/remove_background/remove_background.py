@@ -2,7 +2,7 @@ import numpy as np
 import h5py
 
 # from read_mask_file import read_mask_file
-from super_lorentzian import process_image
+from damped_sinusoids import process_image
 
 # Main processing function
 
@@ -55,10 +55,10 @@ def remove_background(h5_file_path):#, mask_file_path):
 
 if __name__ == "__main__":
     # Paths to the files
-    h5_file_path = '/Users/xiaodong/Desktop/deiced_UOX1_min_15_peak.h5'
-    #h5_file_path = '/home/buster/UOX1/deiced_UOX1_min_15_peak.h5'
+    # h5_file_path = '/Users/xiaodong/Desktop/deiced_UOX1_min_15_peak.h5'
+    h5_file_path = '/home/buster/UOX1/UOX1_background/deiced_UOX1_min_15_peak.h5'
 
-    mask_file_path = '/home/buster/mask/pxmask.h5'
+    # mask_file_path = '/home/buster/mask/pxmask.h5'
 
     # Call the main processing function
     remove_background(h5_file_path)#, mask_file_path)

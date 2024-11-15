@@ -16,7 +16,7 @@ def process_image(image, center_x, center_y):
     radii_flat = radii.flatten()
 
     # Define max_radius as maximum radius to consider
-    max_radius = int(np.min(image.shape) / np.sqrt(2) - 5)
+    max_radius = int(np.min(image.shape) / np.sqrt(2) - 10)
     print(f"Max radius considered: {max_radius}")
 
     # Filter data within max_radius
@@ -56,7 +56,7 @@ def process_image(image, center_x, center_y):
     # Dynamic drop threshold based on data statistics
     gradient_median = np.median(gradient_rev)
     gradient_std = np.std(gradient_rev)
-    drop_threshold = gradient_median - 1 * gradient_std  # Threshold at 1 standard deviation below median
+    drop_threshold = gradient_median - gradient_std  # Threshold at 1 standard deviation below median
 
     # Find indices where gradient drops below the threshold
     drop_indices = np.where(gradient_rev <= drop_threshold)[0]
@@ -73,7 +73,7 @@ def process_image(image, center_x, center_y):
     radial_distances_filtered = radial_distances_rev[::-1]
     radial_stds_filtered = radial_stds_rev[::-1]
 
-    # Exclude additional points with lowest radius (closest to the center)
+    # Exclude additional points with lowest radius (closest to the beam stopper)
     ex_points = 2  # Adjust this number as needed
     radial_medians_filtered = radial_medians_filtered[ex_points:]
     radial_distances_filtered = radial_distances_filtered[ex_points:]
@@ -115,14 +115,14 @@ def process_image(image, center_x, center_y):
     corrected_image = image - background_sl
 
     # Plotting results
-    # plot_results(
-    #     image,
-    #     corrected_image,
-    #     radial_distances_filtered,
-    #     radial_medians_filtered,
-    #     popt_sl,
-    #     residuals_sl
-    # )
+    plot_results(
+        image,
+        corrected_image,
+        radial_distances_filtered,
+        radial_medians_filtered,
+        popt_sl,
+        residuals_sl
+    )
 
     return corrected_image
 

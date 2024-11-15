@@ -1,5 +1,5 @@
 # -------------------------
-# Part 2: Automate Evaluation and Integration
+# Automate Evaluation and Integration
 # -------------------------
 import os
 import traceback
@@ -22,21 +22,19 @@ def automate_evaluation_and_integration(stream_file_folder, weight_list, lattice
             # Evaluate multiple stream files
             print(f"Evaluating multiple stream files with weights: {weight}")
             process_all_stream_files(stream_file_folder, weight)
-            # evaluate_multiple_streams(stream_file_folder, wrmsd_weight, cld_weight, cad_weight, np_weight, nr_weight, pr_weight)
 
-
-            # Write stream file to .sol file
+            # # Write stream file to .sol file
             best_results_stream = f"{stream_file_folder}/best_results_{IQM}.stream"
             best_results_sol = f"{stream_file_folder}/best_results_{IQM}.sol"
             tqdm.write(f"Writing .sol file from stream: {best_results_stream}")
             num_indexed_frames = read_stream_write_sol(best_results_stream, lattice)
 
-            # Generate bash script for fast integration
+            # # Generate bash script for fast integration
             bash_file_name = f"{IQM}"
             bash_file_path = os.path.join(stream_file_folder, bash_file_name) + ".sh"
             output_stream_format = f"{stream_file_folder}/{IQM}/int.stream"
             
-            # tqdm.write(f"Generating bash script: {bash_file_name}")
+            # # tqdm.write(f"Generating bash script: {bash_file_name}")
             generate_bash_script(bash_file_name, stream_file_folder, num_threads, best_results_sol)
 
             # Run fast integration

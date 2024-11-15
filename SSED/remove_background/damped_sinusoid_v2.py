@@ -1,12 +1,9 @@
 import numpy as np
 from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
 
-# Damped sinusoid function
 def damped_sinusoid(r, A_ds, k, phi, tau):
     return A_ds * np.sin(k * r + phi) * np.exp(-r / tau)
 
-# Sum of N damped sinusoids
 def sum_damped_sinusoids(r, *params):
     N = len(params) // 4  # Number of damped sinusoids
     result = np.zeros_like(r)
@@ -17,6 +14,22 @@ def sum_damped_sinusoids(r, *params):
         tau = params[4 * i + 3]
         result += damped_sinusoid(r, A_ds, k, phi, tau)
     return result
+
+def compute_radial_statistics(radii_filtered, image_filtered, bins):
+    num_bins = len(bins)
+    radial_medians = []
+    radial_stds = []
+    radial_distances = []
+    for i in range(1, num_bins):
+        bin_mask = (radii_filtered >= bins[i - 1]) & (radii_filtered < bins[i])
+        if np.any(bin_mask):
+            median_intensity = np.median(image_filtered[bin_mask])
+            std_intensity = np.std(image_filtered[bin_mask])
+            radial_medians.append(median_intensity)
+            radial_stds.append(std_intensity)
+            radial_distances.append((bins[i] + bins[i - 1]) / 2)  # Use bin center
+    return np.array(radial_medians), np.array(radial_stds), np.array(radial_distances)
+
 
 def process_image(image, center_x, center_y):
     # Compute radial distances from the center
@@ -29,7 +42,6 @@ def process_image(image, center_x, center_y):
 
     # Define max_radius as maximum radius to consider
     max_radius = int(np.min(image.shape) / np.sqrt(2) - 10)
-    print(f"Max radius considered: {max_radius}")
 
     # Filter data within max_radius
     within_limit_mask = radii_flat <= max_radius
@@ -39,23 +51,9 @@ def process_image(image, center_x, center_y):
     # Bin the data to compute median intensity in each bin
     num_bins = int(max_radius)
     bins = np.linspace(0, max_radius, num_bins)
-    bin_indices = np.digitize(radii_filtered, bins)
 
-    radial_medians = []
-    radial_stds = []
-    radial_distances = []
-    for i in range(1, len(bins)):
-        bin_mask = bin_indices == i
-        if np.any(bin_mask):
-            median_intensity = np.median(image_filtered[bin_mask])
-            std_intensity = np.std(image_filtered[bin_mask])
-            radial_medians.append(median_intensity)
-            radial_stds.append(std_intensity)
-            radial_distances.append((bins[i] + bins[i - 1]) / 2)  # Use bin center
-
-    radial_medians = np.array(radial_medians)
-    radial_stds = np.array(radial_stds)
-    radial_distances = np.array(radial_distances)
+    # Compute radial statistics
+    radial_medians, radial_stds, radial_distances = compute_radial_statistics(radii_filtered, image_filtered, bins)
 
     # Reverse arrays to start from max_radius moving towards the center
     radial_medians_rev = radial_medians[::-1]
@@ -104,92 +102,23 @@ def process_image(image, center_x, center_y):
 
     # Fit the sum of damped sinusoids to the radial medians
     try:
-        popt_ds, _ = curve_fit(
-            sum_damped_sinusoids,
-            radial_distances_filtered,
-            radial_medians_filtered,
-            p0=initial_guess_ds,
-            sigma=radial_stds_filtered,
-            absolute_sigma=True,
-            maxfev=100000
-        )
+        popt_ds, _ = curve_fit(sum_damped_sinusoids, radial_distances_filtered, radial_medians_filtered, p0=initial_guess_ds, sigma=radial_stds_filtered, absolute_sigma=True, maxfev=100000)
         print("Damped sinusoids fitting successful.")
     except RuntimeError as e:
         print("Damped sinusoids curve fitting failed:", e)
-        popt_ds = initial_guess_ds  # Use initial guess if fitting fails
-
-    # Compute residuals after damped sinusoids fit
-    #residuals_ds = radial_medians_filtered - sum_damped_sinusoids(radial_distances_filtered, *popt_ds)
+        # popt_ds = initial_guess_ds  # Use initial guess if fitting fails
 
     # Evaluate the damped sinusoids model over the entire image
     background_ds = sum_damped_sinusoids(radii, *popt_ds)
 
+
     # Subtract the background from the original image
     corrected_image = image - background_ds  # Version without masking applied
 
-    # Plotting results
-    # plot_results(
-    #     image,
-    #     corrected_image,
-    #     radial_distances_filtered,
-    #     radial_medians_filtered,
-    #     popt_ds,
-    #     residuals_ds,
-    #     N_sinusoids
-    # )
+    # Compute residuals after damped sinusoids fit
+    residuals_ds = radial_medians_filtered - sum_damped_sinusoids(radial_distances_filtered, *popt_ds)
 
-    return corrected_image#, corrected_image, radial_distances_filtered, radial_medians_filtered, popt_ds
+    # Plotting results if requested
+    # plot_results(image, corrected_image, radial_distances_filtered, radial_medians_filtered, popt_ds, residuals_ds, N_sinusoids)
 
-def plot_results(image, corrected_image, radial_distances, radial_medians, popt_ds, residuals_ds, N_sinusoids):
-    # Determine the brightness scale based on the original image
-    vmin = np.nanmin(image)
-    vmax = np.nanmax(image)
-
-    # Plot the original image
-    plt.figure()
-    plt.title('Original Image')
-    plt.imshow(image, cmap='gray', origin='lower', vmin=vmin, vmax=vmax)
-    plt.colorbar()
-
-    # Plot the background corrected image (no mask exclusion)
-    plt.figure()
-    plt.title('Background Corrected Image')
-    plt.imshow(corrected_image, cmap='gray', origin='lower', vmin=vmin, vmax=vmax)
-    plt.colorbar()
-
-    # Plot the radial medians and the fitted model
-    plt.figure()
-    plt.title('Radial Intensity Profile with Damped Sinusoids Fit')
-    plt.plot(radial_distances, radial_medians, 'bo', label='Radial medians')
-    r_fit = np.linspace(0, max(radial_distances), 2000)
-    fitted_ds = sum_damped_sinusoids(r_fit, *popt_ds)
-    plt.plot(r_fit, fitted_ds, 'g-', label='Damped Sinusoids Fit')
-    plt.xlabel('Radius (pixels)')
-    plt.ylabel('median Intensity')
-    plt.legend()
-
-    # Plot the residuals after damped sinusoids fit
-    plt.figure()
-    plt.title('Residuals after Damped Sinusoids Fit')
-    plt.plot(radial_distances, residuals_ds, 'ro', label='Residuals')
-    plt.axhline(0, color='k', linestyle='--')
-    plt.xlabel('Radius (pixels)')
-    plt.ylabel('Residual Intensity')
-    plt.legend()
-
-    # Plot each damped sinusoid component
-    plt.figure()
-    plt.title('Damped Sinusoid Components')
-    for i in range(N_sinusoids):
-        A_ds = popt_ds[4 * i]
-        k = popt_ds[4 * i + 1]
-        phi = popt_ds[4 * i + 2]
-        tau = popt_ds[4 * i + 3]
-        ds_component = damped_sinusoid(r_fit, A_ds, k, phi, tau)
-        plt.plot(r_fit, ds_component, label=f'Damped Sinusoid {i+1}')
-    plt.xlabel('Radius (pixels)')
-    plt.ylabel('Intensity')
-    plt.legend()
-
-    # Show all plots simultaneously
-    plt.show()
+    return corrected_image

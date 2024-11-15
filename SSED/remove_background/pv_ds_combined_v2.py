@@ -18,8 +18,8 @@ def process_image(image, center_x, center_y):
     radii_flat = radii.flatten()
 
     # Define max_radius as maximum radius to consider
-    max_radius = np.min(image.shape)/np.sqrt(2)
-    print(max_radius)
+    max_radius = np.min(image.shape)/np.sqrt(2) - 10
+    # print(max_radius)
 
     # Filter data within max_radius
     within_limit_mask = radii_flat <= max_radius
@@ -76,9 +76,9 @@ def process_image(image, center_x, center_y):
     radial_stds_filtered = radial_stds_filtered[ex_points:]
 
     # Initial guesses based on data
-    A_initial = np.max(radial_medians_filtered)
+    A_initial = np.max(radial_medians_filtered)*3
     mu_initial = 0  # Centered at 0
-    sigma_initial = np.std(radial_distances_filtered)
+    sigma_initial = np.std(radial_distances_filtered)/10
     gamma_initial = sigma_initial  # Assuming gamma similar to sigma
     eta_initial = 0.5  # Mix of Gaussian and Lorentzian
 

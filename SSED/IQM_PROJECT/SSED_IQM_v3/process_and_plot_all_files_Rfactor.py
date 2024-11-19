@@ -1,52 +1,155 @@
 import os
-import pandas as pd
+import re
+import numpy as np
 import plotly.graph_objects as go
 
 from open_plot import open_plot
 
-# Load the CSV file
-csv_path = '/home/buster/UOX1/different_index_params/3x3_retry/rfactor_values.csv'
-df = pd.read_csv(csv_path)
+def find_last_cycle_line(content):
+    """
+    Finds the starting position of the last ':Cycle' in the content.
+    """
+    cycle_pattern = re.compile(r'^:Cycle\s+\d+', re.MULTILINE)
+    matches = list(cycle_pattern.finditer(content))
+    
+    if matches:
+        last_cycle_match = matches[-1]  # Get the last ':Cycle' occurrence
+        last_cycle_line_position = last_cycle_match.start()
+        print(f"Found last cycle at character position: {last_cycle_line_position}.")
+        return last_cycle_line_position
+    else:
+        print("No cycle sections found.")
+        return None
 
-# Extract Rfactor and metrics
-df['Metrics'] = df['Head Folder'].str.replace("IQM_SUM_", "").str.split("_")
-df[['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4', 'Metric 5', 
-    'Metric 6', 'Metric 7', 'Metric 8', 'Metric 9']] = pd.DataFrame(df['Metrics'].tolist(), index=df.index).astype(int)
+def extract_data_from_section(content, last_cycle_line):
+    """
+    Extracts the numerical data from the section starting at the last cycle line.
+    Looks for "Rf_used" line, then the first $$ line, and extracts the table until the next $$ line.
+    """
+    lines = content[last_cycle_line:].splitlines()
+    numerical_section = []
+    rf_used_found = False
+    in_data_block = False
 
-# Prepare the Rfactor and metrics
-rfactor = df['Rfactor']
-metrics = df[['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4', 'Metric 5', 
-              'Metric 6', 'Metric 7', 'Metric 8', 'Metric 9']]
+    # Pattern to match lines containing only '$$'
+    delimiter_pattern = re.compile(r'^\$\$')
 
-# Create the interactive plot
-fig = go.Figure()
+    for line in lines:
+        # Look for the "Rf_used" line
+        if not rf_used_found and 'Rf_used' in line:
+            rf_used_found = True
+            continue  # Skip to the next line after finding "Rf_used"
 
-# Add each metric as a line
-for col in metrics.columns:
+        # Look for the first '$$' line after finding "Rf_used"
+        if rf_used_found and not in_data_block and delimiter_pattern.match(line):
+            in_data_block = True  # Enter the data block
+            continue
+
+        # Extract numerical data while inside the data block
+        if in_data_block:
+            if delimiter_pattern.match(line):
+                break  # Stop at the second '$$' line
+            numerical_section.append(line.strip())
+
+    if numerical_section:
+        return numerical_section
+    else:
+        print("No numerical data found after the 'Rf_used' section.")
+        return None
+
+def format_extracted_data(numerical_section):
+    """
+    Converts the extracted numerical section into a structured NumPy array.
+    """
+    data = []
+    for line in numerical_section:
+        # Split the line by spaces and convert to float
+        values = list(map(float, re.split(r'\s+', line.strip())))
+        data.append(values)
+    
+    return np.array(data)
+
+def plot_data(fig, data, label=None):
+    """
+    Plots the 6th column (Rf_used) vs. 1st column (resolution) using Plotly.
+    Converts resolution using sqrt(1/resolution) before plotting.
+    """
+    resolution = data[:, 0]
+    rf_used = data[:, 5]
+
+    # Convert resolution: sqrt(1/resolution)
+    converted_resolution = np.sqrt(1 / resolution)
+
+    # Add a trace to the global figure
     fig.add_trace(go.Scatter(
-        x=rfactor,
-        y=metrics[col],
+        x=converted_resolution,
+        y=rf_used,
         mode='lines+markers',
-        name=col
+        name=label
     ))
 
-# Update layout
-fig.update_layout(
-    title="Metrics vs Rfactor",
-    xaxis_title="Rfactor",
-    yaxis_title="Metric Value",
-    legend_title="Metrics",
-    hovermode="x unified"
-)
+def process_and_plot_all_files(base_path):
+    fig = go.Figure()
+    folder_labels = []
 
-# Save the plot as an HTML file and open it
-base_path = '/home/buster/UOX1/different_index_params/3x3_retry'
-plotname = "metrics_plot.html"
-plot_filename = os.path.join(base_path, plotname)
-fig.write_html(plot_filename)
+    # Iterate through all folders in the base directory
+    for head_folder in os.listdir(base_path):
+        head_folder_path = os.path.join(base_path, head_folder)
+        
+        if os.path.isdir(head_folder_path):
+            # Iterate through subfolders starting with "merge"
+            for sub_folder in os.listdir(head_folder_path):
+                if sub_folder.startswith("merge"):
+                    merge_folder_path = os.path.join(head_folder_path, sub_folder)
+                    
+                    if os.path.isdir(merge_folder_path):
+                        # Find the .txt file in the "merge" subfolder
+                        for file in os.listdir(merge_folder_path):
+                            if file.endswith(".txt"):
+                                file_path = os.path.join(merge_folder_path, file)
+                                print(f"Processing file: {file_path}")
 
-# Open the plot using the predefined open_plot function
-try:
+                                with open(file_path, 'r') as f:
+                                    content = f.read()
+
+                                last_cycle_line = find_last_cycle_line(content)
+
+                                if last_cycle_line:
+                                    numerical_section = extract_data_from_section(content, last_cycle_line)
+
+                                    if numerical_section:
+                                        data = format_extracted_data(numerical_section)
+
+                                        if data is not None:
+                                            # Use the head folder name as label
+                                            plot_data(fig, data, label=head_folder)
+                                            folder_labels.append(head_folder)
+                                        else:
+                                            print(f"No data to plot for {file_path}.")
+                                    else:
+                                        print(f"No numerical section found in {file_path}.")
+                                else:
+                                    print(f"No last cycle found in {file_path}.")
+
+    # Sort labels by name
+    sorted_labels = sorted(folder_labels)
+    fig.data = sorted(fig.data, key=lambda trace: sorted_labels.index(trace.name))
+
+    fig.update_layout(
+        title=f'Rf_used vs Resolution for data in {base_path}',
+        xaxis_title='Resolution (Å)',
+        yaxis_title='Rf_used',
+        template='plotly_dark',
+        showlegend=True,
+        xaxis=dict(autorange='reversed')  # This line reverses the x-axis
+    )
+    
+    plotname = "Rf_used_vs_Resolution.html"
+    plot_filename = os.path.join(base_path, plotname)
+    fig.write_html(plot_filename)
+
     open_plot(fig, plot_filename)
-except ImportError:
-    print(f"Plot saved as: {plot_filename}. Please ensure 'open_plot' is available.")
+
+# directory = "/home/buster/UOX1/different_index_params/5x5_retry"
+directory = "/home/buster/UOX1"
+process_and_plot_all_files(directory)

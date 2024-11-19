@@ -34,6 +34,7 @@ def compute_radial_statistics(radii_filtered, image_filtered, bins):
             radial_stds.append(std_intensity)
             radial_distances.append((bins[i] + bins[i - 1]) / 2)  # Use bin center
     return np.array(radial_medians), np.array(radial_stds), np.array(radial_distances)
+
 def process_image(image, center_x, center_y):
     # Compute radial distances from the center
     y_indices, x_indices = np.indices(image.shape)
@@ -88,17 +89,17 @@ def process_image(image, center_x, center_y):
     radial_stds_filtered = radial_stds_rev[::-1]
 
     # Exclude additional points with lowest radius (closest to the center)
-    ex_points = 2  # Adjust this number as needed
+    ex_points = 2 # Adjust this number as needed
     radial_medians_filtered = radial_medians_filtered[ex_points:]
     radial_distances_filtered = radial_distances_filtered[ex_points:]
     radial_stds_filtered = radial_stds_filtered[ex_points:]
 
     # Define acceptable residual threshold
-    residual_threshold = 0.5  # Adjust this value based on acceptable residual
+    residual_threshold = 0.1  # Adjust this value based on acceptable residual
 
     # Set minimum and maximum number of sinusoids
     min_N_sinusoids = 3
-    max_N_sinusoids = 7
+    max_N_sinusoids = 5
 
     # Initialize N_sinusoids
     N_sinusoids = min_N_sinusoids
@@ -282,8 +283,7 @@ def remove_background(h5_file_path, new_h5_file_path, selected_indices=None):
             'images',
             shape=(num_images, 1024, 1024),
             dtype='float32',
-            chunks=(chunk_size, 1024, 1024),
-            compression="gzip"
+            chunks=(chunk_size, 1024, 1024)
         )
 
         # Prepare arguments for multiprocessing

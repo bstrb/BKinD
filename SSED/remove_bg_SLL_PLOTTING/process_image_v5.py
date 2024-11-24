@@ -64,7 +64,6 @@ def process_image(image, center_x, center_y):
         radial_distances = radial_distances[include_index:]
         radial_stds = radial_stds[include_index:]
 
-    print(np.min(radial_stds))
     # Adjust initial guesses based on data
     A_initial = np.max(radial_medians)
     mu_initial = 0  # Centered at radius 0
@@ -104,7 +103,7 @@ def process_image(image, center_x, center_y):
             bounds=bounds,
             maxfev=100000
         )
-        print("Enhanced Super-Lorentzian fitting successful.")
+        print("Enhanced Super-Lorentzian fitting successful. Performing iterative LOWESS fit to Residual.")
     except RuntimeError as e:
         print("Enhanced Super-Lorentzian curve fitting failed:", e)
         popt = initial_guess  # Use initial guess if fitting fails
@@ -205,6 +204,13 @@ def process_image(image, center_x, center_y):
     plt.title('Corrected Image')
     plt.imshow(corrected_image, origin='lower', cmap='gray', vmin=vmin, vmax=vmax)
     plt.colorbar(label='Corrected Intensity')
+    plt.show()
+
+    # Optionally, plot the original image
+    plt.figure()
+    plt.title('Original Image')
+    plt.imshow(image, origin='lower', cmap='gray', vmin=vmin, vmax=vmax)
+    plt.colorbar(label='Original Intensity')
     plt.show()
 
     return corrected_image

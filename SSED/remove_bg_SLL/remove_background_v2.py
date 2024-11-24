@@ -1,8 +1,7 @@
 import numpy as np
 import h5py
-from process_image_backup import process_image
+from process_image import process_image
 import multiprocessing
-from tqdm import tqdm
 
 def copy_without_dataset(source_group, dest_group, exclude_paths=[]):
     for name, item in source_group.items():
@@ -42,8 +41,7 @@ def process_image_worker(args):
         return (image_index, corrected_image)
     except Exception as e:
         # Return the exception to handle it in the main process
-        print(f"Error processing image {image_index}: {e}")
-        return (image_index, None)
+        return (image_index, e)
 
 def remove_background(h5_file_path, new_h5_file_path, selected_indices=None):
     # Open the original HDF5 file to get the number of images
@@ -58,13 +56,8 @@ def remove_background(h5_file_path, new_h5_file_path, selected_indices=None):
 
     print(f"Processing {len(selected_indices)} selected images.")
 
-    # Create index mapping for quick lookup
-    index_mapping = {image_index: idx for idx, image_index in enumerate(selected_indices)}
-
-    total_images = len(selected_indices)
-
     # Determine chunk size (adjust as needed)
-    chunk_size = min(1000, total_images)
+    chunk_size = min(1000, len(selected_indices))
 
     # Open the new HDF5 file and create the datasets
     with h5py.File(new_h5_file_path, 'w') as new_h5_file:
@@ -79,33 +72,32 @@ def remove_background(h5_file_path, new_h5_file_path, selected_indices=None):
         images_group = new_h5_file['/entry/data']
         corrected_images_dataset = images_group.create_dataset(
             'images',
-            shape=(total_images, 1024, 1024),
-            dtype='int16',
+            shape=(len(selected_indices), 1024, 1024),
+            dtype='float32',
             chunks=(chunk_size, 1024, 1024)
         )
 
-
         # Process images in chunks
-        num_images = total_images
+        num_images = len(selected_indices)
+        for chunk_start in range(0, num_images, chunk_size):
+            chunk_indices = selected_indices[chunk_start:chunk_start + chunk_size]
 
-        with tqdm(total=total_images, desc='Processing images') as pbar:
-            # We can process all images at once if memory allows
-            # Otherwise, process in chunks to manage memory usage
-            for chunk_start in range(0, num_images, chunk_size):
-                chunk_indices = selected_indices[chunk_start:chunk_start + chunk_size]
+            print(f"Processing images {chunk_start + 1} to {chunk_start + len(chunk_indices)}...")
 
-                # Prepare arguments for worker processes
-                args_list = [(image_index, h5_file_path) for image_index in chunk_indices]
+            # Prepare arguments for worker processes
+            args_list = [(image_index, h5_file_path) for image_index in chunk_indices]
 
-                # Use multiprocessing Pool
-                with multiprocessing.Pool() as pool:
-                    for image_index, result in pool.imap_unordered(process_image_worker, args_list):
-                        idx_in_dataset = index_mapping[image_index]
-                        if result is None:
-                            print(f"Skipping image {image_index} due to processing error.")
-                            continue
-                        corrected_images_dataset[idx_in_dataset, :, :] = result
-                        pbar.update(1)  # Update progress bar
+            # Use multiprocessing Pool
+            with multiprocessing.Pool() as pool:
+                results = pool.map(process_image_worker, args_list)
+
+            # Collect and write results
+            for image_index, result in results:
+                idx_in_dataset = selected_indices.index(image_index)
+                if isinstance(result, Exception):
+                    print(f"Error processing image {image_index}: {result}")
+                    continue  # Handle or log the error as needed
+                corrected_images_dataset[idx_in_dataset, :, :] = result
 
     print("Processing completed.")
 

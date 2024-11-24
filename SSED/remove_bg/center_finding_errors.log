@@ -1,0 +1,29 @@
+ERROR:root:Error finding center: Can't pickle local object 'find_center.<locals>.objective'
+Traceback (most recent call last):
+  File "/mnt/c/Users/bubl3932/Desktop/BKinD/SSED/remove_bg/compute_centers.py", line 77, in find_center
+    result = differential_evolution(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/lib/python3.11/site-packages/scipy/optimize/_differentialevolution.py", line 502, in differential_evolution
+    ret = solver.solve()
+          ^^^^^^^^^^^^^^
+  File "/root/anaconda3/lib/python3.11/site-packages/scipy/optimize/_differentialevolution.py", line 1155, in solve
+    self._calculate_population_energies(
+  File "/root/anaconda3/lib/python3.11/site-packages/scipy/optimize/_differentialevolution.py", line 1316, in _calculate_population_energies
+    self._mapwrapper(self.func, parameters_pop[0:S])
+  File "/root/anaconda3/lib/python3.11/site-packages/scipy/_lib/_util.py", line 511, in __call__
+    return self._mapfunc(func, iterable)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/lib/python3.11/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/lib/python3.11/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "/root/anaconda3/lib/python3.11/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "/root/anaconda3/lib/python3.11/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/lib/python3.11/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+AttributeError: Can't pickle local object 'find_center.<locals>.objective'
+ERROR:root:Center not found for image index 1500

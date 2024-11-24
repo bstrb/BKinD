@@ -21,7 +21,7 @@ def automate_evaluation_and_integration(stream_file_folder, weight_list, lattice
 
             # Evaluate multiple stream files
             print(f"Evaluating multiple stream files with weights: {weight}")
-            # process_all_stream_files(stream_file_folder, weight)
+            process_all_stream_files(stream_file_folder, weight)
 
             # # Write stream file to .sol file
             best_results_stream = f"{stream_file_folder}/best_results_{IQM}.stream"

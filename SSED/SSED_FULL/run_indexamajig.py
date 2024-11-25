@@ -34,11 +34,11 @@ def run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_
 
     base_command = (
         f"indexamajig -g {geomfile_path} -i {listfile_path} -o {output_path} -p {cellfile_path} "
-        f"-j {num_threads} --indexing={indexing_method} --integration={integration_method} --int-radius={int_radius} "
-        f"--push-res={resolution_push} --tolerance={tolerance} --min-peaks={min_peaks} "
+        f"-j {num_threads} --indexing={indexing_method} "#--integration={integration_method} --int-radius={int_radius} "
+        f"--tolerance={tolerance} --min-peaks={min_peaks} "#--push-res={resolution_push} "
         f"--xgandalf-tolerance={xgt} --xgandalf-sampling-pitch={xgsp} --xgandalf-grad-desc-iterations={xgi} "
         f"--no-half-pixel-shift --peaks=cxi --max-indexer-threads=1 --no-non-hits-in-stream --no-image-data "
-        f"--no-refine --no-revalidate " # --no-check-cell --no-check-peaks --no-retry 
+        f"--no-refine --no-revalidate --no-check-peaks " # --no-check-cell  --no-retry 
     )
 
     subprocess.run(base_command, shell=True, check=True)

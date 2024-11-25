@@ -155,8 +155,8 @@ def process_image(image, center_x, center_y):
             prev_lowess_correction = lowess_correction.copy()
             
             iteration += 1
-        else:
-            print("Maximum number of iterations reached without full convergence.")
+        # else:
+        #     print("Maximum number of iterations reached without full convergence.")
 
 
         # Interpolate the total LOWESS correction over the entire image

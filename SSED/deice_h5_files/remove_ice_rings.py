@@ -92,8 +92,8 @@ def remove_ice_rings(input_file, output_file, min_spots=10, inner_radius=100, ou
         print(f"Error processing file {input_file}: {e}")
 
 if __name__ == "__main__":
-    input_file = "/home/buster/UOX1/min_10_peak.h5"  # Example input file path
-    output_file = "/home/buster/UOX1/deiced_UOX1_min_10_peak_int16.h5"  # Example output file path
+    input_file = "/home/buster/UOX1/UOX1_original/min_10_peak.h5"  # Example input file path
+    output_file = "/home/buster/UOX1/UOX1_original/deiced_UOX1_min_10_peak.h5"  # Example output file path
     min_spots = 5  # Set the threshold for minimum number of spots within the annulus
     inner_radius = 60  # Set the inner radius of the annulus in pixels
     outer_radius = 155  # Set the outer radius of the annulus in pixels

@@ -4,11 +4,6 @@ from scipy.ndimage import gaussian_filter1d
 from compute_radial_statistics import compute_radial_statistics
 import statsmodels.api as sm
 
-# def enhanced_super_lorentzian(r, A, mu, gamma, n, C, D):
-#     # Add an additional term D / (r + epsilon) to capture steepness near r = 0
-#     epsilon = 1e-6  # Small value to prevent division by zero
-#     return A / (1 + ((r - mu) / gamma) ** 2) ** n + C + D / (r + epsilon)
-
 def enhanced_super_lorentzian(r, A, mu, gamma, n, C, D):
     epsilon = 1e-6  # Small value to prevent division by zero
     safe_n = np.clip(n, 0, 10)  # Limit n to avoid overflow

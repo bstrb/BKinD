@@ -19,6 +19,7 @@
         "./SSED/SSED_IQM_v4",
         "./SSED/remove_background",
         "./SSED/remove_bg_v2",
-        "./SSED/remove_bg_v2"
+        "./SSED/remove_bg_v2",
+        "./SSED/find_center/find_with_circles"
     ]
 }

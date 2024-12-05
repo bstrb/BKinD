@@ -148,5 +148,5 @@ def process_and_plot_all_files(base_path):
 
     open_plot(fig, plot_filename)
 
-directory = "/home/buster/UOX1/UOX1_min_10_deiced"
+directory = "/mnt/c/Users/bubl3932/Desktop/UOX1"
 process_and_plot_all_files(directory)

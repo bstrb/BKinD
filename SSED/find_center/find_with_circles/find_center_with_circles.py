@@ -1,121 +1,211 @@
 import numpy as np
 import h5py
-from process_image_with_ellipses import process_image
-import multiprocessing
+import matplotlib.pyplot as plt
+from typing import List, Tuple, Optional
+import logging
 
-def load_mask(mask_file_path):
-    with h5py.File(mask_file_path, 'r') as h5_file:
-        mask = h5_file['/mask'][()]
-    return mask
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def init_worker(mask_file_path):
-    global global_mask
-    global_mask = load_mask(mask_file_path)
+def load_h5_dataset(file_path: str, dataset_path: str) -> np.ndarray:
+    """
+    Loads a dataset from an HDF5 file.
 
-def process_images_with_circles_worker(args):
-    image_index, h5_file_path, plot, verbose = args
+    Parameters:
+        file_path (str): Path to the HDF5 file.
+        dataset_path (str): Path to the dataset within the HDF5 file.
+
+    Returns:
+        np.ndarray: The loaded dataset as a NumPy array.
+    """
     try:
-        with h5py.File(h5_file_path, 'r') as h5_file:
-            images_dataset = h5_file['/entry/data/images']
-            image = images_dataset[image_index, :, :].astype(np.float32)
-        mask = global_mask
-        beam_center = process_image(image, image_index, mask, plot=plot, verbose=verbose)
-        return (image_index, beam_center)
+        with h5py.File(file_path, 'r') as h5_file:
+            if dataset_path not in h5_file:
+                raise KeyError(f"Dataset '{dataset_path}' not found in '{file_path}'.")
+            data = h5_file[dataset_path][()]
+            logging.info(f"Loaded dataset '{dataset_path}' from '{file_path}'.")
     except Exception as e:
-        print(f"Error processing image {image_index}: {e}", flush=True)
-        return (image_index, None)
+        logging.error(f"Error loading dataset '{dataset_path}' from '{file_path}': {e}")
+        raise
+    return data
 
-def find_center(h5_file_path, mask_path, selected_indices=None, plot=False, verbose=True):
-    if selected_indices is None:
-        with h5py.File(h5_file_path, 'r') as h5_file:
-            images_dataset = h5_file['/entry/data/images']
-            num_images = images_dataset.shape[0]
-            selected_indices = range(num_images)
+def apply_mask(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    """
+    Applies a mask to an image. Masked areas are set to NaN.
+
+    Parameters:
+        image (np.ndarray): The input image.
+        mask (np.ndarray): The mask array (True for valid pixels, False for masked pixels).
+
+    Returns:
+        np.ndarray: The masked image.
+    """
+    if image.shape != mask.shape:
+        error_msg = f"Image shape {image.shape} and mask shape {mask.shape} do not match."
+        logging.error(error_msg)
+        raise ValueError(error_msg)
+    masked_image = np.where(mask, image, np.nan)
+    logging.info("Applied mask to image.")
+    return masked_image
+
+def compute_radial_median_intensity(image: np.ndarray, center: Tuple[float, float], num_bins: int = 100) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Computes the median intensity as a function of radial distance from a center point.
+
+    Parameters:
+        image (np.ndarray): The 2D image array.
+        center (tuple): (x, y) coordinates of the center.
+        num_bins (int): Number of radial bins.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Radial distances (bin centers) and corresponding median intensities.
+    """
+    y, x = np.indices(image.shape)
+    r = np.sqrt((x - center[0])**2 + (y - center[1])**2)
+    r = r.flatten()
+    intensity = image.flatten()
+
+    # Remove NaN values
+    valid = ~np.isnan(intensity)
+    r = r[valid]
+    intensity = intensity[valid]
+
+    # Define radial bins
+    r_max = r.max()
+    bins = np.linspace(0, r_max, num_bins + 1)
+    bin_centers = (bins[:-1] + bins[1:]) / 2
+
+    # Compute median intensity for each bin
+    median_intensity = np.zeros(num_bins)
+    for i in range(num_bins):
+        bin_mask = (r >= bins[i]) & (r < bins[i + 1])
+        if np.any(bin_mask):
+            median_intensity[i] = np.median(intensity[bin_mask])
+        else:
+            median_intensity[i] = np.nan  # Handle empty bins
+
+    logging.info("Computed radial median intensity.")
+    return bin_centers, median_intensity
+
+def plot_radial_median_intensity(radii: np.ndarray, median_intensity: np.ndarray, image_index: int):
+    """
+    Plots the radial median intensity.
+
+    Parameters:
+        radii (np.ndarray): Radial distances (bin centers).
+        median_intensity (np.ndarray): Median intensities corresponding to the radial bins.
+        image_index (int): Index of the processed image.
+    """
+    plt.figure(figsize=(8, 6))
+    plt.plot(radii, median_intensity, marker='o', linestyle='-')
+    plt.title(f'Radial Median Intensity for Image {image_index}')
+    plt.xlabel('Radius (pixels)')
+    plt.ylabel('Median Intensity')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    logging.info(f"Plotted radial median intensity for image {image_index}.")
+
+def process_image(h5_file_path: str, images_dataset_path: str, mask_file_path: str,
+                 mask_dataset_path: str, image_index: int, center: Optional[Tuple[float, float]] = None):
+    """
+    Processes a single image: applies mask, computes radial median intensity, and plots it.
+
+    Parameters:
+        h5_file_path (str): Path to the HDF5 file containing images.
+        images_dataset_path (str): Dataset path within the HDF5 file for images.
+        mask_file_path (str): Path to the mask HDF5 file.
+        mask_dataset_path (str): Dataset path within the mask HDF5 file.
+        image_index (int): Index of the image to process.
+        center (tuple, optional): (x, y) coordinates for radial computations. Defaults to image center.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Radial distances and median intensities.
+    """
+    # Load mask
+    mask = load_h5_dataset(mask_file_path, mask_dataset_path)
+
+    # Load image
+    images = load_h5_dataset(h5_file_path, images_dataset_path)
+    if image_index >= images.shape[0] or image_index < 0:
+        error_msg = f"Image index {image_index} is out of bounds. Total images: {images.shape[0]}."
+        logging.error(error_msg)
+        raise IndexError(error_msg)
+    image = images[image_index, :, :]
+    logging.info(f"Processing Image Index: {image_index}")
+
+    # Apply mask
+    masked_image = apply_mask(image, mask)
+
+    # Determine center
+    if center is None:
+        # Default to image center
+        center = (image.shape[1] / 2, image.shape[0] / 2)
+        logging.info(f"No center provided. Using image center: {center}")
     else:
-        with h5py.File(h5_file_path, 'r') as h5_file:
-            num_images = h5_file['/entry/data/images'].shape[0]
-            selected_indices = [idx for idx in selected_indices if 0 <= idx < num_images]
+        logging.info(f"Using provided center: {center}")
 
-    # print(f"Processing {len(selected_indices)} selected images.", flush=True)
-    total_images = len(selected_indices)
+    # Compute radial median intensity
+    radii, median_intensity = compute_radial_median_intensity(masked_image, center)
 
-    args_list = [(image_index, h5_file_path, plot, verbose) for image_index in selected_indices]
+    # Plot radial median intensity
+    plot_radial_median_intensity(radii, median_intensity, image_index)
 
-    pool = multiprocessing.Pool(initializer=init_worker, initargs=(mask_path,))
-    try:
-        results = pool.imap_unordered(process_images_with_circles_worker, args_list)
+    return radii, median_intensity
 
-        beam_centers_dict = {}  # Use a dict for direct indexing
-        for result in results:
-            image_index, beam_center = result
-            if beam_center is None:
-                print(f"Skipping image {image_index} due to processing error.", flush=True)
-                continue
-            beam_centers_dict[image_index] = beam_center
-            print(f"Center for image {image_index} found at {beam_center}", flush=True)
-    finally:
-        pool.close()
-        pool.join()
+def process_multiple_images(h5_file_path: str, images_dataset_path: str, mask_file_path: str,
+                           mask_dataset_path: str, selected_indices: List[int], center: Optional[Tuple[float, float]] = None):
+    """
+    Processes multiple images: applies mask, computes radial median intensity, and plots them.
 
-    # Overwrite beam centers in the original HDF5 file
-    with h5py.File(h5_file_path, 'r+') as h5_file:
-        center_x_dataset = h5_file['/entry/data/center_x']
-        center_y_dataset = h5_file['/entry/data/center_y']
+    Parameters:
+        h5_file_path (str): Path to the HDF5 file containing images.
+        images_dataset_path (str): Dataset path within the HDF5 file for images.
+        mask_file_path (str): Path to the mask HDF5 file.
+        mask_dataset_path (str): Dataset path within the mask HDF5 file.
+        selected_indices (List[int]): List of image indices to process.
+        center (tuple, optional): (x, y) coordinates for radial computations. Defaults to image center.
 
-        for image_index in selected_indices:
-            if image_index in beam_centers_dict:
-                beam_center = beam_centers_dict[image_index]
-                center_x_dataset[image_index] = beam_center[0]
-                center_y_dataset[image_index] = beam_center[1]
-            else:
-                # Set to -1 if processing failed
-                center_x_dataset[image_index] = -1
-                center_y_dataset[image_index] = -1
+    Returns:
+        None
+    """
+    for image_index in selected_indices:
+        try:
+            radii, median_intensity = process_image(
+                h5_file_path=h5_file_path,
+                images_dataset_path=images_dataset_path,
+                mask_file_path=mask_file_path,
+                mask_dataset_path=mask_dataset_path,
+                image_index=image_index,
+                center=center
+            )
+        except Exception as e:
+            logging.error(f"Failed to process image {image_index}: {e}")
 
-        # Get the framesize for detector shifts
-        images_dataset = h5_file['/entry/data/images']
-        framesize = images_dataset.shape[1]  # Assuming square images
+def main():
+    """
+    Main function to process selected images and plot radial median intensity.
+    Modify the paths and selected_indices as per your data.
+    """
+    # Example Inputs (Modify these paths and indices as needed)
+    h5_file_path = '/home/buster/UOX1/UOX1_min_10/UOX1_min_10.h5'
+    images_dataset_path = '/entry/data/images'  # Modify if different
+    mask_file_path = '/home/buster/mask/pxmask.h5'
+    mask_dataset_path = '/mask'  # Modify if different
+    selected_indices = [1300]  # Replace with your selected indices
 
-    # Update detector shifts based on the newly found beam centers
-    update_detector_shifts(h5_file_path, beam_centers_dict, selected_indices, framesize)
+    # Optional: Define a custom center (x, y). If None, image center is used.
+    custom_center = None  # e.g., (512, 512) (or image center depending on size)
 
-    print("Processing completed.", flush=True)
+    # Process the selected images
+    process_multiple_images(
+        h5_file_path=h5_file_path,
+        images_dataset_path=images_dataset_path,
+        mask_file_path=mask_file_path,
+        mask_dataset_path=mask_dataset_path,
+        selected_indices=selected_indices,
+        center=custom_center
+    )
 
-def update_detector_shifts(h5_file_path, beam_centers_dict, selected_indices, framesize):
-    pixels_per_meter = 17857.14285714286
-    presumed_center = framesize / 2  # Half of the framesize
-
-    # Open the HDF5 file and prepare to update datasets
-    with h5py.File(h5_file_path, 'r+') as h5_file:
-        # Ensure datasets exist
-        for ds_name in ['entry/data/det_shift_x_mm', 'entry/data/det_shift_y_mm']:
-            if ds_name not in h5_file:
-                # Initialize with zeros or desired default values
-                data_shape = (h5_file['/entry/data/center_x'].shape[0],)
-                h5_file.create_dataset(ds_name, data=np.zeros(data_shape), maxshape=(None,), dtype='float64')
-
-        det_shift_x_mm_dataset = h5_file['/entry/data/det_shift_x_mm']
-        det_shift_y_mm_dataset = h5_file['/entry/data/det_shift_y_mm']
-
-        for image_index in selected_indices:
-            if image_index in beam_centers_dict:
-                beam_center = beam_centers_dict[image_index]
-                det_shift_x = -((beam_center[0] - presumed_center) / pixels_per_meter) * 1000
-                det_shift_y = -((beam_center[1] - presumed_center) / pixels_per_meter) * 1000
-                det_shift_x_mm_dataset[image_index] = det_shift_x
-                det_shift_y_mm_dataset[image_index] = det_shift_y
-            else:
-                # Set to -1 if processing failed
-                det_shift_x_mm_dataset[image_index] = -1
-                det_shift_y_mm_dataset[image_index] = -1
-
-    print('Updated detector shifts written to HDF5 file')
-
-# Example usage
-if __name__ == '__main__':
-    h5_file_path = '/home/buster/UOX1/UOX1_min_50/UOX1_min_50_peak.h5'
-    mask_path = '/home/buster/mask/pxmask.h5'
-    selected_indices = list(range(10, 100))  # Adjust indices as needed
-
-    # Set plot=False to prevent conflicts in multiprocessing
-    find_center(h5_file_path, mask_path, selected_indices=selected_indices, plot=False, verbose=True)
+# Uncomment the following line to run the main function directly
+# main()

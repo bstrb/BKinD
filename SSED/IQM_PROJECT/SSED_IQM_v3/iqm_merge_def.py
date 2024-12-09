@@ -88,8 +88,8 @@ def merge_and_write_mtz(stream_dir, cellfile_path, pointgroup, num_threads, iter
 
 # Example usage
 if __name__ == "__main__":
-    base_path = "/home/buster/UOX123/3x3_retry/RMSD"               # Replace with the integration stream file directory
-    cell_file_folder = "/home/buster/UOX123/3x3_retry"                         # Replace with the cell file directory
+    base_path = "/home/buster/UOX1/UOX1_min_10/CF_intensity_copy5/UOX1_min_10_no_bg_beam_centers19/filtered"               # Replace with the integration stream file directory
+    cell_file_folder = "/home/buster/UOX1/UOX1_min_10/CF_intensity_copy5/UOX1_min_10_no_bg_beam_centers19"                         # Replace with the cell file directory
     cellfile_path = find_first_file(cell_file_folder, ".cell")
     pointgroup = "mmm"
     num_threads = 23

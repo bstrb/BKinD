@@ -161,11 +161,11 @@ def fast_integration(bash_file_path, output_stream_format, num_indexed_frames, i
 
 # Example usage
 def example_usage():
-    bash_file_path = "/home/buster/UOX123/3x3_retry/RMSD.sh"
-    output_stream_format = "/home/buster/UOX123/3x3_retry/RMSD/int.stream"
-    num_indexed_frames = 23914
+    bash_file_path = "/home/buster/UOX1/UOX1_min_10/CF_intensity_copy5/UOX1_min_10_no_bg_beam_centers19/filtered_best_results.sh"
+    output_stream_format = "/home/buster/UOX1/UOX1_min_10/CF_intensity_copy5/UOX1_min_10_no_bg_beam_centers19/filtered/int.stream"
+    num_indexed_frames = 4504
     integration = "rings"
-    ring_sizes = [(3, 4, 7)]
+    ring_sizes = [(2, 5, 10)]
 
     fast_integration(bash_file_path, output_stream_format, num_indexed_frames, integration, ring_sizes)
 

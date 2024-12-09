@@ -20,6 +20,7 @@
         "./SSED/remove_background",
         "./SSED/remove_bg_v2",
         "./SSED/remove_bg_v2",
-        "./SSED/find_center/find_with_circles"
+        "./SSED/find_center/find_with_circles",
+        "./SSED/find_center/find_center_final/find_center_v3"
     ]
 }

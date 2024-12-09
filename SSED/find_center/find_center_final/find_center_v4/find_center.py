@@ -6,18 +6,11 @@ from tqdm import tqdm
 from process_image import process_image
 from update_detector_shifts import update_detector_shifts
 from create_unique_folder import create_unique_folder
-from plot_center_positions_vs_index import plot_center_positions
 import multiprocessing
 
 def load_mask(mask_file_path):
     """
     Load the mask from an HDF5 file.
-    
-    Parameters:
-    - mask_file_path (str): Path to the HDF5 mask file.
-    
-    Returns:
-    - mask (numpy.ndarray): 2D array representing the mask.
     """
     with h5py.File(mask_file_path, 'r') as h5_file:
         mask = h5_file['/mask'][()]
@@ -26,9 +19,6 @@ def load_mask(mask_file_path):
 def init_worker(mask_file_path):
     """
     Initialize worker process by loading the mask into a global variable.
-    
-    Parameters:
-    - mask_file_path (str): Path to the HDF5 mask file.
     """
     global global_mask
     global_mask = load_mask(mask_file_path)
@@ -36,15 +26,10 @@ def init_worker(mask_file_path):
 def process_image_worker(args):
     """
     Worker function to process a single image.
-    
-    Parameters:
-    - args (tuple): Contains all necessary arguments for processing.
-    
-    Returns:
-    - tuple: (image_index, beam_center) where beam_center is a tuple (x, y).
     """
     (
-        image_index,
+        position_in_dataset,  # Position in the images dataset
+        image_index,          # Actual image index from '/entry/data/index'
         h5_file_path,
         plot,
         verbose,
@@ -59,7 +44,7 @@ def process_image_worker(args):
     try:
         with h5py.File(h5_file_path, 'r') as h5_file:
             images_dataset = h5_file['/entry/data/images']
-            image = images_dataset[image_index, :, :].astype(np.int16)
+            image = images_dataset[position_in_dataset, :, :].astype(np.int16)
         
         mask = global_mask
 
@@ -77,14 +62,15 @@ def process_image_worker(args):
             plot=plot,
             verbose=verbose
         )
-        return (image_index, beam_center)
+        return (position_in_dataset, beam_center)
     except Exception as e:
-        print(f"Error processing image {image_index}: {e}", flush=True)
-        return (image_index, None)
+        print(f"Error processing image at position {position_in_dataset}: {e}", flush=True)
+        return (position_in_dataset, None)
 
 def find_center(
     h5_file_path,
     mask_path,
+    selected_positions=None,
     selected_indices=None,
     plot=False,
     verbose=True,
@@ -97,11 +83,12 @@ def find_center(
 ):
     """
     Process multiple images to find their centers and update detector shifts.
-    
+
     Parameters:
     - h5_file_path (str): Path to the HDF5 file containing images and datasets.
     - mask_path (str): Path to the HDF5 mask file.
-    - selected_indices (list or None): List of image indices to process. If None, process all images.
+    - selected_positions (list or None): List of positions in the dataset to process.
+    - selected_indices (list or None): List of actual image indices to process.
     - plot (bool): Whether to generate plots for each image.
     - verbose (bool): Whether to print detailed logs.
     - median_filter_size (int): Size of the median filter window.
@@ -110,26 +97,37 @@ def find_center(
     - center_initial (list or tuple or None): Initial guess for the center coordinates [x, y].
     - radial_bins (int or None): Number of radial bins. If None, defaults to 100.
     - num_slices (int): Number of angular slices to divide the half-circle into.
-    
+
     Returns:
     - None
     """
-    if selected_indices is None:
-        with h5py.File(h5_file_path, 'r') as h5_file:
-            images_dataset = h5_file['/entry/data/images']
-            num_images = images_dataset.shape[0]
-            selected_indices = range(num_images)
+    with h5py.File(h5_file_path, 'r') as h5_file:
+        images_dataset = h5_file['/entry/data/images']
+        indices_dataset = h5_file['/entry/data/index']
+        num_images = images_dataset.shape[0]
+        images_indices = indices_dataset[:]
+
+    # Determine positions to process
+    if selected_positions is not None:
+        # Use provided positions, ensuring they are within bounds
+        selected_positions = [pos for pos in selected_positions if 0 <= pos < num_images]
+    elif selected_indices is not None:
+        # Map indices to positions
+        index_to_pos = {idx: pos for pos, idx in enumerate(images_indices)}
+        selected_positions = [index_to_pos[idx] for idx in selected_indices if idx in index_to_pos]
     else:
-        with h5py.File(h5_file_path, 'r') as h5_file:
-            num_images = h5_file['/entry/data/images'].shape[0]
-            selected_indices = [idx for idx in selected_indices if 0 <= idx < num_images]
-    
-    print(f"Processing {len(selected_indices)} images.", flush=True)
-    
+        # Process all positions
+        selected_positions = list(range(num_images))
+
+    print(f"Processing {len(selected_positions)} images.", flush=True)
+
     # Prepare arguments for each worker
-    args_list = [
-        (
-            image_index,
+    args_list = []
+    for pos in selected_positions:
+        image_index = images_indices[pos]  # Actual image index
+        args = (
+            pos,                      # Position in the images dataset
+            image_index,              # Actual image index
             h5_file_path,
             plot,
             verbose,
@@ -140,61 +138,65 @@ def find_center(
             radial_bins,
             num_slices
         )
-        for image_index in selected_indices
-    ]
-    
+        args_list.append(args)
+
     # Initialize multiprocessing pool with the mask loaded
     pool = multiprocessing.Pool(initializer=init_worker, initargs=(mask_path,))
     try:
         results = pool.imap_unordered(process_image_worker, args_list)
-    
+
         beam_centers_dict = {}  # Use a dict for direct indexing
 
         # Initialize tqdm progress bar
-        with tqdm(total=len(selected_indices), desc="Processing Images", unit="image") as pbar:
+        with tqdm(total=len(selected_positions), desc="Processing Images", unit="image") as pbar:
             for result in results:
-                image_index, beam_center = result
+                position_in_dataset, beam_center = result
                 if beam_center is None:
-                    # print(f"Skipping image {image_index} due to processing error.", flush=True)
+                    # Skipping image due to processing error
                     pass
                 else:
-                    beam_centers_dict[image_index] = beam_center
-                    # print(f"Center for image {image_index} found at {beam_center}", flush=True)
+                    beam_centers_dict[position_in_dataset] = beam_center
                 pbar.update(1)  # Update the progress bar by one
     finally:
         pool.close()
         pool.join()
-    
+
     # Overwrite beam centers in the original HDF5 file
     with h5py.File(h5_file_path, 'r+') as h5_file:
         center_x_dataset = h5_file['/entry/data/center_x']
         center_y_dataset = h5_file['/entry/data/center_y']
-    
-        for image_index in selected_indices:
-            if image_index in beam_centers_dict:
-                beam_center = beam_centers_dict[image_index]
-                center_x_dataset[image_index] = beam_center[0]
-                center_y_dataset[image_index] = beam_center[1]
+
+        for pos in selected_positions:
+            if pos in beam_centers_dict:
+                beam_center = beam_centers_dict[pos]
+                center_x_dataset[pos] = beam_center[0]
+                center_y_dataset[pos] = beam_center[1]
             else:
                 # Set to -1 if processing failed
-                center_x_dataset[image_index] = -1
-                center_y_dataset[image_index] = -1
-    
+                center_x_dataset[pos] = -1
+                center_y_dataset[pos] = -1
+
         # Get the framesize for detector shifts
-        images_dataset = h5_file['/entry/data/images']
-        framesize = images_dataset.shape[1]  # Assuming square images
-    
+        framesize = h5_file['/entry/data/images'].shape[1]  # Assuming square images
+
     # Update detector shifts based on the newly found beam centers
-    update_detector_shifts(h5_file_path, beam_centers_dict, selected_indices, framesize, pixels_per_meter=17857.14285714286)
-    
+    update_detector_shifts(
+        h5_file_path=h5_file_path,
+        beam_centers_dict=beam_centers_dict,
+        selected_positions=selected_positions,
+        framesize=framesize,
+        pixels_per_meter=17857.14285714286
+    )
+
     print("Processing completed.", flush=True)
 
     # === Begin Snippet to Save Beam Centers ===
 
     # Prepare data to save
-    image_indices = list(beam_centers_dict.keys())
-    x_positions = [beam_centers_dict[idx][0] for idx in image_indices]
-    y_positions = [beam_centers_dict[idx][1] for idx in image_indices]
+    positions = list(beam_centers_dict.keys())
+    x_positions = [beam_centers_dict[pos][0] for pos in positions]
+    y_positions = [beam_centers_dict[pos][1] for pos in positions]
+    image_indices = [images_indices[pos] for pos in positions]
 
     # Create a dictionary of input parameters for naming
     params = {

@@ -73,8 +73,8 @@ def process_run_folders(base_path, pdb_file, bins, min_res):
 
 # Example usage
 if __name__ == "__main__":
-    integration_output_folder =  "/home/buster/UOX123/3x3_retry/RMSD" 
-    pdb_file = "/home/buster/UOX123/3x3_retry/UOX.pdb"  # Replace with your actual pdb file path
+    integration_output_folder =  "/home/buster/UOX1/UOX1_min_10/CF_intensity_copy5/UOX1_min_10_no_bg_beam_centers19/filtered" 
+    pdb_file = "/home/buster/UOX1/UOX1_min_10/CF_intensity_copy5/UOX1_min_10_no_bg_beam_centers19/UOX.pdb"  # Replace with your actual pdb file path
     bins = 20
     min_res = 1.5
     process_run_folders(integration_output_folder, pdb_file, bins, min_res)

@@ -1,0 +1,62 @@
+
+- Add CBI to LTA to prepare for merging several experiments
+	# Gaussian fit to find CB spot
+	# Correct normalization of intensities
+	# Add CBI to XDS_ASCII and keep duplicate reflections across XDS_ASCII files with highest CBI
+	# Merge using XSCALE
+	# Prepare for SHELXL refinement using XDSCONV
+	# Refine and compare results to a merging without removing duplicate reflections
+ 
+- Apply Machine Learning to identify dynamical effects:
+	# Center Beam Intensity
+	# SNR
+	# Validate Prediction using SHELXL refinement
+	- Resolution
+	- Systematic Row
+	- Sayre Equation
+
+- SSED Project
+	# Reduce h5 files GUI
+	# Generate bash file GUI for fast integration
+	# Automize FI
+	# Studied and optimized data need for fast integration (about 5000 indexed frames needed for clear trends in refinement)
+	# Assess RMSD for strongest peaks as a metric for index quality (statistically OK but not clearly optimizeable)
+	# New metric for index quality using exponentially weighted normalized product of metrics incorporating intensity weighted RMSD, cell parameter deviations, numberg of peaks and indexed reflections and profile radius
+	# Fit exponential to Chunked Curve
+	# Convert HDF5 images from 16bit integer to 32bit float
+	# Nonindexed frames
+	# Distribuion of orientation matrices
+	# EMP vs RCIS_v1
+	# PhD application
+	# Use retry when indexing
+	# Re-run peakfinding before indexing
+	# Removal of ice rings before indexing
+	# Radial background removal
+	# Erice EC course
+	- xGandalf algorithm for ED (prev xray)
+	- Fine tune IQM
+	- Workflow PDF
+	- Merging h5 files
+	- Which frames are removed by CC1/2 rejection
+	- New workflow:
+		- Intensity based CF, removal of bad frames and background
+		- PF using pf8 or pf9
+		- Indexing with high xGandalf tolerance
+		- Refine center using index results
+		- Re-index with refined center
+		- 
+		
+
+- Xtrapol8 Project
+	- Merge R2aOx and R2aRed
+	
+- KinDyn Project
+
+	# BKinD presentation
+	- Filter to certain R value
+	- CAPS all XDS files
+	- Check .ins lines
+	- open_plot and open_folder etc.
+	- R1[all data]
+	- Remember earlier projects
+

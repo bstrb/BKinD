@@ -29,7 +29,7 @@ def find_beam_center(x, y, h, k, l):
     # Number of reflections
     N = len(x)
     if N < 4:
-        raise ValueError("At least 4 peaks are required to solve for the parameters.")
+        raise ValueError("At least 4 peaks indexed within set tolerance are required to solve for the parameters.")
 
     # We have the equations:
     # X_i = X_c + A*h_i + B*k_i + C*l_i

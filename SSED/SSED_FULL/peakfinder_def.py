@@ -7,7 +7,25 @@ import numpy as np
 
 from diffractem.peakfinder8_extension import peakfinder_8
 
+
 def findpeaks(h5_path, x0, y0, threshold, min_snr, min_pix_count, max_pix_count, local_bg_radius, min_res, max_res):
+
+    """
+    Find peaks in an image stack and save the results to an HDF5 file.
+
+    Parameters:
+    h5_path (str): The path to the HDF5 file containing the image stack.
+    x0 (float): The x-coordinate of the center of the image.
+    y0 (float): The y-coordinate of the center of the image.
+    threshold (float): The threshold for peak detection.
+    min_snr (float): The minimum signal-to-noise ratio for peak detection.
+    min_pix_count (int): The minimum number of pixels for peak detection.
+    max_pix_count (int): The maximum number of pixels for peak detection.
+    local_bg_radius (int): The radius of the local background region.
+    min_res (float): The minimum resolution for peak detection.
+    max_res (float): The maximum resolution for peak detection.
+    """
+
     all_results = []
     
     with h5py.File(h5_path, 'r+') as workingfile:  # Open the file in read/write mode
@@ -58,6 +76,24 @@ def findpeaks(h5_path, x0, y0, threshold, min_snr, min_pix_count, max_pix_count,
     print(f"finished processing {os.path.basename(h5_path)}")
 
 def findpeaks_single_frame(i, image_data, x0, y0, threshold, min_snr, min_pix_count, max_pix_count, local_bg_radius, min_res, max_res):
+    
+    """
+    Find peaks in a single frame of an image stack.
+
+    Parameters:
+    i (int): The index of the frame.
+    image_data (numpy.ndarray): The image data.
+    x0 (float): The x-coordinate of the center of the image.
+    y0 (float): The y-coordinate of the center of the image.
+    threshold (float): The threshold for peak detection.
+    min_snr (float): The minimum signal-to-noise ratio for peak detection.
+    min_pix_count (int): The minimum number of pixels for peak detection.
+    max_pix_count (int): The maximum number of pixels for peak detection.
+    local_bg_radius (int): The radius of the local background region.
+    min_res (float): The minimum resolution for peak detection.
+    max_res (float): The maximum resolution for peak detection.
+    """
+
     if i % 1000 == 0:
        print(str(i) + ' frames processed') 
 
@@ -94,7 +130,21 @@ def findpeaks_single_frame(i, image_data, x0, y0, threshold, min_snr, min_pix_co
 
 # Now only h5 files in given folder
 def find_files_and_run_peakfinding(folder_path, x0, y0, threshold, min_snr, min_pix_count, max_pix_count, local_bg_radius, min_res, max_res):
-    # Only list files in the given folder, no subdirectories
+    """
+    Find peaks in all HDF5 files in a given folder.
+
+    Parameters:
+    folder_path (str): The path to the folder containing the HDF5 files.
+    x0 (float): The x-coordinate of the center of the image.
+    y0 (float): The y-coordinate of the center of the image.
+    threshold (float): The threshold for peak detection.
+    min_snr (float): The minimum signal-to-noise ratio for peak detection.
+    min_pix_count (int): The minimum number of pixels for peak detection.
+    max_pix_count (int): The maximum number of pixels for peak detection.
+    local_bg_radius (int): The radius of the local background region.
+    min_res (float): The minimum resolution for peak detection.
+    max_res (float): The maximum resolution for peak detection.
+    """
     for filename in fnmatch.filter(os.listdir(folder_path), '*.h5'):
         filepath = os.path.join(folder_path, filename)
         # Call your processing function

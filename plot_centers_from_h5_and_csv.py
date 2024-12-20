@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 # File paths
-h5_file_path = "/home/bubl3932/files/UOX1/UOX_His_MUA_450nm_spot4_ON_20240311_0928.h5"
+h5_file_path = "/home/bubl3932/files/UOX1/UOX1_original/UOX_His_MUA_450nm_spot4_ON_20240311_0928.h5"
 csv_file_path =  "/home/bubl3932/files/UOX1/UOX1_0-02_2nd_index_run/beam_centers.csv"
 
 # Load data from .h5 file
@@ -36,8 +36,10 @@ print("Cleaned H5 shape:", center_x_h5_clean.shape)
 combined_x = np.concatenate([center_x_csv, center_x_h5_clean])
 combined_y = np.concatenate([center_y_csv, center_y_h5_clean])
 
-std_x = np.std(combined_x)
-std_y = np.std(combined_y)
+std_x = np.std(center_x_h5_clean)
+std_y = np.std(center_y_h5_clean)
+std_x = np.std(center_x_csv)
+std_y = np.std(center_y_csv)
 
 # ... rest of your code, but update the plotting sections to use center_x_h5_clean and center_y_h5_clean ...
 # Print debug information
@@ -45,8 +47,8 @@ print(f"std_x: {std_x}, std_y: {std_y}")
 print(f"median_Xc: {median_Xc}, median_Yc: {median_Yc}")
 
 # Add safety checks to prevent NaN/Inf
-plotrange_x = max(std_x/10, 0.5) if not np.isnan(std_x) and not np.isinf(std_x) else 0.8
-plotrange_y = max(std_y/10, 0.5) if not np.isnan(std_y) and not np.isinf(std_y) else 0.8
+plotrange_x = 3*std_x
+plotrange_y = 3*std_y
 
 
 y_min_X = median_Xc - plotrange_x

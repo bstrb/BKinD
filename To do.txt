@@ -37,6 +37,9 @@
 	- Fine tune IQM
 	- Workflow PDF
 	- Merging h5 files
+	- Pass center from best results to .h5
+	- Handle multiple phases
+	- Find center with circles
 	- Which frames are removed by CC1/2 rejection
 	- New workflow:
 		- Intensity based CF, removal of bad frames and background

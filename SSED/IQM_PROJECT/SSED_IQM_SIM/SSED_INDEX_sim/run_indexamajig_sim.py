@@ -13,21 +13,12 @@ def run_indexamajig(x, y, geomfile_path, cellfile_path, input_path, output_file_
     base_command = (
         f"indexamajig -g {geomfile_path} -i {listfile_path} -o {output_path} -p {cellfile_path} "
         f"-j {num_threads} --indexing={indexing_method} --integration={integration_method}  --int-radius={int_radius} " # --no-check-cell-nocell-nolatt
-        f"--tolerance={tolerance} --min-peaks={min_peaks}  " #--xgandalf-max-peaks=150 --push-res={resolution_push}
+        f"--tolerance={tolerance} --min-peaks={min_peaks} " #--xgandalf-max-peaks=150 --push-res={resolution_push}
         f"--peaks=peakfinder9 --peak-radius=4.0,5.0,7.0 --min-sig=25 --min-snr-biggest-pix=1 --min-snr=1 --local-bg-radius=1 " # --peaks=cxi
         f"--xgandalf-sampling-pitch={xgsp} --xgandalf-grad-desc-iterations={xgi} --xgandalf-tolerance={xgt} " 
         f"--no-half-pixel-shift --no-non-hits-in-stream " # --no-image-data  
-        f" --no-refine --no-revalidate " # --no-check-cell --no-check-peaks --no-retry
+        f"--no-refine --no-revalidate " # --no-check-cell --no-check-peaks --no-retry
     )
 
     subprocess.run(base_command, shell=True, check=True)
 
-
-    # base_command = (
-    #     f"indexamajig -g {geomfile_path} -i {listfile_path} -o {output_path} -j {num_threads} -p {cellfile_path} "
-    #     f"--indexing={indexing_method} --no-revalidate --no-check-peaks --no-retry --push-res={resolution_push} "
-    #     f"--integration={integration_method} --overpredict --no-refine --fromfile-input-file={solfile_path} "
-    #     f"--no-half-pixel-shift --int-radius={int_radius} --no-check-cell --peaks=cxi --max-indexer-threads=4 "
-    #     f"--min-peaks={min_peaks} --xgandalf-tolerance={xgandalf_tolerance} --xgandalf-sampling-pitch={xgandalf_sampling_pitch} "
-    #     f"--xgandalf-grad-desc-iterations={xgandalf_iterations} --tolerance={tolerance} --no-non-hits-in-stream"
-    # )

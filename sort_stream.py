@@ -79,8 +79,8 @@ def write_stream(outfile, header_lines, chunks, trailer_lines):
         outfile.write(line)
 
 def main():
-    default_input = "/home/bubl3932/files/UOX1/UOX_subset/best_results_IQM_SUM_12_12_10_-12_12_-15_10_13_-13.stream"
-    default_output = "/home/bubl3932/files/UOX1/UOX_subset/best_results_sorted.stream"
+    default_input = "/home/bubl3932/files/UOX1/UOX_subset_center_sensitivity_0.2_pixels/best_results_IQM_SUM_12_12_10_-12_12_-15_10_13_-13.stream"
+    default_output = "/home/bubl3932/files/UOX1/UOX_subset_center_sensitivity_0.2_pixels/best_results_sorted.stream"
 
     if len(sys.argv) == 1:
         input_file = default_input

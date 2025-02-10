@@ -126,6 +126,6 @@ def plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=4):
     gc.collect()
 
 # Example usage:
-csv_file_path = "/home/bubl3932/files/UOX1/UOX_subset_center_sensitivity_0.2_pixels/combined_metrics_IQM_SUM_12_12_10_-12_12_-15_10_13_-13.csv"
+csv_file_path = "/home/bubl3932/files/UOX_sim/combined_simulations_P-1_mee_0_0003_angres_5/IQM_10_10_10_-10_10_-10_10_10_-10/IQM_values.csv"
 
 plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=23)  # Adjust max_workers based on available CPU cores

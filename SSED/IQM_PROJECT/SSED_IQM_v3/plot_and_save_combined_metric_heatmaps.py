@@ -10,7 +10,7 @@ from tqdm import tqdm
 # Use 'Agg' backend to optimize for saving without rendering
 matplotlib.use('Agg')
 
-def generate_heatmap(event_number, group, x_coords, y_coords, combined_metric_min, combined_metric_max, global_mean_combined_metric, output_folder):
+def generate_heatmap(event_number, group, x_coords, y_coords, combined_metric_min, combined_metric_max, global_mean_combined_metric, global_std_combined_metric, output_folder):
     """
     Function to generate and save a heatmap for a given event number.
     
@@ -40,10 +40,14 @@ def generate_heatmap(event_number, group, x_coords, y_coords, combined_metric_mi
         cmap='viridis', 
         origin='lower', 
         extent=[min(x_coords), max(x_coords), min(y_coords), max(y_coords)],
-        vmin=0,  # Set global minimum combined metric value for color scaling
-        vmax=2*global_mean_combined_metric   # Set global maximum combined metric value for color scaling
+        # vmin=-1*global_mean_combined_metric,  # Set global minimum combined metric value for color scaling
+        # vmax=1*global_mean_combined_metric   # Set global maximum combined metric value for color scaling
+        # vmin=combined_metric_min,  # Set global minimum combined metric value for color scaling
+        # vmax=combined_metric_max   # Set global maximum combined metric value for color scaling
+        vmin=global_mean_combined_metric-2*global_std_combined_metric,  # Set global minimum combined metric value for color scaling
+        vmax=global_mean_combined_metric+2*global_std_combined_metric   # Set global maximum combined metric value for color scaling
     )
-    plt.colorbar(label='Combined Metric', ticks=np.linspace(0, 2*global_mean_combined_metric, 10))  # Limit colorbar ticks
+    plt.colorbar(label='Combined Metric')#, ticks=np.linspace(vmin, global_std_combined_metric, vmax))  # Limit colorbar ticks
     plt.title(f'Combined Metric Heatmap for Event Number {event_number}')
     plt.xlabel('X Coordinate')
     plt.ylabel('Y Coordinate')
@@ -94,7 +98,14 @@ def plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=4):
     # Find the global min and max values for combined metric (for consistent color scaling)
     combined_metric_min, combined_metric_max = df['combined_metric'].min(), df['combined_metric'].max()
     global_mean_combined_metric = df['combined_metric'].mean()  # Calculate the mean combined metric for the entire dataset
+    global_median_combined_metric = df['combined_metric'].median()  # Calculate the mean combined metric for the entire dataset
+    global_std_combined_metric = df['combined_metric'].std()  # Calculate the mean combined metric for the entire dataset
 
+    print(f"Combined minimum: {combined_metric_min}")
+    print(f"Combined maximum: {combined_metric_max}")
+    print(f"Global mean: {global_mean_combined_metric}")
+    print(f"Global median: {global_median_combined_metric}")
+    print(f"Global std: {global_std_combined_metric}")    
     # Group the data by event_number
     grouped = df.groupby('event_number')
 
@@ -104,7 +115,7 @@ def plot_and_save_combined_metric_heatmaps(csv_file_path, max_workers=4):
         for event_number, group in grouped:
             # Submit each task (heatmap generation) to the pool
             futures.append(
-                executor.submit(generate_heatmap, event_number, group, x_coords, y_coords, combined_metric_min, combined_metric_max, global_mean_combined_metric, output_folder)
+                executor.submit(generate_heatmap, event_number, group, x_coords, y_coords, combined_metric_min, combined_metric_max, global_mean_combined_metric, global_std_combined_metric, output_folder)
             )
         
         # Display progress using tqdm

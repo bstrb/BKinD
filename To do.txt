@@ -36,7 +36,7 @@
 	- xGandalf algorithm for ED (prev xray)
 	- Fine tune IQM
 	- Workflow PDF
-	- Merging h5 files
+	# Merging h5 files
 	- Pass center from best results to .h5
 	- Handle multiple phases
 	- Find center with circles

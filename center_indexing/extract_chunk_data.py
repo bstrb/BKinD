@@ -11,40 +11,39 @@ def extract_chunk_data(chunk, original_cell_params, tolerance=1.0):
         print("No event number found in chunk.")
 
     # # Extract peak list
-    peak_list_match = re.search(r'Peaks from peak search(.*?)End of peak list', chunk, re.S)
-    if peak_list_match:
-        peaks = re.findall(r'\s+(\d+\.\d+)\s+(\d+\.\d+)\s+[\d.]+\s+[\d.]+\s+p0', peak_list_match.group(1))
-        fs_ss = [(float(fs), float(ss)) for fs, ss in peaks]
-        intensities = []  # Intensities are not used in matching, so we can omit them here
-        if not peaks:
-            print("No peaks found in chunk.")
-    else:
-        fs_ss = []
-        print("No peak list found in chunk.")
-
-
-    # # Extract peak list with intensities
     # peak_list_match = re.search(r'Peaks from peak search(.*?)End of peak list', chunk, re.S)
     # if peak_list_match:
-    #     # Regex captures: fs/px, ss/px, (1/d)/nm^-1, Intensity for panel p0
-    #     peaks = re.findall(
-    #         r'\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+p0', 
-    #         peak_list_match.group(1)
-    #     )
-    #     fs_ss = []
-    #     intensities = []
-        
-    #     for fs, ss, one_over_d, I in peaks:
-    #         fs_ss.append((float(fs), float(ss)))
-    #         intensities.append(float(I))
-        
+    #     peaks = re.findall(r'\s+(\d+\.\d+)\s+(\d+\.\d+)\s+[\d.]+\s+[\d.]+\s+p0', peak_list_match.group(1))
+    #     fs_ss = [(float(fs), float(ss)) for fs, ss in peaks]
+    #     intensities = []  # Intensities are not used in matching, so we can omit them here
     #     if not peaks:
     #         print("No peaks found in chunk.")
     # else:
     #     fs_ss = []
-    #     intensities = []
     #     print("No peak list found in chunk.")
+
+    # Extract peak list with intensities
+    peak_list_match = re.search(r'Peaks from peak search(.*?)End of peak list', chunk, re.S)
+    if peak_list_match:
+        # Regex captures: fs/px, ss/px, (1/d)/nm^-1, Intensity for panel p0
+        peaks = re.findall(
+            r'\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+p0', 
+            peak_list_match.group(1)
+        )
+        fs_ss = []
+        intensities = []
         
+        for fs, ss, one_over_d, I in peaks:
+            fs_ss.append((float(fs), float(ss)))
+            intensities.append(float(I))
+        
+        if not peaks:
+            print("No peaks found in chunk.")
+    else:
+        fs_ss = []
+        intensities = []
+        print("No peak list found in chunk.")
+
     # Extract reflections
     reflections_match = re.search(r'Reflections measured after indexing(.*?)End of reflections', chunk, re.S)
     if reflections_match:

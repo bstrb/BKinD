@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
 # Load your data
-csv_path = "/home/bubl3932/files/UOX1/UOX_subset/combined_metrics_IQM_SUM_12_12_10_-12_12_-15_10_13_-13.csv"
+csv_path = "/home/bubl3932/files/UOX1/UOX1_original_IQM/combined_metrics_IQM_SUM_10_10_10_-10_10_-10_10_10_-10.csv"
 
 df = pd.read_csv(csv_path)
 

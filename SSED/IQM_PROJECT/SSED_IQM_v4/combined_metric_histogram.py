@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Path to your CSV file
-csv_path = "/home/bubl3932/files/UOX1/UOX1_original_IQM/combined_metrics_IQM_SUM_10_12_10_-12_12_-15_10_13_-13.csv"
+csv_path = "/home/bubl3932/files/UOX1/UOX_subset/combined_metrics_IQM_SUM_12_12_10_-12_12_-15_10_13_-13.csv"
 # Load the CSV file into a DataFrame
 df = pd.read_csv(csv_path)
 

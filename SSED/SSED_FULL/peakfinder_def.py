@@ -147,5 +147,6 @@ def find_files_and_run_peakfinding(folder_path, x0, y0, threshold, min_snr, min_
     """
     for filename in fnmatch.filter(os.listdir(folder_path), '*.h5'):
         filepath = os.path.join(folder_path, filename)
+        print(f"Processing {filepath}")
         # Call your processing function
         findpeaks(filepath, x0, y0, threshold, min_snr, min_pix_count, max_pix_count, local_bg_radius, min_res, max_res)

@@ -22,5 +22,5 @@ def print_h5_structure_details(file_path):
 
 if __name__ == "__main__":
     # Example usage
-    file_path = "/home/buster/UOX12/UOX1_minpeaks_15.h5"
+    file_path = "/home/bubl3932/files/MFM300_VIII/MFM300_VIII_spot9_20250408_1441/MFM300_VIII_spot9_20250408_1441.h5"
     print_h5_structure_details(file_path)

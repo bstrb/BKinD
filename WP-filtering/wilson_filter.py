@@ -20,12 +20,13 @@ Filtering:
 - score each reflection by normalized abs residual in log-space within its bin
 - remove top fraction per iteration
 - stop on patience/min improvement or min_keep_frac
+- OUTPUT .hkl is written from the BEST Wilson score (not necessarily the last iteration)
 
-Usage:
-  python wilson_filter_hkl.py --ins input.ins --hkl input.hkl --out filtered.hkl --plot wilson.png
-
-Optional:
-  --plot_each_dir wilson_iter_plots    # save plot every iteration as wilson_iter_0001.png, ...
+Plotting (single flag):
+  --plot
+    If set, writes binned + unbinned plots for EACH iteration and final
+    into a subfolder next to the input .hkl:
+      <hkl_dir>/wilson_iter_plots/
 """
 
 from __future__ import annotations
@@ -98,7 +99,18 @@ def read_hkl(hkl_path: str) -> List[Refl]:
                 continue
             extra = parts[5:]
             is_term = (h == 0 and k == 0 and l == 0 and abs(fo2) < 1e-12 and abs(sig) < 1e-12)
-            refls.append(Refl(h=h, k=k, l=l, fo2=fo2, sig=sig, extra=extra, raw_line=raw, is_terminator=is_term))
+            refls.append(
+                Refl(
+                    h=h,
+                    k=k,
+                    l=l,
+                    fo2=fo2,
+                    sig=sig,
+                    extra=extra,
+                    raw_line=raw,
+                    is_terminator=is_term,
+                )
+            )
     return refls
 
 
@@ -106,11 +118,14 @@ def metric_tensor(cell: Cell) -> np.ndarray:
     a, b, c = cell.a, cell.b, cell.c
     ar, br, gr = math.radians(cell.alpha), math.radians(cell.beta), math.radians(cell.gamma)
     ca, cb, cg = math.cos(ar), math.cos(br), math.cos(gr)
-    return np.array([
-        [a*a, a*b*cg, a*c*cb],
-        [a*b*cg, b*b, b*c*ca],
-        [a*c*cb, b*c*ca, c*c]
-    ], dtype=float)
+    return np.array(
+        [
+            [a * a, a * b * cg, a * c * cb],
+            [a * b * cg, b * b, b * c * ca],
+            [a * c * cb, b * c * ca, c * c],
+        ],
+        dtype=float,
+    )
 
 
 def reciprocal_metric_tensor(cell: Cell) -> np.ndarray:
@@ -266,10 +281,8 @@ def wilson_outlier_scores(
 
     # Build bin assignment for eligible idx
     s2_elig = []
-    fo2_elig = []
     for i in idx:
         s2_elig.append(s2_for_hkl(refls[i], Gstar))
-        fo2_elig.append(refls[i].fo2)
     s2_elig = np.array(s2_elig, dtype=float)
 
     edges = make_equal_count_bins(s2_elig, nbins)
@@ -313,6 +326,53 @@ def plot_wilson(x_bins, y_bins, m, c, out_png: str, title: str) -> None:
     plt.close()
 
 
+def plot_wilson_unbinned(
+    refls: List[Refl],
+    keep: np.ndarray,
+    nonterm: np.ndarray,
+    Gstar: np.ndarray,
+    m: float,
+    c: float,
+    out_png: str,
+    title: str,
+) -> None:
+    import matplotlib.pyplot as plt
+
+    n = len(refls)
+    s2 = np.full(n, np.nan, dtype=float)
+    fo2 = np.full(n, np.nan, dtype=float)
+
+    for i, r in enumerate(refls):
+        if r.is_terminator:
+            continue
+        s2[i] = s2_for_hkl(r, Gstar)
+        fo2[i] = r.fo2
+
+    ok = nonterm & np.isfinite(s2) & np.isfinite(fo2) & (fo2 > 0.0)
+    if not np.any(ok):
+        return
+
+    x = s2[ok]
+    y = np.log(np.clip(fo2[ok], 1e-300, None))
+    km = keep[ok]
+
+    plt.figure()
+    plt.scatter(x[km], y[km], s=6, alpha=0.25, marker="o", label="kept")
+    plt.scatter(x[~km], y[~km], s=10, alpha=0.7, marker="x", label="removed")
+
+    xline = np.linspace(float(np.min(x)), float(np.max(x)), 200)
+    yline = m * xline + c
+    plt.plot(xline, yline, linewidth=2, label="fit")
+
+    plt.xlabel(r"$s^2 = (\sin\theta/\lambda)^2$ (1/$\AA^2$)")
+    plt.ylabel(r"$\ln(F_o^2)$ (per reflection)")
+    plt.title(title)
+    plt.legend(loc="best", fontsize=8)
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=200)
+    plt.close()
+
+
 def write_hkl(refls: List[Refl], keep: np.ndarray, out_path: str) -> None:
     with open(out_path, "w") as f:
         for i, r in enumerate(refls):
@@ -331,17 +391,21 @@ def main() -> None:
     ap.add_argument("--ins", required=True)
     ap.add_argument("--hkl", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--plot", default=None, help="Write final Wilson plot PNG to this path")
-    ap.add_argument("--plot_each_dir", default=None, help="If set, save Wilson plot each iteration into this directory")
-    ap.add_argument("--iters", type=int, default=30)
-    ap.add_argument("--remove_frac", type=float, default=0.002)
+    ap.add_argument(
+        "--plot",
+        action="store_true",
+        help="If set, write binned+unbinned Wilson plots for each iteration and final into "
+             "'wilson_iter_plots/' next to the input .hkl",
+    )
+    ap.add_argument("--iters", type=int, default=50)
+    ap.add_argument("--remove_frac", type=float, default=0.01)
     ap.add_argument("--min_keep_frac", type=float, default=0.85)
-    ap.add_argument("--bins", type=int, default=60)
-    ap.add_argument("--fit_lo_q", type=float, default=0.05)
-    ap.add_argument("--fit_hi_q", type=float, default=0.95)
+    ap.add_argument("--bins", type=int, default=20)
+    ap.add_argument("--fit_lo_q", type=float, default=0.00)
+    ap.add_argument("--fit_hi_q", type=float, default=1.00)
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--patience", type=int, default=5)
-    ap.add_argument("--min_improve", type=float, default=1e-4)
+    ap.add_argument("--patience", type=int, default=10)
+    ap.add_argument("--min_improve", type=float, default=1e-5)
     args = ap.parse_args()
 
     cell = parse_cell_from_ins(args.ins)
@@ -355,23 +419,32 @@ def main() -> None:
 
     keep = np.ones(len(refls), dtype=bool)
     keep[~nonterm] = True  # keep terminator lines always
-
     init_kept = int(np.sum(keep & nonterm))
 
-    print(f"# Parsed CELL: lambda={cell.lam} Å, a={cell.a}, b={cell.b}, c={cell.c}, "
-          f"alpha={cell.alpha}, beta={cell.beta}, gamma={cell.gamma}")
+    # Plot directory (next to input HKL)
+    hkl_dir = os.path.dirname(os.path.abspath(args.hkl))
+    plot_dir = os.path.join(hkl_dir, "wilson_iter_plots")
+    if args.plot:
+        os.makedirs(plot_dir, exist_ok=True)
+
+    print(
+        f"# Parsed CELL: lambda={cell.lam} Å, a={cell.a}, b={cell.b}, c={cell.c}, "
+        f"alpha={cell.alpha}, beta={cell.beta}, gamma={cell.gamma}"
+    )
     print(f"# Starting reflections (non-terminator): {n_total}")
-    print(f"# Settings: bins={args.bins}, remove_frac={args.remove_frac}, min_keep_frac={args.min_keep_frac}, "
-          f"iters={args.iters}, fit_lo_q={args.fit_lo_q}, fit_hi_q={args.fit_hi_q}")
+    print(
+        f"# Settings: bins={args.bins}, remove_frac={args.remove_frac}, min_keep_frac={args.min_keep_frac}, "
+        f"iters={args.iters}, fit_lo_q={args.fit_lo_q}, fit_hi_q={args.fit_hi_q}"
+    )
     print("# Columns: iter  kept  removed_this_iter  wilson_score")
 
-    if args.plot_each_dir:
-        os.makedirs(args.plot_each_dir, exist_ok=True)
-
     best_score = float("inf")
+    best_iter = 0
+    best_keep = keep.copy()
     no_improve = 0
 
     for it in range(1, args.iters + 1):
+        # Score current keep-set BEFORE removing anything this iteration
         score, z, s2, yhat, x_bins, y_bins, m, c = wilson_outlier_scores(
             refls=refls,
             keep=keep,
@@ -391,34 +464,73 @@ def main() -> None:
 
         n_remove = max(1, int(math.floor(args.remove_frac * n_elig)))
 
+        # Choose removals, but do not apply yet (so score printed corresponds to the current keep-set)
         order = np.argsort(z[eligible_idx])[::-1]
         to_remove = eligible_idx[order[:n_remove]]
-        keep[to_remove] = False
 
         kept_now = int(np.sum(keep & nonterm))
         print(f"{it:4d}  {kept_now:6d}  {n_remove:16d}  {score:.6f}")
 
-        if args.plot_each_dir:
-            out_png = os.path.join(args.plot_each_dir, f"wilson_iter_{it:04d}.png")
-            plot_wilson(x_bins, y_bins, m, c, out_png, title=f"Wilson plot (iter {it}, score={score:.4g})")
+        # Plots for the current keep-set (before applying this iteration's removals)
+        if args.plot:
+            out_binned = os.path.join(plot_dir, f"wilson_binned_iter_{it:04d}.png")
+            plot_wilson(x_bins, y_bins, m, c, out_binned, title=f"Wilson binned (iter {it}, score={score:.4g})")
 
+            out_unbinned = os.path.join(plot_dir, f"wilson_unbinned_iter_{it:04d}.png")
+            plot_wilson_unbinned(
+                refls=refls,
+                keep=keep,
+                nonterm=nonterm,
+                Gstar=Gstar,
+                m=m,
+                c=c,
+                out_png=out_unbinned,
+                title=f"Wilson unbinned (iter {it}, score={score:.4g})",
+            )
+
+        # Update "best" snapshot from the score of the CURRENT keep-set
+        # prev_best = best_score
+        # improved = (prev_best - score) >= args.min_improve
+        # improved = (best_score - score) >= args.min_improve
+        is_new_best = score + 1e-15 < best_score
+        improved = is_new_best or ((best_score - score) >= args.min_improve)
+
+
+
+        if score + 1e-15 < best_score:
+            best_score = score
+            best_iter = it
+            best_keep = keep.copy()
+
+        if improved:
+            no_improve = 0
+        else:
+            no_improve += 1
+            if no_improve >= args.patience:
+                print(
+                    f"# Stop: no significant improvement for {args.patience} iterations "
+                    f"(min_improve={args.min_improve})"
+                )
+                break
+
+        # Stopping checks based on fraction kept (current keep-set)
         frac_kept = kept_now / max(1, init_kept)
         if frac_kept < args.min_keep_frac:
             print(f"# Stop: kept fraction {frac_kept:.3f} < min_keep_frac {args.min_keep_frac}")
             break
 
-        if best_score - score >= args.min_improve:
-            best_score = score
-            no_improve = 0
-        else:
-            no_improve += 1
-            if no_improve >= args.patience:
-                print(f"# Stop: no significant improvement for {args.patience} iterations "
-                      f"(min_improve={args.min_improve})")
-                break
+        # Apply removals to get the next keep-set
+        keep[to_remove] = False
 
-    # Final plot on final kept set
+
+    # Use BEST keep-set for output HKL and final plots
+    keep = best_keep
+    kept_final = int(np.sum(keep & nonterm))
+    print(f"# Best Wilson score: {best_score:.6f} at iter {best_iter}")
+    print(f"# Using best-scoring keep-set for output: kept {kept_final} / {n_total} ({kept_final/n_total:.3f})")
+
     if args.plot:
+        # Recompute model for best keep-set, then write final plots
         score, z, s2, yhat, x_bins, y_bins, m, c = wilson_outlier_scores(
             refls=refls,
             keep=keep,
@@ -428,19 +540,31 @@ def main() -> None:
             fit_hi_q=args.fit_hi_q,
             seed=args.seed + 9999,
         )
-        plot_wilson(x_bins, y_bins, m, c, args.plot, title=f"Wilson plot (final, score={score:.4g})")
+
+        out_binned = os.path.join(plot_dir, "wilson_binned_final.png")
+        plot_wilson(x_bins, y_bins, m, c, out_binned, title=f"Wilson binned (final/best, score={score:.4g})")
+
+        out_unbinned = os.path.join(plot_dir, "wilson_unbinned_final.png")
+        plot_wilson_unbinned(
+            refls=refls,
+            keep=keep,
+            nonterm=nonterm,
+            Gstar=Gstar,
+            m=m,
+            c=c,
+            out_png=out_unbinned,
+            title=f"Wilson unbinned (final/best, score={score:.4g})",
+        )
 
     write_hkl(refls, keep, args.out)
-    kept_final = int(np.sum(keep & nonterm))
     print(f"# Wrote: {args.out}")
     print(f"# Final kept reflections (non-terminator): {kept_final} / {n_total}  ({kept_final/n_total:.3f})")
     if args.plot:
-        print(f"# Wrote: {args.plot}")
-    if args.plot_each_dir:
-        print(f"# Wrote per-iteration plots to: {args.plot_each_dir}")
+        print(f"# Wrote plots to: {plot_dir}")
 
 
 if __name__ == "__main__":
     main()
 
-# python wilson_filter.py --ins /home/bubl3932/files/FeAcAc/FeAcAc_11.ins --hkl /home/bubl3932/files/FeAcAc/FeAcAc_11.hkl --out /home/bubl3932/files/FeAcAc/FeAcAc_11_wp_filtered.hkl --plot /home/bubl3932/files/FeAcAc/FeAcAc_11_wp_filtered.png --plot_each_dir /home/bubl3932/files/FeAcAc/wilson_iters --remove_frac 0.001 --patience 8
+# Example:
+# python wilson_filter.py --ins /Users/xiaodong/Desktop/LTA1/shelx/t1_no-error-model.ins --hkl /Users/xiaodong/Desktop/LTA1/shelx/t1_no-error-model.hkl --out /Users/xiaodong/Desktop/LTA1/shelx/t1_no-error-model_wp_filtered.hkl --plot

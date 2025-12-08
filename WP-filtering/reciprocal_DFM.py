@@ -28,6 +28,10 @@ from dataclasses import dataclass
 from typing import Tuple
 
 import numpy as np
+from cctbx import crystal, xray
+from cctbx import sgtbx
+from cctbx import miller
+from cctbx.array_family import flex
 
 # ---------- parsing: SHELX .ins/.res cell ----------
 def parse_shelx_cell(ins_path: str) -> Tuple[float, float, float, float, float, float]:
@@ -144,7 +148,6 @@ def d_spacing_from_hkl(h, k, l, cell) -> np.ndarray:
         d = 1.0 / np.sqrt(inv_d2)
     return d
 
-
 # ---------- cctbx: Fc^2 for given HKLs ----------
 def element_from_label(label: str) -> str:
     m = re.match(r"^([A-Za-z]{1,2})", label.strip())
@@ -161,10 +164,6 @@ def compute_fc2_with_cctbx(ins_path: str, h: np.ndarray, k: np.ndarray, l: np.nd
       - SFAC may contain electron scattering params (numeric), so we infer element from atom label.
       - Use electron scattering table.
     """
-    from cctbx import crystal, xray
-    from cctbx import sgtbx
-    from cctbx import miller
-    from cctbx.array_family import flex
 
     def parse_cell_line(line: str):
         p = line.split()
@@ -286,51 +285,66 @@ def dfm_values(fo2: np.ndarray, fc2: np.ndarray, sig_fo2: np.ndarray, u: float) 
     denom = np.sqrt(sig_fo2**2 + (2.0 * u * fc2)**2)
     denom = np.where(denom == 0.0, np.nan, denom)
     return (fo2 - fc2) / denom
+def solve_u_mean_equals_median_bounded(fo2, fc2, sig_fo2, u_min=0.0, u_max=0.1) -> float:
+    """
+    Solve for u in [u_min, u_max] such that mean(DFM(u)) - median(DFM(u)) = 0.
 
-def solve_u_mean_equals_median(fo2, fc2, sig_fo2) -> float:
+    If no root exists in [u_min, u_max], returns the u in [u_min, u_max]
+    that minimizes |mean(DFM)-median(DFM)| (robust fallback).
+
+    This prevents runaway u (e.g. 1e6).
     """
-    Finds u >= 0 such that mean(DFM(u)) - median(DFM(u)) = 0.
-    Uses a bracket+bisect strategy if possible; otherwise falls back to minimizing |diff|.
-    """
-    def diff(u):
+    u_min = float(u_min)
+    u_max = float(u_max)
+    if not (np.isfinite(u_min) and np.isfinite(u_max) and u_min >= 0 and u_max > u_min):
+        raise ValueError(f"Bad bounds: u_min={u_min}, u_max={u_max}")
+
+    def diff(u: float) -> float:
         v = dfm_values(fo2, fc2, sig_fo2, u)
         v = v[np.isfinite(v)]
         if v.size == 0:
             return np.nan
         return float(np.mean(v) - np.median(v))
 
-    u_lo = 0.0
-    f_lo = diff(u_lo)
+    f_lo = diff(u_min)
+    f_hi = diff(u_max)
 
-    u_hi = 1.0
-    f_hi = diff(u_hi)
-    expansions = 0
-    while (not np.isfinite(f_lo) or not np.isfinite(f_hi) or f_lo * f_hi > 0) and expansions < 25:
-        u_hi *= 2.0
-        f_hi = diff(u_hi)
-        expansions += 1
+    # If either endpoint is NaN, fall back to grid-search
+    if not (np.isfinite(f_lo) and np.isfinite(f_hi)):
+        grid = np.linspace(u_min, u_max, 400)
+        vals = np.array([abs(diff(u)) if np.isfinite(diff(u)) else np.inf for u in grid])
+        return float(grid[int(np.argmin(vals))])
 
-    if np.isfinite(f_lo) and np.isfinite(f_hi) and f_lo * f_hi <= 0:
+    # If sign change exists, bisect
+    if f_lo == 0.0:
+        return u_min
+    if f_hi == 0.0:
+        return u_max
+
+    if f_lo * f_hi < 0:
+        lo, hi = u_min, u_max
+        flo, fhi = f_lo, f_hi
         for _ in range(80):
-            u_mid = 0.5 * (u_lo + u_hi)
-            f_mid = diff(u_mid)
-            if not np.isfinite(f_mid):
-                u_lo = u_mid
+            mid = 0.5 * (lo + hi)
+            fmid = diff(mid)
+            if not np.isfinite(fmid):
+                # shrink interval cautiously
+                lo = mid
+                flo = fmid
                 continue
-            if abs(f_mid) < 1e-8:
-                return u_mid
-            if f_lo * f_mid <= 0:
-                u_hi, f_hi = u_mid, f_mid
+            if abs(fmid) < 1e-10:
+                return mid
+            if flo * fmid <= 0:
+                hi, fhi = mid, fmid
             else:
-                u_lo, f_lo = u_mid, f_mid
-        return 0.5 * (u_lo + u_hi)
+                lo, flo = mid, fmid
+        return 0.5 * (lo + hi)
 
-    grid = np.logspace(-6, 6, 400)
-    vals = np.array([abs(diff(u)) if np.isfinite(diff(u)) else np.inf for u in grid])
-    best = float(grid[int(np.argmin(vals))])
-    if np.isfinite(f_lo) and abs(f_lo) <= np.min(vals):
-        best = 0.0
-    return best
+    # No sign change: minimize |diff| over the bounded interval
+    grid = np.linspace(u_min, u_max, 800)
+    vals = np.array([abs(diff(u)) for u in grid])
+    best_idx = int(np.nanargmin(vals))
+    return float(grid[best_idx])
 
 
 # ---------- optional: robust resolution scaling ----------
@@ -447,6 +461,10 @@ def main():
     # u options
     ap.add_argument("--u", type=float, default=None,
                     help="Override u (otherwise solve u so mean(DFM)=median(DFM))")
+    ap.add_argument("--u-min", type=float, default=0.005,
+                    help="Lower bound for solving u (default: 0.005)")
+    ap.add_argument("--u-max", type=float, default=0.5,
+                    help="Upper bound for solving u (default: 0.5)")
 
     args = ap.parse_args()
 
@@ -469,9 +487,10 @@ def main():
 
     # u
     if args.u is None:
-        u = solve_u_mean_equals_median(fo2, fc2, sig)
+        u = solve_u_mean_equals_median_bounded(fo2, fc2, sig, u_min=args.u_min, u_max=args.u_max)
     else:
         u = float(args.u)
+
 
     dfm = dfm_values(fo2, fc2, sig, u)
     dfm_f = dfm[np.isfinite(dfm)]

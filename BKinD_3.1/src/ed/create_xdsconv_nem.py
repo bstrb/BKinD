@@ -14,7 +14,8 @@ def create_xdsconv_nem(target_directory):
     Returns:
     - None, but creates file in the target directory.
     """
-    xdsconv_file_path = os.path.join(target_directory, 'xdsconv.inp')
+    # xdsconv_file_path = os.path.join(target_directory, 'xdsconv.inp')
+    xdsconv_file_path = os.path.join(target_directory, "XDSCONV.INP")
 
     # Create the xdsconv.inp file
     with open(xdsconv_file_path, 'w') as xdsconv_file:

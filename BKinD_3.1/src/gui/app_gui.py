@@ -88,7 +88,7 @@ class App:
         self.browse_directory(
             self.xds_dir,
             self.check_xds_files,
-            "The selected XDS directory must contain the following files: INTEGRATE.HKL, XDS_ASCII.HKL, and xds.inp. Please select a valid directory."
+            "The selected XDS directory must contain the following files: INTEGRATE.HKL, XDS_ASCII.HKL, and XDS.INP. Please select a valid directory."
         )
 
     def browse_shelx(self, xray=False):
@@ -104,7 +104,7 @@ class App:
         )
 
     def check_xds_files(self, directory):
-        required_files = ['INTEGRATE.HKL', 'XDS_ASCII.HKL', 'xds.inp']
+        required_files = ['INTEGRATE.HKL', 'XDS_ASCII.HKL', 'XDS.INP']
         return all(os.path.exists(os.path.join(directory, f)) for f in required_files)
 
     def check_shelx_files(self, directory):

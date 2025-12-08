@@ -12,9 +12,9 @@ def create_xdsconv(target_directory):
     - target_directory: str, the directory where the xdsconv.inp file will be saved.
 
     Returns:
-    - The path to the created xdsconv.inp file.
+    - The path to the created XDSCONV.INP file.
     """
-    xdsconv_file_path = os.path.join(target_directory, 'xdsconv.inp')
+    xdsconv_file_path = os.path.join(target_directory, "XDSCONV.INP")
     
     with open(xdsconv_file_path, 'w') as xdsconv_file:
         xdsconv_file.write("INPUT_FILE=XDS_ASCII.HKL\n")

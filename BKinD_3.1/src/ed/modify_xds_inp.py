@@ -8,7 +8,8 @@ def modify_xds_inp(target_directory):
     is also commented out, and the line starting with 'STRONG_PIXEL' is commented out.
     """
     
-    file_path = os.path.join(target_directory, 'xds.inp')
+    # file_path = os.path.join(target_directory, 'xds.inp')
+    file_path = os.path.join(target_directory, "XDS.INP")
     with open(file_path, 'r') as file:
         lines = file.readlines()
 

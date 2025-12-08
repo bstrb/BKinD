@@ -41,7 +41,8 @@ def process_filtering_results(output_folder, target_percentages, xds_directory, 
                 convert_csv_to_hkl(data_dir)
             else:
                 copy_and_reduce_hkl(output_folder, data_dir)
-                manage_files('copy', xds_directory, data_dir, filename='xds.inp')
+                # manage_files('copy', xds_directory, data_dir, filename='xds.inp')
+                manage_files('copy', xds_directory, data_dir, filename='XDS.INP')
                 modify_xds_inp(data_dir)
                 create_xdsconv(data_dir)
                 run_process(["xds"], data_dir, suppress_output=True)

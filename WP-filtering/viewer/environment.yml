@@ -1,0 +1,9 @@
+name: dfmviewer
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - dash>=3.0
+  - pandas
+  - plotly
+  - pillow

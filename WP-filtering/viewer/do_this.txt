@@ -1,0 +1,1 @@
+put sample_df_no_filter.csv and images folder containing .pngs in this dir then run ./run_viewer.sh

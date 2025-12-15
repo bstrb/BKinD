@@ -174,7 +174,8 @@ def scale_xds_ascii_file(in_path: str, out_path: str,
                     s = 1.0 / w   # invert for negative DFM
 
             parts[3] = f"{I*s:.3E}"
-            parts[4] = f"{sig*s:.3E}"
+            # parts[4] = f"{sig*s:.3E}"
+            parts[4] = f"{sig:.3E}"
 
             if len(parts) == len(column_widths):
                 out_lines.append(format_line(parts, column_widths) + "\n")
@@ -468,7 +469,8 @@ def scale_shelx_hkl_file(in_path: str, out_path: str,
                     s = 1.0 / w
 
             I_new = I * s
-            sig_new = sig * s
+            # sig_new = sig * s
+            sig_new = sig 
 
             fout.write(f"{h:4d}{k:4d}{l:4d}{I_new:8.2f}{sig_new:8.2f}{tail}\n")
             n_scaled += 1

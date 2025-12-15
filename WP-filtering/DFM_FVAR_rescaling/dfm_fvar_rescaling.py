@@ -374,52 +374,50 @@ def build_sample_df_with_dfm(iter_dir: str, inte_path: str, initial_u: float) ->
 # -----------------------------
 # SHELX HKL scaling
 # -----------------------------
-def scale_shelx_hkl_file(in_path: str, out_path: str, hkl_to_factor: dict[tuple[int,int,int], float], default_factor: float):
-    """
-    Scale HKLF-like lines:
-      h k l I sig [rest...]
-    using factor (I_new=I*factor; sig_new=sig*factor).
-    Leaves comment/header lines unchanged.
-    """
-    def format_line_out(h: int, k: int, l: int, I: float, sig: float, rest_tokens: list[str]) -> str:
-        core = f"{h:4d}{k:4d}{l:4d}{I:14.6E}{sig:14.6E}"
-        if rest_tokens:
-            return core + " " + " ".join(rest_tokens) + "\n"
-        return core + "\n"
+def scale_shelx_hkl_file(in_path: str, out_path: str,
+                         hkl_to_factor: dict[tuple[int,int,int], float],
+                         default_factor: float):
 
     n_scaled = 0
     n_lines = 0
+
     with open(in_path, "r") as fin, open(out_path, "w") as fout:
         for line in fin:
             n_lines += 1
-            s = line.rstrip("\n")
-            if not s.strip() or s.lstrip().startswith(("!", "#")):
-                fout.write(line if line.endswith("\n") else (line + "\n"))
+
+            # Keep comments/blank
+            if not line.strip() or line.lstrip().startswith(("!", "#")):
+                fout.write(line)
                 continue
 
-            parts = s.split()
-            if len(parts) < 5:
-                fout.write(line if line.endswith("\n") else (line + "\n"))
-                continue
-
+            # Try strict SHELX fixed columns: 3I4,2F8.2 plus tail
             try:
-                h, k, l = map(int, parts[:3])
-                I = float(parts[3])
-                sig = float(parts[4])
-            except ValueError:
-                fout.write(line if line.endswith("\n") else (line + "\n"))
-                continue
+                h = int(line[0:4]); k = int(line[4:8]); l = int(line[8:12])
+                I = float(line[12:20]); sig = float(line[20:28])
+                tail = line[28:].rstrip("\n")
+            except Exception:
+                # Fallback: whitespace parse, but still write fixed widths
+                parts = line.split()
+                if len(parts) < 5:
+                    fout.write(line)
+                    continue
+                try:
+                    h, k, l = map(int, parts[:3])
+                    I = float(parts[3]); sig = float(parts[4])
+                    tail = ""  # don't guess tail in fallback
+                except Exception:
+                    fout.write(line)
+                    continue
 
-            # Keep terminator as-is if present
             if (h, k, l) == (0, 0, 0):
-                fout.write(line if line.endswith("\n") else (line + "\n"))
+                fout.write(line)
                 continue
 
             factor = hkl_to_factor.get((h, k, l), default_factor)
             I_new = I * factor
             sig_new = sig * factor
-            rest = parts[5:] if len(parts) > 5 else []
-            fout.write(format_line_out(h, k, l, I_new, sig_new, rest))
+
+            fout.write(f"{h:4d}{k:4d}{l:4d}{I_new:8.2f}{sig_new:8.2f}{tail}\n")
             n_scaled += 1
 
     return n_scaled, n_lines
@@ -609,11 +607,18 @@ def iterative_dfm_filter_rescale_and_final_validate(
     print(f"Saved remaining HKLs: {remaining_csv}")
     print(f"Final FVAR used for remaining reflections: {final_fvar:.6g}")
 
-    # Build HKL -> factor mapping for removed reflections
+    # Build HKL -> FVAR_at_removal mapping for removed reflections
     removed_map: dict[tuple[int, int, int], float] = {}
     for row in removal_rows:
-        # last assignment wins if somehow removed twice
         removed_map[(row["h"], row["k"], row["l"])] = float(row["FVAR_at_removal"])
+
+    # Normalize scale factors to avoid blowing up I/SIG:
+    # scale(hkl) = FVAR_at_removal / FVAR_max   (removed)
+    # scale(default) = final_fvar / FVAR_max    (remaining)
+    fvar_max = max([final_fvar] + [float(r["FVAR_at_removal"]) for r in removal_rows]) if removal_rows else final_fvar
+    removed_map_norm = {hkl: (fvar / fvar_max) for hkl, fvar in removed_map.items()}
+    default_factor_norm = final_fvar / fvar_max
+    print(f"Using normalized scaling with FVAR_max={fvar_max:.6g} (default scale={default_factor_norm:.6g})")
 
     # -----------------------------
     # 2) FINAL validation run:
@@ -651,7 +656,8 @@ def iterative_dfm_filter_rescale_and_final_validate(
     # Write scaled bkind.hkl for SHELXL using your rule:
     # removed HKLs: I_new = I * FVAR_at_removal
     # remaining HKLs: I_new = I * FVAR_final
-    n_scaled, n_lines = scale_shelx_hkl_file(unscaled, bkind_hkl, removed_map, default_factor=final_fvar)
+    # n_scaled, n_lines = scale_shelx_hkl_file(unscaled, bkind_hkl, removed_map_norm, default_factor=default_factor_norm)
+    n_scaled, n_lines = scale_shelx_hkl_file(unscaled, bkind_hkl, removed_map_norm, default_factor=default_factor_norm)
     print(f"Scaled final bkind.hkl: scaled {n_scaled} reflections / {n_lines} lines")
     print(f"Preserved unscaled: {unscaled}")
 

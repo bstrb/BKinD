@@ -21,6 +21,41 @@ POWER = 3.0
 # -----------------------------
 # Helpers / Utilities
 # -----------------------------
+def xds_ascii_negI_to_one(in_path: str, out_path: str, replacement: float = 1.0):
+    column_widths = [6, 6, 6, 11, 11, 8, 8, 9, 10, 4, 4, 8]
+
+    out_lines = []
+    with open(in_path, "r") as f:
+        for line in f:
+            # keep comments
+            if line.startswith("!"):
+                out_lines.append(line)
+                continue
+
+            parts = line.split()
+            if len(parts) < 5:
+                out_lines.append(line if line.endswith("\n") else (line + "\n"))
+                continue
+
+            try:
+                I = float(parts[3])
+            except ValueError:
+                out_lines.append(line if line.endswith("\n") else (line + "\n"))
+                continue
+
+            if I < 0.0:
+                parts[3] = f"{replacement:.3E}"
+
+            # preserve formatting style when possible
+            if len(parts) == len(column_widths):
+                out_lines.append(format_line(parts, column_widths) + "\n")
+            else:
+                out_lines.append(" ".join(parts) + "\n")
+
+    with open(out_path, "w") as f:
+        f.writelines(out_lines)
+
+
 def die(msg: str, code: int = 2):
     print(f"ERROR: {msg}", file=sys.stderr)
     raise SystemExit(code)
@@ -794,7 +829,12 @@ def main():
 
     args = ap.parse_args()
 
-    xds_ascii_path = os.path.join(os.path.abspath(args.xds_dir), "XDS_ASCII.HKL")
+    xds_ascii_path_raw = os.path.join(os.path.abspath(args.xds_dir), "XDS_ASCII.HKL")
+
+    # Make a sanitized copy once, and use it for round 0
+    xds_ascii_path = os.path.join(os.path.abspath(args.out_dir), "XDS_ASCII_NEGI_TO_ONE.HKL")
+    xds_ascii_negI_to_one(xds_ascii_path_raw, xds_ascii_path, replacement=1.0)
+    print(f"Using sanitized XDS_ASCII (neg I -> 1.0): {xds_ascii_path}")
 
     for r in range(args.n_rounds):
         xds_ascii_path = iterative_dfm_filter_rescale_and_final_validate(

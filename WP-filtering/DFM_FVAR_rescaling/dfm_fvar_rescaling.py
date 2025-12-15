@@ -172,7 +172,7 @@ def scale_xds_ascii_file(in_path: str, out_path: str,
             if hkl_to_dfm is not None and hkl_to_dfm.get(hkl, 0.0) < 0.0:
                 if w > 0:
                     s = 1.0 / w   # invert for negative DFM
-
+            s = s**3
             parts[3] = f"{I*s:.3E}"
             # parts[4] = f"{sig*s:.3E}"
             parts[4] = f"{sig:.3E}"
@@ -467,7 +467,7 @@ def scale_shelx_hkl_file(in_path: str, out_path: str,
             if hkl_to_dfm is not None and hkl_to_dfm.get(hkl, 0.0) < 0.0:
                 if w > 0:
                     s = 1.0 / w
-
+            s = s**4
             I_new = I * s
             # sig_new = sig * s
             sig_new = sig 
@@ -782,10 +782,10 @@ def main():
     ap.add_argument("--xds-dir", required=True, help="Directory containing XDS_ASCII.HKL and INTEGRATE.HKL")
     ap.add_argument("--out-dir", required=True, help="Output directory; a unique run_* subfolder will be created")
 
-    ap.add_argument("--n-rounds", type=int, default=10, help="Number of full rescaling rounds (default 10)")
+    ap.add_argument("--n-rounds", type=int, default=50, help="Number of full rescaling rounds (default 10)")
 
-    ap.add_argument("--remove-fraction", type=float, default=0.01, help="Fraction removed per iteration by |DFM| (default 0.01)")
-    ap.add_argument("--fvar-tol", type=float, default=0.1, help="Absolute tolerance for FVAR convergence (default 0.1)")
+    ap.add_argument("--remove-fraction", type=float, default=0.01, help="Fraction removed per iteration by |DFM| (default 0.001)")
+    ap.add_argument("--fvar-tol", type=float, default=0.01, help="Absolute tolerance for FVAR convergence (default 0.1)")
     ap.add_argument("--max-iters", type=int, default=50, help="Max iterations (default 50)")
     ap.add_argument("--initial-u", type=float, default=0.01, help="Initial u for DFM optimization (default 0.01)")
     ap.add_argument("--min-remaining", type=int, default=0, help="Stop if remaining reflections <= this (default 0)")
@@ -814,3 +814,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# python dfm_fvar_rescaling.py --shelx-dir  /home/bubl3932/files/3DED-DATA/LTA/LTA1/unlocked --xds-dir /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA1/dfm_fvar_rescaling
+
+# python dfm_fvar_rescaling.py --shelx-dir  /home/bubl3932/files/3DED-DATA/LTA/LTA4/unlocked --xds-dir /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA4/dfm_fvar_rescaling
+

@@ -137,9 +137,11 @@ def parse_fvar_from_res(res_path: str) -> float:
                         continue
                 die(f"Found FVAR line but could not parse float: {s}")
     die(f"No FVAR line found in {res_path}")
+
 def scale_xds_ascii_file(in_path: str, out_path: str,
                          hkl_to_factor: dict[tuple[int,int,int], float],
-                         default_factor: float):
+                         default_factor: float,
+                         hkl_to_dfm: dict[tuple[int,int,int], float] | None = None):
     # Same fixed widths you use elsewhere
     column_widths = [6, 6, 6, 11, 11, 8, 8, 9, 10, 4, 4, 8]
 
@@ -163,9 +165,16 @@ def scale_xds_ascii_file(in_path: str, out_path: str,
                 out_lines.append(line if line.endswith("\n") else (line + "\n"))
                 continue
 
-            factor = hkl_to_factor.get((h, k, l), default_factor)
-            parts[3] = f"{I*factor:.3E}"
-            parts[4] = f"{sig*factor:.3E}"
+            hkl = (h, k, l)
+            w = hkl_to_factor.get(hkl, default_factor)
+
+            s = w
+            if hkl_to_dfm is not None and hkl_to_dfm.get(hkl, 0.0) < 0.0:
+                if w > 0:
+                    s = 1.0 / w   # invert for negative DFM
+
+            parts[3] = f"{I*s:.3E}"
+            parts[4] = f"{sig*s:.3E}"
 
             if len(parts) == len(column_widths):
                 out_lines.append(format_line(parts, column_widths) + "\n")
@@ -412,7 +421,8 @@ def build_sample_df_with_dfm(iter_dir: str, inte_path: str, initial_u: float) ->
 # -----------------------------
 def scale_shelx_hkl_file(in_path: str, out_path: str,
                          hkl_to_factor: dict[tuple[int,int,int], float],
-                         default_factor: float):
+                         default_factor: float,
+                         hkl_to_dfm: dict[tuple[int,int,int], float] | None = None):
 
     n_scaled = 0
     n_lines = 0
@@ -449,9 +459,16 @@ def scale_shelx_hkl_file(in_path: str, out_path: str,
                 fout.write(line)
                 continue
 
-            factor = hkl_to_factor.get((h, k, l), default_factor)
-            I_new = I * factor
-            sig_new = sig * factor
+            hkl = (h, k, l)
+            w = hkl_to_factor.get(hkl, default_factor)
+
+            s = w
+            if hkl_to_dfm is not None and hkl_to_dfm.get(hkl, 0.0) < 0.0:
+                if w > 0:
+                    s = 1.0 / w
+
+            I_new = I * s
+            sig_new = sig * s
 
             fout.write(f"{h:4d}{k:4d}{l:4d}{I_new:8.2f}{sig_new:8.2f}{tail}\n")
             n_scaled += 1
@@ -651,6 +668,11 @@ def iterative_dfm_filter_rescale_and_final_validate(
     for row in removal_rows:
         removed_map[(row["h"], row["k"], row["l"])] = float(row["FVAR_at_removal"])
 
+    # Build HKL -> DFM_at_removal mapping for removed reflections (for info)
+    dfm_map: dict[tuple[int,int,int], float] = {}
+    for row in removal_rows:
+        dfm_map[(row["h"], row["k"], row["l"])] = float(row["DFM_at_removal"])
+
     # Normalize scale factors to avoid blowing up I/SIG:
     # scale(hkl) = FVAR_at_removal / FVAR_max   (removed)
     # scale(default) = final_fvar / FVAR_max    (remaining)
@@ -695,8 +717,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
     # Write scaled bkind.hkl for SHELXL using your rule:
     # removed HKLs: I_new = I * FVAR_at_removal
     # remaining HKLs: I_new = I * FVAR_final
-    # n_scaled, n_lines = scale_shelx_hkl_file(unscaled, bkind_hkl, removed_map_norm, default_factor=default_factor_norm)
-    n_scaled, n_lines = scale_shelx_hkl_file(unscaled, bkind_hkl, removed_map_norm, default_factor=default_factor_norm)
+    n_scaled, n_lines = scale_shelx_hkl_file(unscaled, bkind_hkl, removed_map_norm, default_factor=default_factor_norm, hkl_to_dfm=dfm_map)
     print(f"Scaled final bkind.hkl: scaled {n_scaled} reflections / {n_lines} lines")
     print(f"Preserved unscaled: {unscaled}")
 
@@ -740,6 +761,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
         out_path=next_xds_ascii,
         hkl_to_factor=removed_map_norm,
         default_factor=default_factor_norm,
+        hkl_to_dfm=dfm_map,
     )
     print(f"Saved scaled XDS_ASCII for next round: {next_xds_ascii}")
     return next_xds_ascii

@@ -782,7 +782,7 @@ def main():
     ap.add_argument("--xds-dir", required=True, help="Directory containing XDS_ASCII.HKL and INTEGRATE.HKL")
     ap.add_argument("--out-dir", required=True, help="Output directory; a unique run_* subfolder will be created")
 
-    ap.add_argument("--n-rounds", type=int, default=1, help="Number of full rescaling rounds (default 1)")
+    ap.add_argument("--n-rounds", type=int, default=10, help="Number of full rescaling rounds (default 10)")
 
     ap.add_argument("--remove-fraction", type=float, default=0.01, help="Fraction removed per iteration by |DFM| (default 0.01)")
     ap.add_argument("--fvar-tol", type=float, default=0.1, help="Absolute tolerance for FVAR convergence (default 0.1)")

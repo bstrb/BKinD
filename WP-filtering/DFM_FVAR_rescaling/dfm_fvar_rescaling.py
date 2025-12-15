@@ -17,7 +17,7 @@ from iotbx.reflection_file_reader import any_reflection_file
 from iotbx.shelx.hklf import miller_array_export_as_shelx_hklf as hklf
 from scitbx.array_family import flex
 
-
+POWER = 3.0
 # -----------------------------
 # Helpers / Utilities
 # -----------------------------
@@ -172,7 +172,7 @@ def scale_xds_ascii_file(in_path: str, out_path: str,
             if hkl_to_dfm is not None and hkl_to_dfm.get(hkl, 0.0) < 0.0:
                 if w > 0:
                     s = 1.0 / w   # invert for negative DFM
-            s = s**3
+            s = s**POWER
             parts[3] = f"{I*s:.3E}"
             # parts[4] = f"{sig*s:.3E}"
             parts[4] = f"{sig:.3E}"
@@ -467,7 +467,7 @@ def scale_shelx_hkl_file(in_path: str, out_path: str,
             if hkl_to_dfm is not None and hkl_to_dfm.get(hkl, 0.0) < 0.0:
                 if w > 0:
                     s = 1.0 / w
-            s = s**4
+            s = s**POWER
             I_new = I * s
             # sig_new = sig * s
             sig_new = sig 

@@ -504,6 +504,10 @@ def scale_shelx_hkl_file(in_path: str, out_path: str,
                     s = 1.0 / w
             s = s**POWER
             I_new = I * s
+
+            if I_new > 99999.99:
+                I_new = 99999.99
+                
             # sig_new = sig * s
             sig_new = sig 
 
@@ -830,6 +834,9 @@ def main():
     args = ap.parse_args()
 
     xds_ascii_path_raw = os.path.join(os.path.abspath(args.xds_dir), "XDS_ASCII.HKL")
+
+    out_dir_abs = os.path.abspath(args.out_dir)
+    os.makedirs(out_dir_abs, exist_ok=True)
 
     # Make a sanitized copy once, and use it for round 0
     xds_ascii_path = os.path.join(os.path.abspath(args.out_dir), "XDS_ASCII_NEGI_TO_ONE.HKL")

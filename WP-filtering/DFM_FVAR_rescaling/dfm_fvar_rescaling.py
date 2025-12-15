@@ -117,29 +117,50 @@ def modify_ins_file(file_path):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def parse_fvar_from_lst(lst_path: str) -> float:
+def parse_fvar_from_res(res_path: str) -> float:
     """
-    Parses single-line:
-        FVAR      14.66029
+    Parses FVAR from a SHELX .res file line like:
+      FVAR      14.66029
     Uses the first float after FVAR.
     """
-    with open(lst_path, "r") as f:
+    with open(res_path, "r") as f:
         for line in f:
             s = line.strip()
             if not s:
                 continue
             if s.upper().startswith("FVAR"):
                 parts = s.split()
-                floats = []
                 for tok in parts[1:]:
                     try:
-                        floats.append(float(tok))
+                        return float(tok)
                     except ValueError:
-                        pass
-                if not floats:
-                    die(f"Found FVAR line but could not parse float(s): {s}")
-                return float(floats[0])
-    die(f"No FVAR line found in {lst_path}")
+                        continue
+                die(f"Found FVAR line but could not parse float: {s}")
+    die(f"No FVAR line found in {res_path}")
+
+# def parse_fvar_from_lst(lst_path: str) -> float:
+#     """
+#     Parses single-line:
+#         FVAR      14.66029
+#     Uses the first float after FVAR.
+#     """
+#     with open(lst_path, "r") as f:
+#         for line in f:
+#             s = line.strip()
+#             if not s:
+#                 continue
+#             if s.upper().startswith("FVAR"):
+#                 parts = s.split()
+#                 floats = []
+#                 for tok in parts[1:]:
+#                     try:
+#                         floats.append(float(tok))
+#                     except ValueError:
+#                         pass
+#                 if not floats:
+#                     die(f"Found FVAR line but could not parse float(s): {s}")
+#                 return float(floats[0])
+#     die(f"No FVAR line found in {lst_path}")
 
 def format_line(parts, column_widths):
     formatted_parts = []
@@ -521,7 +542,8 @@ def iterative_dfm_filter_rescale_and_final_validate(
 
         run_xdsconv_and_shelxl(iter_dir, xds_dir, keep_set)
 
-        fvar = parse_fvar_from_lst(os.path.join(iter_dir, "bkind.lst"))
+        # fvar = parse_fvar_from_lst(os.path.join(iter_dir, "bkind.lst"))
+        fvar = parse_fvar_from_res(os.path.join(iter_dir, "bkind.res"))
         final_fvar = fvar
         fvar_hist.append({"iteration": it, "FVAR": fvar, "n_keep": len(keep_set)})
         print(f"FVAR: {fvar:.6g}")
@@ -671,7 +693,8 @@ def iterative_dfm_filter_rescale_and_final_validate(
     if not os.path.exists(os.path.join(final_dir, "bkind.lst")):
         die("shelxl did not produce bkind.lst in final validation run")
 
-    fvar_final_run = parse_fvar_from_lst(os.path.join(final_dir, "bkind.lst"))
+    # fvar_final_run = parse_fvar_from_lst(os.path.join(final_dir, "bkind.lst"))
+    fvar_final_run = parse_fvar_from_res(os.path.join(final_dir, "bkind.res"))
     print(f"Final-run FVAR (from .lst after rescaling): {fvar_final_run:.6g}")
 
     sample_df_final = build_sample_df_with_dfm(final_dir, inte_path, initial_u=initial_u)

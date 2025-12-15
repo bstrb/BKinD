@@ -137,44 +137,30 @@ def parse_fvar_from_res(res_path: str) -> float:
                         continue
                 die(f"Found FVAR line but could not parse float: {s}")
     die(f"No FVAR line found in {res_path}")
-def scale_xds_ascii_file(in_path: str, out_path: str,
-                         hkl_to_factor: dict[tuple[int,int,int], float],
-                         default_factor: float):
-    # Same fixed widths you use elsewhere
-    column_widths = [6, 6, 6, 11, 11, 8, 8, 9, 10, 4, 4, 8]
 
-    out_lines = []
-    with open(in_path, "r") as f:
-        for line in f:
-            if line.startswith("!"):
-                out_lines.append(line)
-                continue
-
-            parts = line.split()
-            if len(parts) < 5:
-                out_lines.append(line if line.endswith("\n") else (line + "\n"))
-                continue
-
-            try:
-                h, k, l = map(int, parts[:3])
-                I = float(parts[3])
-                sig = float(parts[4])
-            except ValueError:
-                out_lines.append(line if line.endswith("\n") else (line + "\n"))
-                continue
-
-            factor = hkl_to_factor.get((h, k, l), default_factor)
-            parts[3] = f"{I*factor:.3E}"
-            parts[4] = f"{sig*factor:.3E}"
-
-            if len(parts) == len(column_widths):
-                out_lines.append(format_line(parts, column_widths) + "\n")
-            else:
-                out_lines.append((" ".join(parts)) + "\n")
-
-    with open(out_path, "w") as f:
-        f.writelines(out_lines)
-
+# def parse_fvar_from_lst(lst_path: str) -> float:
+#     """
+#     Parses single-line:
+#         FVAR      14.66029
+#     Uses the first float after FVAR.
+#     """
+#     with open(lst_path, "r") as f:
+#         for line in f:
+#             s = line.strip()
+#             if not s:
+#                 continue
+#             if s.upper().startswith("FVAR"):
+#                 parts = s.split()
+#                 floats = []
+#                 for tok in parts[1:]:
+#                     try:
+#                         floats.append(float(tok))
+#                     except ValueError:
+#                         pass
+#                 if not floats:
+#                     die(f"Found FVAR line but could not parse float(s): {s}")
+#                 return float(floats[0])
+#     die(f"No FVAR line found in {lst_path}")
 
 def format_line(parts, column_widths):
     formatted_parts = []
@@ -258,9 +244,8 @@ class Integrate:
 # -----------------------------
 # NEM XDS_ASCII creation (fixed width) + filtering
 # -----------------------------
-def create_xds_ascii_nem_filtered(xds_dir: str, target_dir: str, keep_set: set[tuple[int, int, int]],
-                                  xds_ascii_path: str | None = None):
-    xds_path = xds_ascii_path if xds_ascii_path is not None else os.path.join(xds_dir, "XDS_ASCII.HKL")
+def create_xds_ascii_nem_filtered(xds_dir: str, target_dir: str, keep_set: set[tuple[int, int, int]]):
+    xds_path = os.path.join(xds_dir, "XDS_ASCII.HKL")
     integrate_path = os.path.join(xds_dir, "INTEGRATE.HKL")
     output_path = os.path.join(target_dir, "XDS_ASCII_NEM.HKL")
 
@@ -468,10 +453,10 @@ def prepare_run_ins(run_dir: str, shelx_dir: str):
         die(f"Could not copy .ins from {shelx_dir}")
     modify_ins_file(os.path.join(run_dir, "bkind.ins"))
 
-def run_xdsconv_and_shelxl(iter_dir: str, xds_dir: str, keep_set: set[tuple[int,int,int]], xds_ascii_path: str):
+def run_xdsconv_and_shelxl(iter_dir: str, xds_dir: str, keep_set: set[tuple[int,int,int]]):
+    ensure_dir(iter_dir)
 
-
-    create_xds_ascii_nem_filtered(xds_dir, iter_dir, keep_set, xds_ascii_path=xds_ascii_path)
+    create_xds_ascii_nem_filtered(xds_dir, iter_dir, keep_set)
     create_xdsconv_inp(iter_dir)
 
     p = subprocess.run(["xdsconv"], cwd=iter_dir)
@@ -489,8 +474,6 @@ def run_xdsconv_and_shelxl(iter_dir: str, xds_dir: str, keep_set: set[tuple[int,
         die("shelxl did not produce bkind.fcf")
     if not os.path.exists(os.path.join(iter_dir, "bkind.lst")):
         die("shelxl did not produce bkind.lst")
-    if not os.path.exists(os.path.join(iter_dir, "bkind.res")):
-        die("shelxl did not produce bkind.res")
 
 
 # -----------------------------
@@ -507,8 +490,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
     min_remaining: int,
     run_label: str | None,
     make_plots: bool,
-    xds_ascii_path: str):
-
+):
     shelx_dir = os.path.abspath(shelx_dir)
     xds_dir = os.path.abspath(xds_dir)
     out_dir = os.path.abspath(out_dir)
@@ -529,6 +511,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
     prepare_run_ins(run_dir, shelx_dir)
 
     # Initial keep set from XDS_ASCII.HKL
+    xds_ascii_path = os.path.join(xds_dir, "XDS_ASCII.HKL")
     if not os.path.exists(xds_ascii_path):
         die(f"Missing {xds_ascii_path}")
 
@@ -557,7 +540,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
         print(f"\n=== Iteration {it} ===")
         print(f"Keeping {len(keep_set)} reflections")
 
-        run_xdsconv_and_shelxl(iter_dir, xds_dir, keep_set, xds_ascii_path=xds_ascii_path)
+        run_xdsconv_and_shelxl(iter_dir, xds_dir, keep_set)
 
         # fvar = parse_fvar_from_lst(os.path.join(iter_dir, "bkind.lst"))
         fvar = parse_fvar_from_res(os.path.join(iter_dir, "bkind.res"))
@@ -677,7 +660,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
     print(f"Using all reflections: {len(all_set)}")
 
     # Run xdsconv + shelxl ONCE to create baseline bkind.hkl, then replace with scaled version
-    create_xds_ascii_nem_filtered(xds_dir, final_dir, all_set, xds_ascii_path=xds_ascii_path)
+    create_xds_ascii_nem_filtered(xds_dir, final_dir, all_set)
     create_xdsconv_inp(final_dir)
 
     p = subprocess.run(["xdsconv"], cwd=final_dir)
@@ -712,7 +695,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
 
     # fvar_final_run = parse_fvar_from_lst(os.path.join(final_dir, "bkind.lst"))
     fvar_final_run = parse_fvar_from_res(os.path.join(final_dir, "bkind.res"))
-    print(f"Final-run FVAR (from .res after rescaling): {fvar_final_run:.6g}")
+    print(f"Final-run FVAR (from .lst after rescaling): {fvar_final_run:.6g}")
 
     sample_df_final = build_sample_df_with_dfm(final_dir, inte_path, initial_u=initial_u)
     opt_u_final = float(sample_df_final.attrs.get("optimal_u", np.nan))
@@ -734,16 +717,6 @@ def iterative_dfm_filter_rescale_and_final_validate(
         fig.write_html(out_html)
         print(f"Saved final plot: {out_html}")
 
-    next_xds_ascii = os.path.join(run_dir, "XDS_ASCII_SCALED.HKL")
-    scale_xds_ascii_file(
-        in_path=xds_ascii_path,
-        out_path=next_xds_ascii,
-        hkl_to_factor=removed_map_norm,
-        default_factor=default_factor_norm,
-    )
-    print(f"Saved scaled XDS_ASCII for next round: {next_xds_ascii}")
-    return next_xds_ascii
-
     print(f"\nFinal validation directory: {final_dir}")
 
 
@@ -758,8 +731,6 @@ def main():
     ap.add_argument("--xds-dir", required=True, help="Directory containing XDS_ASCII.HKL and INTEGRATE.HKL")
     ap.add_argument("--out-dir", required=True, help="Output directory; a unique run_* subfolder will be created")
 
-    ap.add_argument("--n-rounds", type=int, default=1, help="Number of full rescaling rounds (default 1)")
-
     ap.add_argument("--remove-fraction", type=float, default=0.01, help="Fraction removed per iteration by |DFM| (default 0.01)")
     ap.add_argument("--fvar-tol", type=float, default=0.1, help="Absolute tolerance for FVAR convergence (default 0.1)")
     ap.add_argument("--max-iters", type=int, default=50, help="Max iterations (default 50)")
@@ -770,23 +741,18 @@ def main():
 
     args = ap.parse_args()
 
-    xds_ascii_path = os.path.join(os.path.abspath(args.xds_dir), "XDS_ASCII.HKL")
-
-    for r in range(args.n_rounds):
-        xds_ascii_path = iterative_dfm_filter_rescale_and_final_validate(
-            shelx_dir=args.shelx_dir,
-            xds_dir=args.xds_dir,
-            out_dir=args.out_dir,
-            remove_fraction=args.remove_fraction,
-            fvar_tol=args.fvar_tol,
-            max_iters=args.max_iters,
-            initial_u=args.initial_u,
-            min_remaining=args.min_remaining,
-            run_label=(f"{args.run_label}_round{r:02d}" if args.run_label else f"round{r:02d}"),
-            make_plots=not args.no_plots,
-            xds_ascii_path=xds_ascii_path,
-        )
-
+    iterative_dfm_filter_rescale_and_final_validate(
+        shelx_dir=args.shelx_dir,
+        xds_dir=args.xds_dir,
+        out_dir=args.out_dir,
+        remove_fraction=args.remove_fraction,
+        fvar_tol=args.fvar_tol,
+        max_iters=args.max_iters,
+        initial_u=args.initial_u,
+        min_remaining=args.min_remaining,
+        run_label=args.run_label,
+        make_plots=not args.no_plots,
+    )
 
 if __name__ == "__main__":
     main()

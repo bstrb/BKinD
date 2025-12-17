@@ -173,7 +173,7 @@ def parse_fvar_from_res(res_path: str) -> float:
                 die(f"Found FVAR line but could not parse float: {s}")
     die(f"No FVAR line found in {res_path}")
 
-def scale_int_file(in_path: str, out_path: str,
+def scale_xds_ascii_file(in_path: str, out_path: str,
                          hkl_to_factor: dict[tuple[int,int,int], float],
                          default_factor: float,
                          hkl_to_dfm: dict[tuple[int,int,int], float] | None = None):
@@ -303,14 +303,16 @@ class Integrate:
 # -----------------------------
 # NEM XDS_ASCII creation (fixed width) + filtering
 # -----------------------------
-def create_xds_ascii_nem_filtered(xds_dir: str, target_dir: str, keep_set: set[tuple[int, int, int]], xds_ascii_path: str | None = None):
+def create_xds_ascii_nem_filtered(xds_dir: str, target_dir: str, keep_set: set[tuple[int, int, int]],
+                                  xds_ascii_path: str | None = None):
+    xds_path = xds_ascii_path if xds_ascii_path is not None else os.path.join(xds_dir, "XDS_ASCII.HKL")
     integrate_path = os.path.join(xds_dir, "INTEGRATE.HKL")
     output_path = os.path.join(target_dir, "XDS_ASCII_NEM.HKL")
 
     column_widths = [6, 6, 6, 11, 11, 8, 8, 9, 10, 4, 4, 8]
 
-    if not os.path.exists(xds_ascii_path):
-        die(f"Missing {xds_ascii_path}")
+    if not os.path.exists(xds_path):
+        die(f"Missing {xds_path}")
     if not os.path.exists(integrate_path):
         die(f"Missing {integrate_path}")
 
@@ -330,7 +332,7 @@ def create_xds_ascii_nem_filtered(xds_dir: str, target_dir: str, keep_set: set[t
             integrate_dict[(h, k, l)] = vals
 
     output_data = []
-    with open(xds_ascii_path, "r") as f:
+    with open(xds_path, "r") as f:
         for line in f:
             if line.startswith("!"):
                 output_data.append(line)
@@ -524,15 +526,8 @@ def prepare_run_ins(run_dir: str, shelx_dir: str):
         die(f"Could not copy .ins from {shelx_dir}")
     modify_ins_file(os.path.join(run_dir, "bkind.ins"))
 
-def run_xds_xdsconv_and_shelxl(iter_dir: str, xds_dir: str, keep_set: set[tuple[int,int,int]]):
+def run_xdsconv_and_shelxl(iter_dir: str, xds_dir: str, keep_set: set[tuple[int,int,int]], xds_ascii_path: str):
 
-    p = subprocess.run(["xds"], cwd=iter_dir)
-    if p.returncode != 0:
-        die(f"xds failed in {iter_dir} with exit code {p.returncode}")
-    xds_ascii_path = os.path.join(iter_dir, "XDS_ASCII.HKL")
-
-    if not os.path.exists(os.path.join(iter_dir, "XDS_ASCII.HKL")):
-        die("shelxl did not produce XDS_ASCII.HKL")
 
     create_xds_ascii_nem_filtered(xds_dir, iter_dir, keep_set, xds_ascii_path=xds_ascii_path)
     create_xdsconv_inp(iter_dir)
@@ -569,7 +564,8 @@ def iterative_dfm_filter_rescale_and_final_validate(
     initial_u: float,
     min_remaining: int,
     run_label: str | None,
-    make_plots: bool):
+    make_plots: bool,
+    xds_ascii_path: str):
 
     shelx_dir = os.path.abspath(shelx_dir)
     xds_dir = os.path.abspath(xds_dir)
@@ -581,30 +577,20 @@ def iterative_dfm_filter_rescale_and_final_validate(
     run_dir = unique_run_dir(out_dir, run_label=run_label)
     print(f"Run directory: {run_dir}")
 
-    # Copy INTEGRATE.HKL and XDS.INP into run_dir (never touch originals)
+    # Copy INTEGRATE.HKL into run_dir (never touch originals)
     ok = manage_files("copy", xds_dir, run_dir, filename="INTEGRATE.HKL", new_filename="INTEGRATE.HKL")
     if not ok:
         die(f"Could not copy INTEGRATE.HKL from {xds_dir}")
     inte_path = os.path.join(run_dir, "INTEGRATE.HKL")
 
-    ok = manage_files("copy", xds_dir, run_dir, filename="XDS.INP", new_filename="XDS.INP")
-    if not ok:
-        die(f"Could not copy XDS.INP from {xds_dir}")
-    xdsinp_path = os.path.join(run_dir, "XDS.INP")
-
     # Prepare fixed bkind.ins once
-    # prepare_run_ins(run_dir, shelx_dir)
-    ok = manage_files("copy", shelx_dir, run_dir, extension=".ins", new_filename="shelx.ins")
-    if not ok:
-        die(f"Could not copy .ins from {shelx_dir}")
-    shelxins_path = os.path.join(run_dir, "shelx.ins")
+    prepare_run_ins(run_dir, shelx_dir)
 
     # Initial keep set from XDS_ASCII.HKL
-    if not os.path.exists(run_dir):
-        die(f"Missing {run_dir}")
+    if not os.path.exists(xds_ascii_path):
+        die(f"Missing {xds_ascii_path}")
 
-
-    all_hkls = read_xds_ascii_hkls(inte_path)
+    all_hkls = read_xds_ascii_hkls(xds_ascii_path)
     keep_set: set[tuple[int, int, int]] = set(all_hkls)
     if len(keep_set) == 0:
         die("No HKLs found in XDS_ASCII.HKL")
@@ -629,7 +615,7 @@ def iterative_dfm_filter_rescale_and_final_validate(
         print(f"\n=== Iteration {it} ===")
         print(f"Keeping {len(keep_set)} reflections")
 
-        run_xds_xdsconv_and_shelxl(iter_dir, xds_dir, keep_set)
+        run_xdsconv_and_shelxl(iter_dir, xds_dir, keep_set, xds_ascii_path=xds_ascii_path)
 
         # fvar = parse_fvar_from_lst(os.path.join(iter_dir, "bkind.lst"))
         fvar = parse_fvar_from_res(os.path.join(iter_dir, "bkind.res"))
@@ -753,14 +739,6 @@ def iterative_dfm_filter_rescale_and_final_validate(
     print(f"\n=== Final validation run (after rescaling) ===")
     print(f"Using all reflections: {len(all_set)}")
 
-    p = subprocess.run(["xds"], cwd=final_dir)
-    if p.returncode != 0:
-        die(f"xds failed in {final_dir} with exit code {p.returncode}")
-    xds_ascii_path = os.path.join(final_dir, "XDS_ASCII.HKL")
-
-    if not os.path.exists(os.path.join(final_dir, "XDS_ASCII.HKL")):
-        die("shelxl did not produce XDS_ASCII.HKL")
-
     # Run xdsconv + shelxl ONCE to create baseline bkind.hkl, then replace with scaled version
     create_xds_ascii_nem_filtered(xds_dir, final_dir, all_set, xds_ascii_path=xds_ascii_path)
     create_xdsconv_inp(final_dir)
@@ -818,8 +796,8 @@ def iterative_dfm_filter_rescale_and_final_validate(
         fig.write_html(out_html)
         print(f"Saved final plot: {out_html}")
 
-    next_xds_ascii = os.path.join(run_dir, "INTE.HKL")
-    scale_int_file(
+    next_xds_ascii = os.path.join(run_dir, "XDS_ASCII_SCALED.HKL")
+    scale_xds_ascii_file(
         in_path=xds_ascii_path,
         out_path=next_xds_ascii,
         hkl_to_factor=removed_map_norm,
@@ -840,7 +818,7 @@ def main():
         description="Iterative |DFM| removal until FVAR converges, rescale raw .hkl by per-HKL FVAR_at_removal/final FVAR, then final xdsconv+shelxl+DFM validation."
     )
     ap.add_argument("--shelx-dir", required=True, help="Directory containing template .ins (copied to bkind.ins)")
-    ap.add_argument("--xds-dir", required=True, help="Directory containing XDS.INP and INTEGRATE.HKL")
+    ap.add_argument("--xds-dir", required=True, help="Directory containing XDS_ASCII.HKL and INTEGRATE.HKL")
     ap.add_argument("--out-dir", required=True, help="Output directory; a unique run_* subfolder will be created")
 
     ap.add_argument("--n-rounds", type=int, default=50, help="Number of full rescaling rounds (default 10)")
@@ -855,10 +833,18 @@ def main():
 
     args = ap.parse_args()
 
-    
+    xds_ascii_path_raw = os.path.join(os.path.abspath(args.xds_dir), "XDS_ASCII.HKL")
+
+    out_dir_abs = os.path.abspath(args.out_dir)
+    os.makedirs(out_dir_abs, exist_ok=True)
+
+    # Make a sanitized copy once, and use it for round 0
+    xds_ascii_path = os.path.join(os.path.abspath(args.out_dir), "XDS_ASCII_NEGI_TO_ONE.HKL")
+    xds_ascii_negI_to_one(xds_ascii_path_raw, xds_ascii_path, replacement=1.0)
+    print(f"Using sanitized XDS_ASCII (neg I -> 1.0): {xds_ascii_path}")
 
     for r in range(args.n_rounds):
-        current_run_dir = iterative_dfm_filter_rescale_and_final_validate(
+        xds_ascii_path = iterative_dfm_filter_rescale_and_final_validate(
             shelx_dir=args.shelx_dir,
             xds_dir=args.xds_dir,
             out_dir=args.out_dir,
@@ -869,7 +855,7 @@ def main():
             min_remaining=args.min_remaining,
             run_label=(f"{args.run_label}_round{r:02d}" if args.run_label else f"round{r:02d}"),
             make_plots=not args.no_plots,
-            current_run_dir=current_run_dir,
+            xds_ascii_path=xds_ascii_path,
         )
 
 

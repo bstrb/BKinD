@@ -465,7 +465,6 @@ def scale_integrate_hkl(
     integrate_in: Path,
     integrate_out: Path,
     hkl_to_scale: Dict[HKL, float],
-    scale_sigma: bool,
     require_dfm: bool,
 ) -> None:
     missing: List[HKL] = []
@@ -511,7 +510,7 @@ def scale_integrate_hkl(
                 continue
 
             scale = float(hkl_to_scale[hkl])
-            I2 = I * scale
+            I2 = I #* scale
             s2 = s * scale 
 
             # Replace I and sigma *in place*, preserving all spacing and tail columns
@@ -552,13 +551,7 @@ def main() -> None:
     ap.add_argument("--rounds", type=int, required=True, help="Number of rounds to run")
     ap.add_argument("--alpha", type=float, default=0.5, help="alpha in scale=exp(alpha*tanh(z))")
     ap.add_argument("--initial-u", type=float, default=0.01, help="Initial u for optimization")
-    ap.add_argument("--scale-sigma", action="store_true", help="Also scale sigma in INTEGRATE.HKL")
     ap.add_argument("--out-dir", default=".", help="Where to create run_### folders (default: .)")
-
-    ap.add_argument("--xds-cmd", default="xds", help="XDS executable (default: xds)")
-    ap.add_argument("--xdsconv-cmd", default="xdsconv", help="XDSCONV executable (default: xdsconv)")
-    ap.add_argument("--shelxl-cmd", default="shelxl", help="SHELXL executable (default: shelxl)")
-
     ap.add_argument("--no-modify-ins", action="store_true", help="Do not patch the copied INS file (LIST 4 / MERG 0 etc)")
 
     args = ap.parse_args()
@@ -579,7 +572,7 @@ def main() -> None:
     if not summary_csv.exists():
         with summary_csv.open("w", newline="") as f:
             w = csv.writer(f)
-            w.writerow(["round", "FVAR", "R1_4sig", "R1_all", "u_opt", "alpha", "scale_sigma"])
+            w.writerow(["round", "FVAR", "R1_4sig", "R1_all", "u_opt", "alpha"])
 
     current_integrate = integrate0
 
@@ -604,7 +597,7 @@ def main() -> None:
             modify_ins_file(ins_dst)
 
         # 1) XDS (CORRECT): XDS.INP must be JOB=CORRECT, produces XDS_ASCII.HKL
-        run_cmd([args.xds_cmd], cwd=run_dir)
+        run_cmd("xds", cwd=run_dir)
         xds_ascii = run_dir / "XDS_ASCII.HKL"
         if not xds_ascii.exists():
             die(f"XDS did not produce {xds_ascii}")
@@ -615,7 +608,7 @@ def main() -> None:
 
         # 3) XDSCONV: XDS_ASCII_NEM.HKL -> SHELX.HKL
         write_xdsconv_inp(run_dir)
-        run_cmd([args.xdsconv_cmd], cwd=run_dir)
+        run_cmd("xdsconv", cwd=run_dir)
 
         shelx_hkl = run_dir / "SHELX.hkl"
         if not shelx_hkl.exists():
@@ -624,7 +617,7 @@ def main() -> None:
         # shutil.copy(shelx_hkl, run_dir / "SHELX.HKL")
 
         # 4) SHELXL: SHELX.hkl + SHELX.ins -> SHELX.res + SHELX.fcf
-        run_cmd([args.shelxl_cmd, "SHELX"], cwd=run_dir)
+        run_cmd(["shelxl", "SHELX"], cwd=run_dir)
 
         res_path = run_dir / "SHELX.res"
         if not res_path.exists():
@@ -658,7 +651,7 @@ def main() -> None:
         z = robust_zscore(sample_df["DFM"].to_numpy(dtype=float))
 
         keys = list(sample_df["Miller"])
-        scales = np.exp(-(args.alpha * np.tanh(z)))
+        scales = np.exp(-(np.log(args.alpha) * np.tanh(z/np.max(np.abs(z)))))
         hkl_to_scale: Dict[HKL, float] = {hkl: float(scales[i]) for i, hkl in enumerate(keys)}
 
         per_csv = run_dir / "dfm_per_hkl.csv"
@@ -675,15 +668,14 @@ def main() -> None:
             integrate_in=integrate_in,
             integrate_out=integrate_out,
             hkl_to_scale=hkl_to_scale,
-            scale_sigma=args.scale_sigma,
             require_dfm=True,   # per your requirement: if no DFM something is wrong
         )
-        print(f"[WRITE] {integrate_out.name}   (alpha={args.alpha}, scale_sigma={args.scale_sigma})")
+        print(f"[WRITE] {integrate_out.name}   (alpha={args.alpha})")
 
         # 8) Append summary row
         with summary_csv.open("a", newline="") as f:
             w = csv.writer(f)
-            w.writerow([r, fvar, r1_4sig, r1_all, opt_u, args.alpha, args.scale_sigma])
+            w.writerow([r, fvar, r1_4sig, r1_all, opt_u, args.alpha])
 
         # 9) Next round uses scaled integrate
         current_integrate = integrate_out
@@ -700,6 +692,6 @@ if __name__ == "__main__":
 # /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/XDS.INP
 # /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/INTEGRATE.HKL
 
-# python ./dfm_scaling.py --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/INTEGRATE.HKL --xds-inp /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/XDS.INP --shelx-ins /home/bubl3932/files/3DED-DATA/LTA/LTA1/unlocked/t1_no-error-model.ins --rounds 20 --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA1/dfm_test_2 --alpha 0.4
+# python ./dfm_scaling.py --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/INTEGRATE.HKL --xds-inp /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/XDS.INP --shelx-ins /home/bubl3932/files/3DED-DATA/LTA/LTA1/unlocked/t1_no-error-model.ins --rounds 20 --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA1/dfm_test_2 --alpha 0.1
 
-# python ./dfm_scaling.py --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --xds-inp /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/XDS.INP --shelx-ins /home/bubl3932/files/3DED-DATA/LTA/LTA4/unlocked/t4_no-error-model.ins --rounds 100 --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA4/dfm_test_1 --alpha 0.1
+# python ./dfm_scaling.py --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --xds-inp /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/XDS.INP --shelx-ins /home/bubl3932/files/3DED-DATA/LTA/LTA4/unlocked/t4_no-error-model.ins --rounds 100 --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA4/dfm_test_5 --alpha 1.5

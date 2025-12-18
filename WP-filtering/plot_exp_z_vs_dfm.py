@@ -58,8 +58,8 @@ def main():
     mu = np.median(dfm)
     sigma = 1.4826 * np.median(np.abs(dfm - mu))
     z = (dfm - mu) / sigma
-    alpha = 0.5
-    scale = np.exp(alpha * np.tanh(z))
+    scale = np.exp(-(np.log(args.alpha) * np.tanh(z/np.max(np.abs(z)))))
+    scale = np.exp(-(np.log(args.alpha) * np.tanh(z/3)))
     # y = np.log(scale)
     y = scale
 
@@ -68,7 +68,7 @@ def main():
         out_prefix = os.path.splitext(os.path.basename(in_path))[0]
 
     plt.figure()
-    plt.scatter(dfm, y, s=args.s, alpha=args.alpha)
+    plt.scatter(dfm, y, s=args.s)
     plt.xlabel(dfm_col)
     plt.ylabel(f"exp(z-score({dfm_col}))")
     plt.title(f"exp(z-score({dfm_col})) vs {dfm_col}  (mean={mu:.4g}, std={sigma:.4g})")
@@ -76,7 +76,7 @@ def main():
 
     
 
-    out_png = f"{out_prefix}_exp_z_vs_dfm.png"
+    out_png = f"{out_prefix}_exp_z_vs_dfm_{args.alpha}.png"
     plt.savefig(out_png, dpi=250)
     print(f"DFM column: {dfm_col}")
     print(f"n={dfm.size}  mean={mu:.6g}  std={sigma:.6g}")

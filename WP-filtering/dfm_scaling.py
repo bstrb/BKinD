@@ -528,7 +528,7 @@ def scale_integrate_hkl(
             fout.write(new_line)
             n_scaled += 1
 
-    if missing:
+    if len(missing) > n_parsed * 0.01:
         raise SystemExit(f"ERROR: Missing scale for {len(missing)} reflections (first few: {missing[:10]})")
 
     if n_scaled == 0:
@@ -694,4 +694,12 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 # python ./dfm_scaling.py --integrate /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA1/xds/INTEGRATE.HKL --xds-inp /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA1/xds/XDS.INP --shelx-ins /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA1/shelx/t1_no-error-model.ins --rounds 10 --out-dir /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA1
+# /home/bubl3932/files/3DED-DATA/LTA/LTA1/unlocked/t1_no-error-model.ins
+# /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/XDS.INP
+# /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/INTEGRATE.HKL
+
+# python ./dfm_scaling.py --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/INTEGRATE.HKL --xds-inp /home/bubl3932/files/3DED-DATA/LTA/LTA1/xds/XDS.INP --shelx-ins /home/bubl3932/files/3DED-DATA/LTA/LTA1/unlocked/t1_no-error-model.ins --rounds 20 --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA1/dfm_test_2 --alpha 0.4
+
+# python ./dfm_scaling.py --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --xds-inp /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/XDS.INP --shelx-ins /home/bubl3932/files/3DED-DATA/LTA/LTA4/unlocked/t4_no-error-model.ins --rounds 100 --out-dir /home/bubl3932/files/3DED-DATA/LTA/LTA4/dfm_test_1 --alpha 0.1

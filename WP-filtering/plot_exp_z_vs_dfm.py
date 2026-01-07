@@ -16,8 +16,8 @@ def main():
                     help="DFM column name (default: 'DFM' if present else last column)")
     ap.add_argument("--out-prefix", default=None,
                     help="Output prefix (default: input filename without extension)")
-    ap.add_argument("--alpha", type=float, default=0.2, help="Scatter alpha (default: 0.2)")
-    ap.add_argument("--s", type=float, default=6.0, help="Marker size (default: 6)")
+    ap.add_argument("--alpha", type=float, default=2, help="Scatter alpha (default: 0.2)")
+    ap.add_argument("--s", type=float, default=2.0, help="Marker size (default: 6)")
     ap.add_argument("--no-show", action="store_true", help="Do not display plot (still saves PNG)")
     args = ap.parse_args()
 
@@ -58,8 +58,12 @@ def main():
     mu = np.median(dfm)
     sigma = 1.4826 * np.median(np.abs(dfm - mu))
     z = (dfm - mu) / sigma
-    scale = np.exp(-(np.log(args.alpha) * np.tanh(z/np.max(np.abs(z)))))
-    scale = np.exp(-(np.log(args.alpha) * np.tanh(z/3)))
+
+    # Compute scaled exponential
+    # scale = np.exp(-(np.log(args.alpha) * np.tan(z/np.max(np.abs(z)))))
+    scale = np.exp(-(np.log(args.alpha) * np.tanh(z/np.max(np.abs(z)/np.pi))))
+    # scale = np.exp(-(np.log(args.alpha) * np.tanh(z/3)))
+    # scale = np.exp(-(np.log(args.alpha) * np.tan(z/10)))
     # y = np.log(scale)
     y = scale
 

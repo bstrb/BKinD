@@ -74,12 +74,12 @@ def insert_anis_after_ls(ins_in: str, ins_out: str):
                 out.append("EXYZ\n")
             inserted = True
 
-    if not inserted:
-        out.append("\nANIS\nEXYZ\n")
-        print(
-            f"WARNING: No 'L.S.' line found in {ins_in}; appended ANIS/EXYZ at end.",
-            file=sys.stderr
-        )
+    # if not inserted:
+    #     out.append("\nANIS\nEXYZ\n")
+    #     print(
+    #         f"WARNING: No 'L.S.' line found in {ins_in}; appended ANIS/EXYZ at end.",
+    #         file=sys.stderr
+    #     )
 
     with open(ins_out, "w") as f:
         f.writelines(out)

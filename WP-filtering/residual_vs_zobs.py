@@ -160,7 +160,11 @@ def main():
     ap.add_argument("--min_sigma", type=float, default=1e-12, help="Drop rows with (s*sigma) <= this")
     args = ap.parse_args()
 
-    s = args.scale
+    # s = args.scale
+    FVAR = 39.34112  # SHELX default
+    FVAR = 30.0      # SHELX recommended for electron diffraction
+    s = 1/FVAR**2
+
     if not np.isfinite(s) or s <= 0:
         raise ValueError("--scale must be a positive finite number.")
 
@@ -198,7 +202,7 @@ def main():
         df,
         x="zobs",
         y="resid_std",
-        title=f"Standardized residual vs ZOBS (scale s={s:g})",
+        title=f"Standardized residual vs ZOBS (FVAR={FVAR:g})",
         labels={"zobs": "ZOBS", "resid_std": "(s*Fo^2 - Fc^2)/(s*sigma(Fo^2))"},
         hover_data={
             "hkl": True,
@@ -233,4 +237,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python residual_vs_zobs.py --raw_hkl /home/bubl3932/files/3DED-DATA/LTA/LTA4/unlocked/t4_no-error-model.hkl --fcf /home/bubl3932/files/3DED-DATA/LTA/LTA4/unlocked/t4_no-error-model.fcf --integrate /home/bubl3932/files/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --scale 1600
+# python residual_vs_zobs.py --raw_hkl /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/shelx/t4_no-error-model.hkl --fcf /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/shelx/t4_no-error-model.fcf --integrate /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --scale 1600

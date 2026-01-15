@@ -156,17 +156,17 @@ def main():
     ap.add_argument("--raw_hkl", required=True, help="Raw HKLF4 .hkl containing Fo^2 and sigma(Fo^2)")
     ap.add_argument("--fcf", required=True, help=".fcf containing Fc^2 (_refln_F_squared_calc)")
     ap.add_argument("--integrate", required=True, help="INTEGRATE.HKL (used only to extract ZOBS)")
-    ap.add_argument("--scale", required=True, type=float, help="Overall scale factor s to apply to Fo^2 and sigma(Fo^2)")
+    ap.add_argument("--fvar", required=True, type=float, help="FVAR to apply to Fo^2 and sigma(Fo^2)")
     ap.add_argument("--min_sigma", type=float, default=1e-12, help="Drop rows with (s*sigma) <= this")
     args = ap.parse_args()
 
     # s = args.scale
-    FVAR = 39.34112  # SHELX default
-    FVAR = 30.0      # SHELX recommended for electron diffraction
+    FVAR = args.fvar  # SHELX default
+    # FVAR = 30.0      # SHELX recommended for electron diffraction
     s = 1/FVAR**2
 
     if not np.isfinite(s) or s <= 0:
-        raise ValueError("--scale must be a positive finite number.")
+        raise ValueError("--fvar must be a positive finite number.")
 
     raw = parse_hklf4_raw(args.raw_hkl)
     fcf = parse_fcf_fcalc2(args.fcf)
@@ -237,4 +237,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python residual_vs_zobs.py --raw_hkl /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/shelx/t4_no-error-model.hkl --fcf /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/shelx/t4_no-error-model.fcf --integrate /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --scale 1600
+# python residual_vs_zobs.py --raw_hkl /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/wght_study/wght_study.hkl --fcf /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/wght_study/wght_study.fcf --integrate /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/xds/INTEGRATE.HKL --scale 0

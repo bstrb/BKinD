@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-wght_shelxl_scan.py
+shelxl_wght_run.py
 
-1) Rewrites the WGHT line in <base>.ins inside a target folder
-2) Runs: shelxl <base>
-3) Parses the “Resolution(A) … / … K … / … GooF … / … R1 …” table from <base>.lst
-4) Parses the line like:
-      <n> atoms may be split and <m> atoms NPD
-   including warning forms like:
-      ** Warning:     0  atoms may be split and     2  atoms NPD **
-5) Parses OSF from the LAST least-squares cycle block in <base>.lst
-6) Saves:
-   - a plot of K vs resolution
-   - the parsed table as a .txt
-Both outputs are named after the WGHT used.
+Run SHELXL with a user-specified WGHT (a-f), in an isolated subfolder.
+
+Inputs (ONLY):
+  --dir   Path containing exactly one matching pair: <base>.ins and <base>.hkl
+  --wghts Six numbers: a b c d e f   (or a full "WGHT a b c d e f" line)
+
+Behavior:
+  - Creates a subfolder under --dir named by the WGHT values
+  - Copies <base>.ins and <base>.hkl into that subfolder (NO backups)
+  - Rewrites/insert WGHT line in the copied .ins
+  - Runs: shelxl <base>  (in the subfolder)
+  - Parses <base>.lst for:
+      * NPD count (atoms NPD)
+      * OSF in the last least-squares cycle block
+      * Resolution table:
+          Resolution(A), Number in group, GooF, K, R1
+  - Writes:
+      * summary.txt
+      * metrics_vs_resolution.png
+  - Prints the same summary to terminal
 """
 
 from __future__ import annotations
@@ -23,54 +31,138 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 
-def sanitize_wght_tag(wght_line: str) -> str:
-    s = wght_line.strip()
+# ------------------------- Helpers -------------------------
+
+def _sanitize_tag(s: str) -> str:
+    s = s.strip()
     s = re.sub(r"\s+", "_", s)
     s = s.replace(".", "p")
     s = re.sub(r"[^A-Za-z0-9_+-]", "", s)
     return s
 
 
-def rewrite_wght_in_ins(ins_path: Path, wght_line: str, backup: bool = True) -> None:
-    if not ins_path.exists():
-        raise FileNotFoundError(f"Missing .ins file: {ins_path}")
+def _parse_wghts_arg(wghts: str) -> Tuple[str, str]:
+    """
+    Returns (wght_line, folder_tag)
+    Accepts either:
+      "WGHT a b c d e f"
+    or:
+      "a b c d e f"
+    """
+    raw = wghts.strip()
+    if raw.upper().startswith("WGHT"):
+        tokens = re.split(r"\s+", raw)
+        tokens = tokens[1:]
+    else:
+        tokens = re.split(r"\s+", raw)
 
+    if len(tokens) != 6:
+        raise ValueError(
+            f"--wghts must provide 6 numbers (a b c d e f). Got {len(tokens)} tokens: {tokens}"
+        )
+
+    # Validate numeric
+    vals: List[float] = []
+    for t in tokens:
+        try:
+            vals.append(float(t))
+        except ValueError as e:
+            raise ValueError(f"Non-numeric WGHT token: {t!r}") from e
+
+    # Normalize formatting (keep readable, but stable)
+    def fmt(x: float) -> str:
+        # avoid scientific unless needed
+        if abs(x) >= 1e4 or (abs(x) > 0 and abs(x) < 1e-3):
+            return f"{x:.6g}"
+        return f"{x:g}"
+
+    norm = [fmt(v) for v in vals]
+    wght_line = "WGHT " + " ".join(norm)
+    tag = _sanitize_tag("WGHT_" + "_".join(norm))
+    return wght_line, tag
+
+
+def _find_base_pair(workdir: Path) -> Tuple[str, Path, Path]:
+    """
+    Find a unique <base>.ins with matching <base>.hkl in workdir.
+
+    Rules:
+      - If exactly one .ins exists and matching .hkl exists -> use it.
+      - Else choose the unique basename that has both .ins and .hkl.
+      - Else error.
+    """
+    ins_files = sorted(workdir.glob("*.ins"))
+    hkl_files = {p.stem for p in workdir.glob("*.hkl")}
+
+    if len(ins_files) == 1:
+        ins = ins_files[0]
+        base = ins.stem
+        hkl = workdir / f"{base}.hkl"
+        if hkl.exists():
+            return base, ins, hkl
+        raise FileNotFoundError(
+            f"Found one .ins ({ins.name}) but missing matching .hkl ({base}.hkl)."
+        )
+
+    candidates = []
+    for ins in ins_files:
+        if ins.stem in hkl_files:
+            candidates.append(ins.stem)
+
+    candidates = sorted(set(candidates))
+    if len(candidates) == 1:
+        base = candidates[0]
+        return base, workdir / f"{base}.ins", workdir / f"{base}.hkl"
+
+    if not ins_files:
+        raise FileNotFoundError(f"No .ins files found in: {workdir}")
+    if not candidates:
+        raise FileNotFoundError(
+            f"Found .ins files but no matching .hkl with same basename in: {workdir}"
+        )
+    raise RuntimeError(
+        f"Ambiguous: multiple .ins/.hkl basenames found in {workdir}: {candidates}\n"
+        "Keep only one matching pair in the directory to use this script (since inputs are only --dir and --wghts)."
+    )
+
+
+def _rewrite_wght_in_ins(ins_path: Path, wght_line: str) -> None:
+    """
+    Replace existing WGHT line(s); if none exist, insert before END (or append).
+    No backups.
+    """
     txt = ins_path.read_text(errors="replace").splitlines(keepends=True)
 
-    if backup:
-        bak = ins_path.with_suffix(ins_path.suffix + ".bak")
-        shutil.copy2(ins_path, bak)
-
-    out_lines: List[str] = []
+    out: List[str] = []
     replaced = False
-
     for line in txt:
         if line.lstrip().upper().startswith("WGHT"):
+            # Preserve original line ending style if present
             m = re.search(r"(\r\n|\n)$", line)
             line_ending = m.group(1) if m else "\n"
-            out_lines.append(wght_line.rstrip() + line_ending)
+            out.append(wght_line.rstrip() + line_ending)
             replaced = True
         else:
-            out_lines.append(line)
+            out.append(line)
 
     if not replaced:
+        insert_line = wght_line.rstrip() + "\n"
         end_idx = None
-        for i, line in enumerate(out_lines):
+        for i, line in enumerate(out):
             if line.strip().upper() == "END":
                 end_idx = i
-        insert_line = wght_line.rstrip() + "\n"
         if end_idx is None:
-            out_lines.append(insert_line)
+            out.append(insert_line)
         else:
-            out_lines.insert(end_idx, insert_line)
+            out.insert(end_idx, insert_line)
 
-    ins_path.write_text("".join(out_lines))
+    ins_path.write_text("".join(out))
 
 
-def run_shelxl(workdir: Path, base: str) -> None:
+def _run_shelxl(workdir: Path, base: str) -> None:
     cmd = ["shelxl", base]
     proc = subprocess.run(
         cmd,
@@ -101,10 +193,13 @@ def _to_float(token: str) -> Optional[float]:
         return None
 
 
-def parse_resolution_table(lst_path: Path) -> Dict[str, List[float]]:
-    if not lst_path.exists():
-        raise FileNotFoundError(f"Missing .lst file: {lst_path}")
-
+def _parse_resolution_table(lst_path: Path) -> Dict[str, List[float]]:
+    """
+    Extracts the table starting at "Resolution(A)" and the rows:
+      Number in group, GooF, K, R1
+    Returns dict with keys:
+      resolution, number_in_group, goof, k, r1
+    """
     lines = lst_path.read_text(errors="replace").splitlines()
 
     header_idx = None
@@ -116,9 +211,7 @@ def parse_resolution_table(lst_path: Path) -> Dict[str, List[float]]:
         raise ValueError("Could not find 'Resolution(A)' header in the .lst file.")
 
     def parse_row(idx: int) -> Tuple[str, List[float]]:
-        line = lines[idx].strip()
-        parts = re.split(r"\s+", line)
-
+        parts = re.split(r"\s+", lines[idx].strip())
         first_num = None
         for j, p in enumerate(parts):
             if _to_float(p) is not None:
@@ -146,7 +239,8 @@ def parse_resolution_table(lst_path: Path) -> Dict[str, List[float]]:
 
     out: Dict[str, List[float]] = {"resolution": res}
 
-    for i in range(header_idx + 1, min(header_idx + 40, len(lines))):
+    # scan a window below header
+    for i in range(header_idx + 1, min(header_idx + 60, len(lines))):
         line = lines[i].strip()
         if not line:
             continue
@@ -162,51 +256,42 @@ def parse_resolution_table(lst_path: Path) -> Dict[str, List[float]]:
     return out
 
 
-def parse_split_npd_line(lst_path: Path) -> str:
-    if not lst_path.exists():
-        return f"Split/NPD line not found (missing file): {lst_path}"
-
+def _parse_npd_count(lst_path: Path) -> Optional[int]:
+    """
+    Finds the last occurrence of "<n> atoms may be split and <m> atoms NPD"
+    Returns m as int.
+    """
     text = lst_path.read_text(errors="replace")
-    pat = re.compile(
-        r"(?i)(\d+)\s+atoms\s+may\s+be\s+split\s+and\s+(\d+)\s+atoms\s+NPD"
-    )
-    m = pat.search(text)
-    if not m:
-        return "Split/NPD line not found: '<n> atoms may be split and <m> atoms NPD'"
-    n, m2 = m.group(1), m.group(2)
-    return f"{n} atoms may be split and {m2} atoms NPD"
-
-
-def parse_last_cycle_osf(lst_path: Path) -> Optional[float]:
-    """
-    Find OSF value in the LAST 'Least-squares cycle ...' block.
-    In that block, find the line that ends with 'OSF' and parse the numeric 'value' column.
-
-    Example line:
-         1    36.60794     1.19550     0.000    OSF
-    """
-    if not lst_path.exists():
+    pat = re.compile(r"(?i)(\d+)\s+atoms\s+may\s+be\s+split\s+and\s+(\d+)\s+atoms\s+NPD")
+    matches = list(pat.finditer(text))
+    if not matches:
         return None
+    m = matches[-1]
+    return int(m.group(2))
 
+
+def _parse_last_cycle_osf(lst_path: Path) -> Optional[float]:
+    """
+    Find OSF value inside the LAST "Least-squares cycle" block.
+    Looks for a line containing OSF and parses the first float after the leading index.
+    Typical line:
+       1    36.60794     1.19550     0.000    OSF
+    """
     lines = lst_path.read_text(errors="replace").splitlines()
 
-    # Find last occurrence of a cycle header
     cycle_idxs = [i for i, line in enumerate(lines) if line.startswith(" Least-squares cycle")]
     if not cycle_idxs:
         return None
     start = cycle_idxs[-1]
 
-    # Define end as next cycle header or EOF
     end = len(lines)
     for j in range(start + 1, len(lines)):
         if lines[j].startswith(" Least-squares cycle"):
             end = j
             break
 
-    # Within this last block, look for an OSF row
-    # Format is typically: N value esd shift/esd parameter
     osf_pat = re.compile(
-        r"^\s*\d+\s+([-+]?\d*\.?\d+(?:[Ee][-+]?\d+)?)\s+[-+]?\d*\.?\d+(?:[Ee][-+]?\d+)?\s+[-+]?\d*\.?\d+(?:[Ee][-+]?\d+)?\s+OSF\s*$"
+        r"^\s*\d+\s+([-+]?\d*\.?\d+(?:[Ee][-+]?\d+)?)\s+.*\bOSF\b"
     )
     for i in range(start, end):
         m = osf_pat.match(lines[i])
@@ -215,93 +300,135 @@ def parse_last_cycle_osf(lst_path: Path) -> Optional[float]:
                 return float(m.group(1))
             except ValueError:
                 return None
-
     return None
 
 
-def save_table_txt(workdir: Path, tag: str, table: Dict[str, List[float]], lst_path: Path) -> Path:
-    out_path = workdir / f"{tag}_resolution_table.txt"
-
-    res = table["resolution"]
-    finite_res = [r for r in res if r != float("inf")]
-
-    def align(vals: List[float]) -> List[float]:
-        return vals[:len(finite_res)]
-
-    ngrp = align(table["number_in_group"])
-    goof = align(table["goof"])
-    kvals = align(table["k"])
-    r1 = align(table["r1"])
-
-    split_npd = parse_split_npd_line(lst_path)
-    osf = parse_last_cycle_osf(lst_path)
-
-    with out_path.open("w") as f:
-        f.write(f"WGHT tag: {tag}\n")
-        f.write(f"{split_npd}\n")
-        f.write(f"OSF (last cycle): {osf if osf is not None else 'not found'}\n")
-        f.write("Columns correspond to finite resolution bins (inf excluded).\n\n")
-        f.write("Resolution(A):      " + "  ".join(f"{x:>6.2f}" for x in finite_res) + "\n")
-        f.write("Number in group:    " + "  ".join(f"{x:>6.0f}" for x in ngrp) + "\n")
-        f.write("GooF:               " + "  ".join(f"{x:>6.3f}" for x in goof) + "\n")
-        f.write("K:                  " + "  ".join(f"{x:>6.3f}" for x in kvals) + "\n")
-        f.write("R1:                 " + "  ".join(f"{x:>6.3f}" for x in r1) + "\n")
-
-    return out_path
-
-
-def save_k_plot(workdir: Path, tag: str, table: Dict[str, List[float]]) -> Path:
+def _save_metrics_plot(outdir: Path, table: Dict[str, List[float]], tag: str) -> Path:
     import matplotlib.pyplot as plt
 
     res = table["resolution"]
-    finite_res = [r for r in res if r != float("inf")]
-    k = table["k"][:len(finite_res)]
+    # Exclude "inf" bin from x-axis; also keep arrays aligned
+    finite_idx = [i for i, r in enumerate(res) if r != float("inf")]
+    x = [res[i] for i in finite_idx]
 
-    out_path = workdir / f"{tag}_K_vs_resolution.png"
+    goof = [table["goof"][i] for i in finite_idx]
+    k = [table["k"][i] for i in finite_idx]
+    r1 = [table["r1"][i] for i in finite_idx]
 
-    plt.figure()
-    plt.plot(finite_res, k, marker="o")
-    plt.xlabel("Resolution (Å)")
-    plt.ylabel("K")
-    plt.title(f"K vs Resolution ({tag})")
-    plt.gca().invert_xaxis()
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
-    plt.close()
+    out_path = outdir / "metrics_vs_resolution.png"
+
+    fig, ax1 = plt.subplots()
+
+    # GooF often dwarfs K/R1, so use a second axis but keep it ONE figure
+    l1, = ax1.plot(x, goof, marker="o", label="GooF")
+    ax1.set_xlabel("Resolution (Å)")
+    ax1.set_ylabel("GooF")
+    ax1.invert_xaxis()
+
+    ax2 = ax1.twinx()
+    l2, = ax2.plot(x, k, marker="o", label="K")
+    l3, = ax2.plot(x, r1, marker="o", label="R1")
+    ax2.set_ylabel("K / R1")
+
+    # Combined legend
+    lines = [l1, l2, l3]
+    labels = [ln.get_label() for ln in lines]
+    ax1.legend(lines, labels, loc="best")
+
+    fig.suptitle(f"WGHT scan metrics ({tag})")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
 
     return out_path
 
 
+def _format_summary(
+    base: str,
+    wght_line: str,
+    npd: Optional[int],
+    osf: Optional[float],
+    table: Dict[str, List[float]],
+) -> str:
+    res = table["resolution"]
+    finite_idx = [i for i, r in enumerate(res) if r != float("inf")]
+    x = [res[i] for i in finite_idx]
+
+    ngrp = [table["number_in_group"][i] for i in finite_idx]
+    goof = [table["goof"][i] for i in finite_idx]
+    k = [table["k"][i] for i in finite_idx]
+    r1 = [table["r1"][i] for i in finite_idx]
+
+    lines: List[str] = []
+    lines.append(f"Base: {base}")
+    lines.append(f"{wght_line}")
+    lines.append(f"NPD atoms (last reported): {npd if npd is not None else 'NOT FOUND'}")
+    lines.append(f"OSF (last LS cycle): {osf if osf is not None else 'NOT FOUND'}")
+    lines.append("")
+    lines.append("Columns correspond to finite resolution bins (inf excluded).")
+    lines.append("")
+    lines.append("Resolution(A):      " + "  ".join(f"{v:>6.2f}" for v in x))
+    lines.append("Number in group:    " + "  ".join(f"{v:>6.0f}" for v in ngrp))
+    lines.append("GooF:               " + "  ".join(f"{v:>10.3f}" for v in goof))
+    lines.append("K:                  " + "  ".join(f"{v:>10.3f}" for v in k))
+    lines.append("R1:                 " + "  ".join(f"{v:>10.3f}" for v in r1))
+    lines.append("")
+    return "\n".join(lines)
+
+
+# ------------------------- Main -------------------------
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dir", required=True, help="Folder containing <base>.ins/.hkl etc")
-    ap.add_argument("--base", required=True, help="Base name, e.g. wght_study (without extension)")
-    ap.add_argument("--wght", required=True, help='WGHT line (either "WGHT a b" or just "a b")')
-    ap.add_argument("--no-backup", action="store_true", help="Do not create <base>.ins.bak")
+    ap.add_argument("--dir", required=True, help="Directory containing <base>.ins and <base>.hkl (one unique pair).")
+    ap.add_argument("--wghts", required=True, help='Six numbers "a b c d e f" or full "WGHT a b c d e f".')
     args = ap.parse_args()
 
-    workdir = Path(args.dir).expanduser().resolve()
-    base = args.base
+    root = Path(args.dir).expanduser().resolve()
+    if not root.is_dir():
+        raise NotADirectoryError(f"--dir is not a directory: {root}")
 
-    wght_line = args.wght.strip()
-    if not wght_line.upper().startswith("WGHT"):
-        wght_line = "WGHT " + wght_line
+    wght_line, tag = _parse_wghts_arg(args.wghts)
+    base, ins_src, hkl_src = _find_base_pair(root)
 
-    ins_path = workdir / f"{base}.ins"
-    lst_path = workdir / f"{base}.lst"
+    outdir = root / tag
+    outdir.mkdir(parents=True, exist_ok=False)
 
-    rewrite_wght_in_ins(ins_path, wght_line, backup=(not args.no_backup))
-    run_shelxl(workdir, base)
+    # Copy only the requested inputs (no backups, do not modify originals)
+    ins_dst = outdir / ins_src.name
+    hkl_dst = outdir / hkl_src.name
+    shutil.copy2(ins_src, ins_dst)
+    shutil.copy2(hkl_src, hkl_dst)
 
-    table = parse_resolution_table(lst_path)
+    # Edit WGHT in the copied ins
+    _rewrite_wght_in_ins(ins_dst, wght_line)
 
-    tag = sanitize_wght_tag(wght_line)
-    txt_path = save_table_txt(workdir, tag, table, lst_path)
-    plot_path = save_k_plot(workdir, tag, table)
+    # Run SHELXL in the new folder
+    _run_shelxl(outdir, base)
 
-    print(f"Done.\n- Table: {txt_path}\n- Plot:  {plot_path}")
+    # Parse outputs
+    lst_path = outdir / f"{base}.lst"
+    if not lst_path.exists():
+        raise FileNotFoundError(f"Expected .lst not found after SHELXL run: {lst_path}")
+
+    table = _parse_resolution_table(lst_path)
+    npd = _parse_npd_count(lst_path)
+    osf = _parse_last_cycle_osf(lst_path)
+
+    # Save plot + summary
+    plot_path = _save_metrics_plot(outdir, table, tag)
+    summary = _format_summary(base, wght_line, npd, osf, table)
+    summary_path = outdir / "summary.txt"
+    summary_path.write_text(summary)
+
+    # Print summary to terminal
+    print(summary)
+    print(f"Saved:\n  - {summary_path}\n  - {plot_path}")
+    print(f"Run folder:\n  - {outdir}")
+
 
 if __name__ == "__main__":
     main()
 
-# python wght_shelxl_scan.py --dir /Users/xiaodong/Desktop/3DED-DATA/LTA/LTA4/wght_study --base wght_study --wght "0.2 0.0"
+
+# python wght_shelxl_scan.py --dir /Users/xiaodong/Desktop/LTA1/wght_study --wghts "0.2 0 0 0 0 0"

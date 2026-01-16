@@ -326,8 +326,8 @@ def _save_metrics_plot(outdir: Path, table: Dict[str, List[float]], tag: str) ->
     ax1.invert_xaxis()
 
     ax2 = ax1.twinx()
-    l2, = ax2.plot(x, k, marker="o", label="K")
-    l3, = ax2.plot(x, r1, marker="o", label="R1")
+    l2, = ax2.plot(x, k, marker="x", label="K")
+    l3, = ax2.plot(x, r1, marker="x", label="R1")
     ax2.set_ylabel("K / R1")
 
     # Combined legend

@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 import argparse
 import numpy as np
+import os
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
 
-# Force opening in your default browser (reliable in VS Code on macOS)
-pio.renderers.default = "browser"
+# Detect WSL2
+def is_wsl() -> bool:
+    """Check if running in WSL (Windows Subsystem for Linux)."""
+    try:
+        with open('/proc/version', 'r') as f:
+            return 'microsoft' in f.read().lower()
+    except:
+        return False
 
 
 # =========================
@@ -229,7 +236,25 @@ def main():
     fig.update_layout(title="WGHT behavior vs resolution (synthetic ED-like, Io/Ic shown)",
                       legend=dict(orientation="h", yanchor="bottom", y=1.08, xanchor="left", x=0.0))
 
-    fig.show()
+    # Show plot with WSL2 compatibility
+    if is_wsl():
+        # In WSL2, write to temp file and open with Windows browser
+        import tempfile
+        import subprocess
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+            html_file = f.name
+            fig.write_html(html_file)
+        
+        # Convert WSL path to Windows path and open
+        result = subprocess.run(['wslpath', '-w', html_file], 
+                               capture_output=True, text=True, check=True)
+        windows_path = result.stdout.strip()
+        subprocess.run(['cmd.exe', '/c', 'start', windows_path], 
+                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print(f"Plot saved to {html_file} and opened in Windows browser")
+    else:
+        fig.show()
 
 
 if __name__ == "__main__":

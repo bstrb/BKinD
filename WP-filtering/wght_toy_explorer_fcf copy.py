@@ -2,8 +2,8 @@
 """
 WGHT toy explorer (FCF-backed).
 Loads a SHELXL .fcf (hklf 4) to get Fo^2, Fc^2, sigma(Fo^2), hkl, and cell (if present);
-computes s = sin(theta)/lambda directly from hkl and cell;
-plots q(s), weights, relative weights, and chi terms for one-or-more WGHT parameter sets.
+computes s = sin(theta)/lambda from hkl, cell, and user-provided lambda;
+plots w, relative w, and w*(Fo^2-Fc^2)^2 for one-or-more WGHT parameter sets.
 Parameters per curve: a, b, c, f. Sigma/Fc come from the loaded file.
 """
 from __future__ import annotations
@@ -180,7 +180,7 @@ def weights_wght(Fo2: np.ndarray, Fc2: np.ndarray, sigma2: np.ndarray, s: np.nda
         q = np.exp(c * s * s)
     else:
         q = 1.0 - np.exp(c * s * s)
-    P = float(f) * np.maximum(Fo2, 0.1) + (1.0 - float(f)) * np.maximum(Fc2, 0.1)
+    P = float(f) * np.maximum(Fo2, 0.0) + (1.0 - float(f)) * Fc2
     denom = sigma2 + (float(a) * P) ** 2 + float(b) * P  # d=e=0
     return q / np.maximum(denom, 1e-30)
 
@@ -191,22 +191,13 @@ def bin_logx_median(x: np.ndarray, y: np.ndarray, nbins: int = 80):
     x = x[ok]; y = y[ok]
     if x.size == 0:
         return np.array([]), np.array([])
-    xmin = np.min(x); xmax = np.max(x)
-    if xmin <= 0 or xmax <= 0 or xmin == xmax:
-        return np.array([]), np.array([])
-    edges = np.logspace(np.log10(xmin), np.log10(xmax), nbins + 1)
+    edges = np.logspace(np.log10(np.min(x)), np.log10(np.max(x)), nbins + 1)
     xc = np.sqrt(edges[:-1] * edges[1:])
     yy = np.full_like(xc, np.nan, float)
     for i in range(len(xc)):
-        if i == len(xc) - 1:
-            m = (x >= edges[i]) & (x <= edges[i+1])
-        else:
-            m = (x >= edges[i]) & (x < edges[i+1])
+        m = (x >= edges[i]) & (x < edges[i+1])
         if np.any(m):
             yy[i] = np.nanmedian(y[m])
-        elif i > 0 and np.any((x >= edges[i-1]) & (x < edges[i])):
-            # carry forward last value if gap, to avoid dropping the tail entirely
-            yy[i] = yy[i-1]
     ok2 = np.isfinite(yy)
     return xc[ok2], yy[ok2]
 
@@ -227,40 +218,7 @@ class FcfWghtExplorer(QtWidgets.QWidget):
         self.hkl: Optional[np.ndarray] = None
         self.cell: Optional[Dict[str, float]] = None
 
-        self.lambda_presets = [
-            ("Electron 300 kV", 0.01968),
-            ("Electron 200 kV", 0.02508),
-            ("Mo Kα (X-ray)", 0.71073),
-            ("Cu Kα (X-ray)", 1.54056),
-            ("Custom", None),
-        ]
-
-        self.log_defaults = {
-            "w_p": True,
-            "relw_p": True,
-            "chi_p": True,
-            "w_d": True,
-            "relw_d": True,
-            "chi_d": True,
-        }
-        self.style_defaults = {
-            "w_p": "binned",
-            "relw_p": "binned",
-            "chi_p": "binned",
-            "w_d": "binned",
-            "relw_d": "binned",
-            "chi_d": "binned",
-        }
-        self.bin_defaults = {
-            "w_p": 100,
-            "relw_p": 100,
-            "chi_p": 100,
-            "w_d": 100,
-            "relw_d": 100,
-            "chi_d": 100,
-        }
-
-        self.default_params = {"a": 0.1, "b": 0.0, "c": 0.0, "f": 1/3}
+        self.default_params = {"a": 0.0, "b": 0.0, "c": 0.0, "f": 1/3}
         self._suspend_plot = False
 
         self._build_ui()
@@ -289,35 +247,18 @@ class FcfWghtExplorer(QtWidgets.QWidget):
         self.btn_load.clicked.connect(self.load_fcf_dialog)
         form.addRow(self.btn_load)
 
-        # Lambda presets + custom
-        self.combo_lambda = QtWidgets.QComboBox()
-        for name, val in self.lambda_presets:
-            label = f"{name}" if val is None else f"{name} ({val:.5f} Å)"
-            self.combo_lambda.addItem(label, val)
-        self.combo_lambda.currentIndexChanged.connect(self._on_lambda_preset_changed)
-
+        # Lambda
         self.spin_lambda = QtWidgets.QDoubleSpinBox()
         self.spin_lambda.setRange(1e-4, 10.0)
         self.spin_lambda.setDecimals(6)
         self.spin_lambda.setValue(0.71073)  # default Mo Kα
-        self.spin_lambda.editingFinished.connect(self._on_lambda_spin_changed)
-        self.spin_lambda.setEnabled(False)
-
-        lambda_row = QtWidgets.QHBoxLayout()
-        lambda_row.addWidget(self.combo_lambda)
-        lambda_row.addWidget(self.spin_lambda)
-        lambda_row_widget = QtWidgets.QWidget(); lambda_row_widget.setLayout(lambda_row)
-        form.addRow("λ (Å)", lambda_row_widget)
+        self.spin_lambda.editingFinished.connect(self.update_plots)
+        form.addRow("λ (Å)", self.spin_lambda)
 
         # Curve table
-        self.table = QtWidgets.QTableWidget(0, 6)
-        self.table.setHorizontalHeaderLabels(["on", "a", "b", "c", "f", "label"])
+        self.table = QtWidgets.QTableWidget(0, 5)
+        self.table.setHorizontalHeaderLabels(["a", "b", "c", "f", "label"])
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
-        # Default widths; last column stretches
-        self.table.setColumnWidth(0, 20)
-        for col in (1, 2, 3, 4):
-            self.table.setColumnWidth(col, 30)
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.AllEditTriggers)
@@ -346,43 +287,11 @@ class FcfWghtExplorer(QtWidgets.QWidget):
         btn_row_widget = QtWidgets.QWidget(); btn_row_widget.setLayout(btn_row)
         form.addRow(btn_row_widget)
 
-        # Per-plot style, bins, and log toggles
-        self.style_combos: Dict[str, QtWidgets.QComboBox] = {}
-        self.bin_spins: Dict[str, QtWidgets.QSpinBox] = {}
-        self.log_checks: Dict[str, QtWidgets.QCheckBox] = {}
-        style_keys = [
-            ("w vs P", "w_p"),
-            ("rel w vs P", "relw_p"),
-            ("chi vs P", "chi_p"),
-            ("w vs d", "w_d"),
-            ("rel w vs d", "relw_d"),
-            ("chi vs d", "chi_d"),
-        ]
-        style_grid = QtWidgets.QGridLayout()
-        for i, (label, key) in enumerate(style_keys):
-            combo = QtWidgets.QComboBox()
-            combo.addItems(["binned", "scatter", "both"])
-            combo.setCurrentText(self.style_defaults.get(key, "binned"))
-            combo.currentIndexChanged.connect(self.update_plots)
-            self.style_combos[key] = combo
-            spin = QtWidgets.QSpinBox()
-            spin.setRange(0, 500)
-            spin.setSingleStep(5)
-            spin.setValue(self.bin_defaults.get(key, 80))
-            spin.setToolTip("Bins (0 = off)")
-            spin.valueChanged.connect(self.update_plots)
-            self.bin_spins[key] = spin
-            log_chk = QtWidgets.QCheckBox("log")
-            log_chk.setChecked(self.log_defaults.get(key, True))
-            log_chk.stateChanged.connect(self.update_plots)
-            self.log_checks[key] = log_chk
-            style_grid.addWidget(QtWidgets.QLabel(label), i, 0)
-            style_grid.addWidget(combo, i, 1)
-            style_grid.addWidget(spin, i, 2)
-            style_grid.addWidget(log_chk, i, 3)
-        style_group = QtWidgets.QGroupBox("Plot style / bins / log")
-        style_group.setLayout(style_grid)
-        form.addRow(style_group)
+        # Scale toggle
+        self.chk_log = QtWidgets.QCheckBox("Log axes")
+        self.chk_log.setChecked(True)
+        self.chk_log.stateChanged.connect(self.update_plots)
+        form.addRow(self.chk_log)
 
         # Status
         self.status_box = QtWidgets.QPlainTextEdit(); self.status_box.setReadOnly(True); self.status_box.setFixedHeight(160)
@@ -405,29 +314,16 @@ class FcfWghtExplorer(QtWidgets.QWidget):
 
     def _setup_axes(self) -> None:
         self.fig.clear()
-        gs = self.fig.add_gridspec(2, 3, height_ratios=[1.0, 1.0], hspace=0.32, wspace=0.22)
-        # top row: w/relw/chi vs P
-        self.ax_w_p = self.fig.add_subplot(gs[0, 0])
-        self.ax_relw_p = self.fig.add_subplot(gs[0, 1])
-        self.ax_chi_p = self.fig.add_subplot(gs[0, 2])
-        # bottom row: w/relw/chi vs d
-        self.ax_w_d = self.fig.add_subplot(gs[1, 0])
-        self.ax_relw_d = self.fig.add_subplot(gs[1, 1])
-        self.ax_chi_d = self.fig.add_subplot(gs[1, 2])
-        for ax in (self.ax_w_p, self.ax_relw_p, self.ax_chi_p, self.ax_w_d, self.ax_relw_d, self.ax_chi_d):
+        gs = self.fig.add_gridspec(3, 1, height_ratios=[1.0, 1.0, 1.0])
+        self.ax_w = self.fig.add_subplot(gs[0])
+        self.ax_relw = self.fig.add_subplot(gs[1])
+        self.ax_term = self.fig.add_subplot(gs[2])
+        for ax in (self.ax_w, self.ax_relw, self.ax_term):
             ax.grid(True, which="both", alpha=0.25)
-        self.ax_w_p.set_ylabel("w")
-        self.ax_relw_p.set_ylabel("relative w = w / (1/σ²)")
-        self.ax_chi_p.set_ylabel("chi = w·(Fo² - Fc²)²")
-        self.ax_w_d.set_ylabel("w")
-        self.ax_relw_d.set_ylabel("relative w = w / (1/σ²)")
-        self.ax_chi_d.set_ylabel("chi = w·(Fo² - Fc²)²")
-        self.ax_w_p.set_xlabel("P")
-        self.ax_relw_p.set_xlabel("P")
-        self.ax_chi_p.set_xlabel("P")
-        self.ax_w_d.set_xlabel("resolution d (Å)")
-        self.ax_relw_d.set_xlabel("resolution d (Å)")
-        self.ax_chi_d.set_xlabel("resolution d (Å)")
+        self.ax_w.set_ylabel("w")
+        self.ax_relw.set_ylabel("relative w = w / (1/σ²)")
+        self.ax_term.set_ylabel("w*(Fo² - Fc²)²")
+        self.ax_term.set_xlabel("Fo²")
 
     def add_curve_row(self, overrides: Optional[dict] = None) -> None:
         params = {**self.default_params}
@@ -436,22 +332,15 @@ class FcfWghtExplorer(QtWidgets.QWidget):
         self._suspend_plot = True
         row = self.table.rowCount()
         self.table.insertRow(row)
-        # on/off checkbox
-        on_item = QtWidgets.QTableWidgetItem()
-        on_item.setFlags(on_item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
-        on_item.setCheckState(QtCore.Qt.CheckState.Checked)
-        on_item.setTextAlignment(int(QtCore.Qt.AlignmentFlag.AlignCenter))
-        self.table.setItem(row, 0, on_item)
-
         vals = [params["a"], params["b"], params["c"], params["f"]]
-        for col, v in enumerate(vals, start=1):
+        for col, v in enumerate(vals):
             item = QtWidgets.QTableWidgetItem(f"{v:.6g}")
             item.setTextAlignment(int(QtCore.Qt.AlignmentFlag.AlignCenter))
             self.table.setItem(row, col, item)
         label_item = QtWidgets.QTableWidgetItem("")
         label_item.setTextAlignment(int(QtCore.Qt.AlignmentFlag.AlignCenter))
         label_item.setFlags(label_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-        self.table.setItem(row, 5, label_item)
+        self.table.setItem(row, 4, label_item)
         self._suspend_plot = False
         self.status_box.setPlainText(f"Added curve row #{row+1}")
         self.update_plots()
@@ -514,36 +403,14 @@ class FcfWghtExplorer(QtWidgets.QWidget):
             return
         self.update_plots()
 
-    def _on_lambda_preset_changed(self, idx: int) -> None:
-        val = self.combo_lambda.itemData(idx)
-        if val is None:
-            # Custom: enable manual entry but don't overwrite current value
-            self.spin_lambda.setEnabled(True)
-            return
-        self.spin_lambda.setEnabled(False)
-        self.spin_lambda.setValue(float(val))
-        self.update_plots()
-
-    def _on_lambda_spin_changed(self) -> None:
-        idx = self.combo_lambda.currentIndex()
-        val = self.combo_lambda.itemData(idx)
-        if val is not None:
-            # a preset is selected; ignore manual edit
-            return
-        self.spin_lambda.setEnabled(True)
-        self.update_plots()
-
     def _read_curves(self) -> List[dict]:
         curves: List[dict] = []
         for row in range(self.table.rowCount()):
             try:
-                on_item = self.table.item(row, 0)
-                if on_item is None or on_item.checkState() != QtCore.Qt.CheckState.Checked:
-                    continue
-                a = float(self.table.item(row, 1).text())
-                b = float(self.table.item(row, 2).text())
-                c = float(self.table.item(row, 3).text())
-                f = float(self.table.item(row, 4).text())
+                a = float(self.table.item(row, 0).text())
+                b = float(self.table.item(row, 1).text())
+                c = float(self.table.item(row, 2).text())
+                f = float(self.table.item(row, 3).text())
             except Exception:
                 continue
             curves.append({"a": a, "b": b, "c": c, "f": f})
@@ -569,75 +436,22 @@ class FcfWghtExplorer(QtWidgets.QWidget):
         cell_txt = "; cell ok" if cell else "; cell missing"
         hkl_txt = "; hkl ok" if hkl is not None else "; hkl missing"
         self.status_box.setPlainText(f"Loaded {path.name} (n={len(Fo2)} reflections{cell_txt}{hkl_txt})")
-        self._set_bin_spin_limits(len(Fo2))
         self.update_plots()
-
-    def _set_bin_spin_limits(self, n_reflections: int) -> None:
-        max_bins = max(2, int(n_reflections // 2)) if n_reflections else 2
-        for spin in self.bin_spins.values():
-            spin.setMaximum(max_bins)
-            if spin.value() > max_bins:
-                spin.setValue(max_bins)
 
     def update_plots(self) -> None:
         Fo2 = self.Fo2; Fc2 = self.Fc2; sigFo2 = self.sigFo2; hkl = self.hkl; cell = self.cell
         curves = self._read_curves()
 
-        def is_log(key: str) -> bool:
-            chk = self.log_checks.get(key)
-            return chk.isChecked() if chk else True
-
-        def style_mode(key: str) -> str:
-            combo = self.style_combos.get(key)
-            val = combo.currentText().strip().lower() if combo else "binned"
-            return val if val in ("binned", "scatter", "both") else "binned"
-
-        def bin_count(key: str) -> int:
-            spin = self.bin_spins.get(key)
-            if spin is None:
-                return 0
-            try:
-                return int(spin.value())
-            except Exception:
-                return 0
-
-        def nb_for(key: str) -> int:
-            spin = self.bin_spins.get(key)
-            n = bin_count(key)
-            if n <= 0:
-                return 0
-            max_allowed = spin.maximum() if spin else n
-            return int(max(2, min(max_allowed, n)))
-
-        axes = {
-            "w_p": self.ax_w_p,
-            "relw_p": self.ax_relw_p,
-            "chi_p": self.ax_chi_p,
-            "w_d": self.ax_w_d,
-            "relw_d": self.ax_relw_d,
-            "chi_d": self.ax_chi_d,
-        }
-        for key, ax in axes.items():
+        use_log = self.chk_log.isChecked()
+        for ax in (self.ax_w, self.ax_relw, self.ax_term):
             ax.cla()
-            log_on = is_log(key)
-            ax.set_xscale("log" if log_on else "linear")
-            ax.set_yscale("log" if log_on else "linear")
+            ax.set_xscale("log" if use_log else "linear")
+            ax.set_yscale("log" if use_log else "linear")
             ax.grid(True, which="both", alpha=0.25)
-        self.ax_w_p.set_ylabel("w")
-        self.ax_relw_p.set_ylabel("relative w = w / (1/σ²)")
-        self.ax_chi_p.set_ylabel("chi = w·(Fo² - Fc²)²")
-        self.ax_w_d.set_ylabel("w")
-        self.ax_relw_d.set_ylabel("relative w = w / (1/σ²)")
-        self.ax_chi_d.set_ylabel("chi = w·(Fo² - Fc²)²")
-        self.ax_w_p.set_xlabel("P")
-        self.ax_relw_p.set_xlabel("P")
-        self.ax_chi_p.set_xlabel("P")
-        self.ax_w_d.set_xlabel("resolution d (Å)")
-        self.ax_relw_d.set_xlabel("resolution d (Å)")
-        self.ax_chi_d.set_xlabel("resolution d (Å)")
-
-        bins = {k: nb_for(k) for k in axes.keys()}
-        mode = {k: style_mode(k) for k in axes.keys()}
+        self.ax_w.set_ylabel("w")
+        self.ax_relw.set_ylabel("relative w = w / (1/σ²)")
+        self.ax_term.set_ylabel("w*(Fo² - Fc²)²")
+        self.ax_term.set_xlabel("Fo²")
 
         if Fo2 is None or Fc2 is None or sigFo2 is None:
             self.status_box.setPlainText("Load a .fcf to plot.")
@@ -652,177 +466,53 @@ class FcfWghtExplorer(QtWidgets.QWidget):
 
         try:
             s = _sin_theta_over_lambda(hkl, cell)
+            lambda_A = float(self.spin_lambda.value())
+            # s already sin(theta)/lambda; multiply by lambda? actually s = |h*|/2; to get sin(theta)/lambda for given lambda:
+            s = s / lambda_A  # adjust to user lambda
         except Exception as exc:
             self.status_box.setPlainText(f"Failed to compute s: {exc}")
             self.canvas.draw_idle(); return
 
         sigma2 = np.maximum(sigFo2, 1e-12) ** 2
         colors = plt_cm(len(curves))
-        debug_lines = []
-        P_min_pos = np.inf
-        P_max_pos = 0.0
-        rng = np.random.default_rng(0)
         for idx, curve in enumerate(curves):
             a = curve["a"]; b = curve["b"]; c = curve["c"]; f = curve["f"]
-            # q(s) as in weights_wght
-            if c == 0.0:
-                q = np.ones_like(s)
-            elif c > 0.0:
-                q = np.exp(c * s * s)
-            else:
-                q = 1.0 - np.exp(c * s * s)
-            q = np.maximum(q, 1e-300)
-
-            P = float(f) * np.maximum(Fo2, 0.0) + (1.0 - float(f)) * np.maximum(Fc2, 0.0)
-            P_pos = np.maximum(P, 1e-300)
-            P_min_pos = min(P_min_pos, float(P_pos.min()))
-            P_max_pos = max(P_max_pos, float(P_pos.max()))
-
             w = weights_wght(Fo2, Fc2, sigma2, s, a, b, c, f)
-            w = np.maximum(w, 1e-300)
             resid = Fo2 - Fc2
-            chi = np.maximum(w * (resid ** 2), 1e-300)
+            contrib = w * (resid ** 2)
             w0 = 1.0 / np.maximum(sigma2, 1e-30)
-            relw = np.maximum(w / w0, 1e-300)
+            relw = w / w0
 
-            s_pos = np.clip(s, 1e-9, None)
-            res_pos = 1.0 / np.maximum(2.0 * s_pos, 1e-12)
-
-            nb_w_p = bins.get("w_p", 0)
-            nb_relw_p = bins.get("relw_p", 0)
-            nb_chi_p = bins.get("chi_p", 0)
-            nb_w_d = bins.get("w_d", 0)
-            nb_relw_d = bins.get("relw_d", 0)
-            nb_chi_d = bins.get("chi_d", 0)
-            show_bin_w_p = nb_w_p > 0 and mode["w_p"] in ("binned", "both")
-            show_bin_relw_p = nb_relw_p > 0 and mode["relw_p"] in ("binned", "both")
-            show_bin_chi_p = nb_chi_p > 0 and mode["chi_p"] in ("binned", "both")
-            show_bin_w_d = nb_w_d > 0 and mode["w_d"] in ("binned", "both")
-            show_bin_relw_d = nb_relw_d > 0 and mode["relw_d"] in ("binned", "both")
-            show_bin_chi_d = nb_chi_d > 0 and mode["chi_d"] in ("binned", "both")
-
-            show_scatter_w_p = mode["w_p"] in ("scatter", "both")
-            show_scatter_relw_p = mode["relw_p"] in ("scatter", "both")
-            show_scatter_chi_p = mode["chi_p"] in ("scatter", "both")
-            show_scatter_w_d = mode["w_d"] in ("scatter", "both")
-            show_scatter_relw_d = mode["relw_d"] in ("scatter", "both")
-            show_scatter_chi_d = mode["chi_d"] in ("scatter", "both")
-
-            xs_w_d = ys_w_d = xs_relw_d = ys_relw_d = xs_chi_d = ys_chi_d = np.array([])
-            xp_w_p = yp_w_p = xp_relw_p = yp_relw_p = xp_chi_p = yp_chi_p = np.array([])
-            if show_bin_w_d:
-                xs_w_d, ys_w_d = bin_logx_median(res_pos, w, nb_w_d)
-            if show_bin_relw_d:
-                xs_relw_d, ys_relw_d = bin_logx_median(res_pos, relw, nb_relw_d)
-            if show_bin_chi_d:
-                xs_chi_d, ys_chi_d = bin_logx_median(res_pos, chi, nb_chi_d)
-            if show_bin_w_p:
-                xp_w_p, yp_w_p = bin_logx_median(P_pos, w, nb_w_p)
-            if show_bin_relw_p:
-                xp_relw_p, yp_relw_p = bin_logx_median(P_pos, relw, nb_relw_p)
-            if show_bin_chi_p:
-                xp_chi_p, yp_chi_p = bin_logx_median(P_pos, chi, nb_chi_p)
+            # bin medians for smoother curves
+            xw, yw = bin_logx_median(Fo2, relw)
+            xc, yc = bin_logx_median(Fo2, contrib)
 
             color = colors[idx % len(colors)]
             label = f"curve {idx+1}: a={a:g}, b={b:g}, c={c:g}, f={f:g}"
-            if show_bin_w_p and xp_w_p.size:
-                self.ax_w_p.plot(xp_w_p, yp_w_p, color=color, alpha=0.95, label=label)
-            if show_bin_relw_p and xp_relw_p.size:
-                self.ax_relw_p.plot(xp_relw_p, yp_relw_p, color=color, alpha=0.95)
-            if show_bin_chi_p and xp_chi_p.size:
-                self.ax_chi_p.plot(xp_chi_p, yp_chi_p, color=color, alpha=0.95)
-            if show_bin_w_d and xs_w_d.size:
-                self.ax_w_d.plot(xs_w_d, ys_w_d, color=color, alpha=0.95)
-            if show_bin_relw_d and xs_relw_d.size:
-                self.ax_relw_d.plot(xs_relw_d, ys_relw_d, color=color, alpha=0.95)
-            if show_bin_chi_d and xs_chi_d.size:
-                self.ax_chi_d.plot(xs_chi_d, ys_chi_d, color=color, alpha=0.95)
-
-            # raw subsamples, controlled per-plot
-            idx_s_samp = np.array([], int)
-            if s_pos.size > 0 and (show_scatter_w_d or show_scatter_relw_d or show_scatter_chi_d):
-                n_samp_s = min(s_pos.size, 3000)
-                idx_s_samp = rng.choice(s_pos.size, size=n_samp_s, replace=False)
-            idx_p_samp = np.array([], int)
-            if P_pos.size > 0 and (show_scatter_w_p or show_scatter_relw_p or show_scatter_chi_p):
-                n_samp_p = min(P_pos.size, 3000)
-                idx_p_samp = rng.choice(P_pos.size, size=n_samp_p, replace=False)
-
-            if show_scatter_w_p and idx_p_samp.size:
-                self.ax_w_p.plot(P_pos[idx_p_samp], w[idx_p_samp], linestyle="", marker=".", markersize=3, alpha=0.12, color=color)
-            if show_scatter_relw_p and idx_p_samp.size:
-                self.ax_relw_p.plot(P_pos[idx_p_samp], relw[idx_p_samp], linestyle="", marker=".", markersize=3, alpha=0.12, color=color)
-            if show_scatter_chi_p and idx_p_samp.size:
-                self.ax_chi_p.plot(P_pos[idx_p_samp], chi[idx_p_samp], linestyle="", marker=".", markersize=3, alpha=0.12, color=color)
-            if show_scatter_w_d and idx_s_samp.size:
-                self.ax_w_d.plot(res_pos[idx_s_samp], w[idx_s_samp], linestyle="", marker=".", markersize=3, alpha=0.12, color=color)
-            if show_scatter_relw_d and idx_s_samp.size:
-                self.ax_relw_d.plot(res_pos[idx_s_samp], relw[idx_s_samp], linestyle="", marker=".", markersize=3, alpha=0.12, color=color)
-            if show_scatter_chi_d and idx_s_samp.size:
-                self.ax_chi_d.plot(res_pos[idx_s_samp], chi[idx_s_samp], linestyle="", marker=".", markersize=3, alpha=0.12, color=color)
-
-            # show P extents for diagnostics
-            pmax = float(P_pos.max())
-            p95 = float(np.percentile(P_pos, 95))
-            if pmax > 0:
-                self.ax_relw_p.axvline(pmax, color=color, alpha=0.25, linestyle="--")
-                self.ax_chi_p.axvline(pmax, color=color, alpha=0.25, linestyle="--")
-            if p95 > 0:
-                self.ax_relw_p.axvline(p95, color=color, alpha=0.25, linestyle=":")
-                self.ax_chi_p.axvline(p95, color=color, alpha=0.25, linestyle=":")
-
-            bin_note = f"bins w_P={nb_w_p or 'off'} relw_P={nb_relw_p or 'off'} chi_P={nb_chi_p or 'off'} w_d={nb_w_d or 'off'} relw_d={nb_relw_d or 'off'} chi_d={nb_chi_d or 'off'}"
-            debug_lines.append(
-                f"#{idx+1} f={f:g} a={a:g} b={b:g} c={c:g} {bin_note} style P={mode['w_p']}/{mode['relw_p']}/{mode['chi_p']} d={mode['w_d']}/{mode['relw_d']}/{mode['chi_d']} | P max={P_pos.max():.3g} p95={np.percentile(P_pos,95):.3g} | xp_max={xp_relw_p.max() if xp_relw_p.size else float('nan'):.3g} | w max={w.max():.3g}"
-            )
+            self.ax_w.plot(xw, yw, color=color, alpha=0.95, label=label)
+            self.ax_relw.plot(xw, yw, color=color, alpha=0.95)
+            self.ax_term.plot(xc, yc, color=color, alpha=0.95)
 
             # label cell color/text
             try:
                 self._suspend_plot = True
-                label_item = self.table.item(idx, 5)
+                label_item = self.table.item(idx, 4)
                 if label_item is None:
                     label_item = QtWidgets.QTableWidgetItem("")
                     label_item.setFlags(label_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                     label_item.setTextAlignment(int(QtCore.Qt.AlignmentFlag.AlignCenter))
-                    self.table.setItem(idx, 5, label_item)
+                    self.table.setItem(idx, 4, label_item)
                 label_item.setText(label)
                 rgb = [int(max(0, min(1, c)) * 255) for c in color[:3]]
                 label_item.setBackground(QBrush(QColor(*rgb)))
             finally:
                 self._suspend_plot = False
 
-        lam_txt = f"λ preset: {self.combo_lambda.currentText()} | λ = {self.spin_lambda.value():.5f} Å"
-        cell_txt = "cell: none"
-        if cell:
-            cell_txt = "cell: " + ", ".join(
-                f"{k}={cell.get(k, float('nan')):.4f}" for k in ["a", "b", "c", "alpha", "beta", "gamma"] if k in cell
-            )
-        status_lines = [
-            f"Reflections: {len(Fo2)}",
-            f"Curves plotted: {len(curves)}",
-            lam_txt,
-            cell_txt,
-            "Bins per plot: " + ", ".join(
-                [
-                    f"w_P={bins['w_p'] or 'off'}",
-                    f"relw_P={bins['relw_p'] or 'off'}",
-                    f"chi_P={bins['chi_p'] or 'off'}",
-                    f"w_d={bins['w_d'] or 'off'}",
-                    f"relw_d={bins['relw_d'] or 'off'}",
-                    f"chi_d={bins['chi_d'] or 'off'}",
-                ]
-            ),
-            "c controls q(s); f mixes P = f·Fo² + (1-f)·Fc²",
-        ]
-        status_lines.extend(debug_lines)
-        self.status_box.setPlainText("\n".join(status_lines))
-
-        if P_max_pos > 0.0 and np.isfinite(P_min_pos):
-            lo = max(P_min_pos, P_max_pos * 1e-6, 1e-9)
-            hi = P_max_pos * 1.05
-            self.ax_w_p.set_xlim(lo, hi)
-            self.ax_relw_p.set_xlim(lo, hi)
-            self.ax_chi_p.set_xlim(lo, hi)
+        self.status_box.setPlainText(
+            f"Reflections: {len(Fo2)}\n"
+            f"curves plotted: {len(curves)}\n"
+            f"σ from FCF; q(c) uses s from hkl/cell and λ"
+        )
 
         self.canvas.draw_idle()
 

@@ -20,7 +20,8 @@ if "QT_QPA_PLATFORM" not in os.environ:
         os.environ["QT_QPA_PLATFORM"] = "cocoa"
     else:
         # Fallback to offscreen for headless cases; can be overridden by user env
-        os.environ["QT_QPA_PLATFORM"] = "offscreen"
+        # os.environ["QT_QPA_PLATFORM"] = "offscreen"
+        pass
 import numpy as np
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtGui import QColor, QBrush

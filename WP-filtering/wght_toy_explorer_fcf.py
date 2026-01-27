@@ -13,6 +13,14 @@ from typing import List, Optional, Tuple, Dict
 import shlex
 import sys
 import os
+
+# Ensure Qt can start on macOS/WSL without xcb. Prefer cocoa on macOS if not set.
+if "QT_QPA_PLATFORM" not in os.environ:
+    if sys.platform == "darwin":
+        os.environ["QT_QPA_PLATFORM"] = "cocoa"
+    else:
+        # Fallback to offscreen for headless cases; can be overridden by user env
+        os.environ["QT_QPA_PLATFORM"] = "offscreen"
 import numpy as np
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtGui import QColor, QBrush

@@ -1,0 +1,22 @@
+run x:
+INTEGRATE.HKL + XDS.INP -> XDS_ASCII.HKL
+INTEGRATE.HKL + XDS_ASCII.HKL -> XDS_ASCII_NEM.HKL
+XDS_ASCII_NEM.HKL + XDSCONV.INP -> SHELX.HKL
+SHELX.HKL + SHELX.INS -> SHELX.FCF
+SHELX.HKL + SHELX.FCF + CCTBX -> DFM (u-factor optimized to mean=median)
+DFM -> INTEGRATE_FILTERED.HKL + stats summary + plots
+INTEGRATE_FILTERED.HKL -> run x+1/INTEGRATE.HKL
+
+rescale wrt to DFM(u(model), res, orientation, thickness)
+
+
+DFM rescaling:
+run_x/INTEGRATE.HKL + XDS.INP -> XDS_ASCII.HKL
+INTEGRATE.HKL + XDS_ASCII.HKL -> XDS_ASCII_NEM.HKL
+XDS_ASCII_NEM.HKL + XDSCONV.INP -> SHELX.HKL
+SHELX.HKL + SHELX.INS -> SHELX.FCF
+SHELX.HKL + SHELX.FCF + CCTBX -> DFM (u-factor optimized so that mean=median)
+DFM -> INTEGRATE_SCALED.HKL=exp(tanh(z))*INTEGRATE.HKL
+INTEGRATE_SCALED.HKL -> run x+1/INTEGRATE.HKL
+
+rescale wrt to DFM(u(model), res, orientation, thickness)

@@ -1,0 +1,443 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{microtype}
+\usepackage[a4paper,
+  top=1.15cm,
+  bottom=1.55cm,
+  left=1.55cm,
+  right=1.55cm
+]{geometry}
+\usepackage{hyperref}
+
+% Layout tweaks (important for multicols)
+\setlength{\columnsep}{20pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\raggedbottom
+\sloppy
+
+% Make display math tighter
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+
+% Macros (keep your originals)
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\kb}{k_{\mathrm B}}
+\newcommand{\epsz}{\varepsilon_0}
+
+% Macros to match the attached exam formula sheet notation
+\newcommand{\HH}{\widehat{\mathcal{H}}}
+\newcommand{\Hk}{\widehat{\mathcal{H}}_{\mathrm{k}}}
+\newcommand{\Hp}{\widehat{\mathcal{H}}_{\mathrm{p}}}
+
+\title{Formelsamling f\"or kursen Kvantmekanik och Spektroskopi}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{center}
+Detta dokument inneh\aa ller alla formler som ni har tillg\aa ngliga under tentan.
+V\"arden p\aa\ alla \\konstanter finns i \emph{Book of Data}. \"Ovriga formler som beh\"ovs
+finns angivna i uppgiftstexten.
+\end{center}
+\vspace{0.3cm}
+
+\begin{multicols*}{2}
+\raggedcolumns
+\scriptsize
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{1 Allmänna formler}
+
+\textbf{Energi, frekvens, v\aa gl\"angd, v\aa gtal}
+\[
+E = h\nu = \hbar\omega = hc\,\tilde{\nu},\quad \Delta E = h\nu\]
+
+\[
+\lambda\nu = c,\quad \tilde{\nu}=\frac{1}{\lambda},\quad \omega=2\pi\nu
+\]
+
+\textbf{De Broglie och kinetik}
+\[
+\lambda = \frac{h}{p},\quad p=mv,\quad E_k=\frac{p^2}{2m}=\frac12 mv^2
+\]
+
+\textbf{Fotoelektriska effekten}
+\[
+ h\nu=\Phi+E_k
+\]
+
+\textbf{Reducerad massa}
+\[
+\mu=\frac{m_A m_B}{m_A+m_B}
+\]
+
+\textbf{Allmänt superpositionstillstånd}
+\[
+\psi=\sum_j c_j\psi_j,\quad \hat A\psi=\psi'
+\]
+\textbf{Kommutator}
+\[
+[\hat A,\hat B]\equiv \hat A\hat B-\hat B\hat A,\quad [\hat A,\hat B]=-[\hat B,\hat A]
+\]
+\[
+[\hat A,\hat B+\hat C]=[\hat A,\hat B]+[\hat A,\hat C],\quad [c\hat A,\hat B]=c[\hat A,\hat B]=[\hat A,c\hat B]
+\]
+
+\textbf{Hermitesk operator}
+\[
+\hat A^\dagger=\hat A,\quad (\hat A\hat B)^\dagger=\hat B^\dagger\hat A^\dagger,\quad (\hat A+\hat B)^\dagger=\hat A^\dagger+\hat B^\dagger
+\]
+\[
+\int (\psi_j)^*\,\hat A\,\psi_k\,\dd\tau=\left(\int (\psi_k)^*\,\hat A\,\psi_j\,\dd\tau\right)^*
+\]
+
+\textbf{Normalisering och ortonormalitet}
+\[
+\int\!|\psi|^2\,\dd\tau=1,\quad \int\!(\psi_j)^*\psi_k\,\dd\tau=\delta_{jk},\quad v_j^\dagger v_k=\delta_{jk}
+\]
+
+\textbf{Egenekvation}
+\[ \hat A\psi_k=a_k\psi_k\quad(\text{alt. }
+\hat A\lvert k\rangle=a_k\lvert k\rangle)
+\]
+
+\textbf{V\"antev\"arde}
+\[
+\langle \hat A\rangle=\sum_j |c_j|^2 a_j
+=\int\!\psi^*(\mathbf r)\,\hat A\,\psi(\mathbf r)\,\dd\tau
+=\psi^\dagger\hat A\psi
+\]
+
+\textbf{Positions- och r\"orelsem\"angdsoperator (1D, riktning $q$)}
+\[
+\hat q=q,\quad \hat p_q=-\ii\hbar\frac{\dd}{\dd q},\quad [\hat q,\hat p_q]=\ii\hbar
+\]
+
+\textbf{Os\"akerhetsrelationer}
+\[
+\Delta q\,\Delta p_q\ge \frac{\hbar}{2},\quad
+\Delta A\,\Delta B\ge \frac{1}{2}\left|\langle[\hat A,\hat B]\rangle\right|
+\]
+
+\textbf{Lambert--Beers lag}
+\[
+\log_{10}\!\left(\frac{I_0}{I_t}\right)=\varepsilon c l = A
+\]
+
+\textbf{Komplexa tal}
+\[
+\ii^2=-1,\quad \frac{1}{\ii}=-\ii,\quad z^*=\text{konjugat},\quad zz^*=|z|^2
+\]\[
+z+z^*=2\Re(z),\quad z-z^*=2\ii\,\Im(z)
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Hamiltonoperator \& Schr\"odingerekvationen}
+
+\textbf{Generellt}
+\[
+\HH=\Hk+\Hp,\quad \Hp=V(q)
+\]
+
+\textbf{Kinetisk energi}
+\[
+\widehat{\mathcal{H}}_{\mathrm{k},\text{1D}}=\frac{\hat p_q^{\,2}}{2m}=-\frac{\hbar^2}{2m}\frac{\dd^2}{\dd q^2},\quad
+\widehat{\mathcal{H}}_{\mathrm{k},\text{3D}}=-\frac{\hbar^2}{2m}\nabla^2
+\]
+
+\textbf{Laplaceoperatorn i sf\"ariska koordinater}
+\[
+\nabla^2 =
+\frac{1}{r^2}\frac{\partial}{\partial r}
+\left(r^2\frac{\partial}{\partial r}\right)
++
+\frac{1}{r^2\sin\theta}
+\frac{\partial}{\partial\theta}
+\left(\sin\theta \frac{\partial}{\partial\theta}\right)
++
+\frac{1}{r^2\sin^2\theta}
+\frac{\partial^2}{\partial\phi^2}
+\]
+\textbf{Tidsberoende Schr\"odingerekvationen}
+\[
+\ii\hbar \frac{\partial \psi(\mathbf r,t)}{\partial t}
+=
+\HH \psi(\mathbf r,t)
+\]
+\[
+\text{Separation av variabler:}\quad
+\psi(\mathbf r,t)=\psi(\mathbf r)\e^{-\ii Et/\hbar}
+\]
+
+\textbf{Tidsoberoende Schr\"odingerekvationen ($\HH\psi=E\psi$)}
+\[
+-\frac{\hbar^2}{2m}\frac{\dd^2\psi(x)}{\dd x^2}+V(x)\psi(x)=E\psi(x),\quad
+-\frac{\hbar^2}{2m}\nabla^2\psi(\mathbf r)+V(\mathbf r)\psi(\mathbf r)=E\psi(\mathbf r)
+\]
+
+\textbf{Harmonisk oscillator}
+\[
+V(x)=\frac{k}{2}x^2,\quad x=R-R_e,\quad \text{(ofta }m\to\mu\text{ f\"or diatom)}
+\]
+
+\textbf{Partikel p\aa\ ring / sf\"ar}
+\[
+\HH_{\text{ring}}=-\frac{\hbar^2}{2I}\frac{\dd^2}{\dd\phi^2},\quad
+\HH_{\text{sf\"ar}}=-\frac{\hbar^2}{2I}\nabla^2_{\Omega}
+\]
+
+\textbf{H-liknande atom (Coulomb)}
+\[
+V(r)=-\frac{Ze^2}{4\pi\epsz\,r},\quad
+V_{\text{eff}}(r)= -\frac{Ze^2}{4\pi\epsz\,r}+\frac{\hbar^2 l(l+1)}{2\mu r^2}
+\]
+\[
+\Hk\ \text{(exakt)}=-\frac{\hbar^2}{2m_n}\nabla_n^2-\frac{\hbar^2}{2m_e}\nabla_e^2,\quad
+\Hk\ \text{(approx)}\approx-\frac{\hbar^2}{2\mu}\nabla_{\text{rel}}^2
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{3 Translationsr\"orelse}
+\textbf{Fri partikel ($V=0$)}
+\[
+-\frac{\hbar^2}{2m}\frac{\dd^2\psi}{\dd x^2}
+=
+E\psi,\quad
+\psi(x)=A\e^{\ii kx}+B\e^{-\ii kx},\quad
+E=\frac{\hbar^2 k^2}{2m}
+\]
+
+\textbf{Partikel i 1D-l\aa da}
+\[
+ n\lambda=2L,\quad
+\psi_n(x)=\sqrt{\frac{2}{L}}\sin\!\left(\frac{n\pi x}{L}\right),\quad
+E_n=\frac{n^2h^2}{8mL^2}
+\]
+
+\textbf{Partikel i 3D-l\aa da}
+\[
+\psi_{n_1n_2n_3}=\sqrt{\frac{8}{L_1L_2L_3}}
+\sin\!\left(\frac{n_1\pi x}{L_1}\right)
+\sin\!\left(\frac{n_2\pi y}{L_2}\right)
+\sin\!\left(\frac{n_3\pi z}{L_3}\right)
+\]
+\[
+E_{n_1n_2n_3}=\frac{h^2}{8m}\left(\frac{n_1^2}{L_1^2}+\frac{n_2^2}{L_2^2}+\frac{n_3^2}{L_3^2}\right)
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{4 Rotation \& angular momentum}
+
+\textbf{Klassiskt (partikel p\aa\ ring)}
+\[
+J=\pm pr,\quad J_z=p_z r,\quad E_k=\frac{p_z^2}{2m}=\frac{J_z^2}{2I},\quad I=mr^2
+\]
+
+\textbf{Partikel p\aa\ ring}
+\[
+\psi_{m_l}(\phi)=\frac{1}{\sqrt{2\pi}}\e^{\ii m_l\phi},\quad
+E_{m_l}=\frac{\hbar^2 m_l^2}{2I},\quad m_l=0,\pm1,\pm2,\dots
+\]
+
+\textbf{Partikel p\aa\ sf\"ar (sf\"arharmoniska)}
+\[
+Y_{l,m_l}(\theta,\phi)=\Theta_l(\theta)\Phi_{m_l}(\phi),\quad
+E_l=\frac{\hbar^2}{2I}l(l+1)
+\]
+\[l=0,1,\dots,\quad m_l=0,\pm1,\dots,\pm l
+\]
+\[
+Y_{l,m_l}^*(\theta,\phi)=(-1)^{m_l}Y_{l,-m_l}(\theta,\phi),\quad
+\int Y_{l_1}^{m_1*}Y_{l_2}^{m_2}\,\dd\Omega=\delta_{l_1l_2}\delta_{m_1m_2}
+\]
+
+\textbf{Atomorbital}
+\[
+\psi_{n,l,m_l}(r,\theta,\phi)=R_{n,l}(r)\,Y_{l,m_l}(\theta,\phi)
+\]
+
+\textbf{Orbitaloperatorer}
+\[
+\hat l_x=-\ii\hbar\left(y\frac{\dd}{\dd z}-z\frac{\dd}{\dd y}\right),\quad
+\hat l_y=-\ii\hbar\left(z\frac{\dd}{\dd x}-x\frac{\dd}{\dd z}\right)
+\]\[
+\hat l_z=-\ii\hbar\left(x\frac{\dd}{\dd y}-y\frac{\dd}{\dd x}\right)=-\ii\hbar\frac{\dd}{\dd\phi}
+\]
+\[
+\hat l_zY_{l,m_l}=m_l\hbar Y_{l,m_l},\quad \hat l^2Y_{l,m_l}=l(l+1)\hbar^2Y_{l,m_l},\quad \hat l^2=\hat l_x^2+\hat l_y^2+\hat l_z^2
+\]
+
+\textbf{Allm\"ant f\"or angular momentum ($\hat J=\hat l$ eller $\hat J=\hat I$)}
+\[
+[\hat J^2,\hat J_q]=0,\quad [\hat J_x,\hat J_y]=\ii\hbar\hat J_z\ \text{(cykliskt)},\quad |\mathbf J|=\hbar\sqrt{J(J+1)}
+\]
+
+\textbf{Spinn $1/2$ och Pauli-matriser ($I=s=1/2$)}
+\[
+\psi\{\alpha\}=\begin{pmatrix}1\\0\end{pmatrix},\quad
+\psi\{\beta\}=\begin{pmatrix}0\\1\end{pmatrix},\quad
+\psi=c_\alpha\psi\{\alpha\}+c_\beta\psi\{\beta\}
+\]
+\[
+I_x=\frac{\hbar}{2}\begin{pmatrix}0&1\\1&0\end{pmatrix},\quad
+I_y=\frac{\hbar}{2}\begin{pmatrix}0&-\ii\\ \ii&0\end{pmatrix},\quad
+I_z=\frac{\hbar}{2}\begin{pmatrix}1&0\\0&-1\end{pmatrix}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{5 Rotationspektroskopi}
+
+\textbf{Tr\"oghetsmoment}
+\[
+I=\sum_j m_j x_j^2,\quad \text{specialfall: } I=MR^2,\ M=m\ \text{eller }M=\mu
+\]
+
+\textbf{Klassisk energi (asymmetrisk rotor)}
+\[
+E_k=\frac{J_a^2}{2I_a}+\frac{J_b^2}{2I_b}+\frac{J_c^2}{2I_c}
+\]
+
+\textbf{Linj\"ar rotor}
+\[
+E_J=\frac{\hbar^2}{2I}J(J+1)=hB\,J(J+1),\quad J=0,1,2,\dots
+\]
+\[
+B=\frac{\hbar}{4\pi I}\ \text{(Hz)},\quad \tilde B=\frac{\hbar}{4\pi c I}\ \text{(m$^{-1}$)},\quad\tilde D=\frac{4\tilde B^3}{\tilde\nu^2}
+\]
+\[
+\tilde F(J)=\tilde B J(J+1),\quad \tilde\nu_J=\tilde F(J+1)-\tilde F(J)=2\tilde B(J+1)
+\]
+\[
+\tilde F(J)=\tilde B J(J+1)-\tilde D J^2(J+1)^2,\quad
+\tilde\nu_J=2\tilde B(J+1)-4\tilde D(J+1)^3
+\]
+\[
+N_J\propto (2J+1)\exp\!\left(-\frac{E_J}{\kb T}\right)
+\]
+
+\textbf{Symmetrisk rotor}
+\[
+\tilde F(J,K)=\tilde BJ(J+1)+(\tilde A-\tilde B)K^2,\quad K=0,\pm1,\dots,\pm J
+\]\[
+\quad \tilde B=\frac{\hbar}{4\pi c I_{\perp}},\quad \tilde A=\frac{\hbar}{4\pi c I_{\parallel}}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{6 Vibration: harmonisk oscillator}
+
+\[
+E_v=\hbar\omega\left(v+\frac{1}{2}\right)=hc\,\tilde\nu\left(v+\frac{1}{2}\right),\quad v=0,1,2,\dots
+\]
+\[
+\omega=\sqrt{\frac{k}{\mu}},\quad \tilde\nu=\frac{1}{2\pi c}\sqrt{\frac{k}{\mu}},\quad \tilde G(v)=\tilde\nu\left(v+\frac{1}{2}\right)\Rightarrow \Delta \tilde G_{v+1/2}=\tilde\nu
+\]
+\[
+\tilde S(v,J)=\tilde F(J)+\tilde G(v)=\tilde\nu\left(v+\frac{1}{2}\right)+\tilde BJ(J+1)
+\]
+
+F\"or \,$\Delta v=1$\, erh\aa lls tre grenar:
+\[
+\Delta J=0:\ \tilde\nu_Q(J)=\tilde\nu,\quad
+\Delta J=\pm1:\ \tilde\nu_{R/P}(J)=\tilde\nu\pm2\tilde B J
+\]
+
+\textbf{Antal vibrationsmoder:} linj\"ar $3N-5$,\quad icke-linj\"ar $3N-6$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{7 Vibration: anharmonisk oscillator}
+
+\textbf{Morsepotential}
+\[
+V(x)=hc\,\tilde D_e\left(1-\e^{-ax}\right)^2,\quad
+a=\left(\frac{\mu\omega^2}{2hc\,\tilde D_e}\right)^{1/2},\quad
+x_e=\frac{\tilde\nu}{4\tilde D_e}
+\]
+\[
+\tilde G(v)=\tilde\nu\left(v+\frac12\right)-x_e\tilde\nu\left(v+\frac12\right)^2,\quad
+\Delta \tilde G_{v+1/2}=\tilde\nu-2(v+1)x_e\tilde\nu
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{8 Atomstruktur \& elektronspektroskopi}
+
+\textbf{H-liknande atom}
+\[
+E_n=-\frac{\mu Z^2 e^4}{32\pi^2\epsz^2\hbar^2}\frac{1}{n^2},\quad
+Z=1:\ E_n=-\frac{hc\,\tilde R_H}{n^2},\quad
+\tilde\nu=\tilde R\left(\frac{1}{n_1^2}-\frac{1}{n_2^2}\right)
+\]
+\[
+\tilde R_H=\frac{\mu_H e^4}{8\epsz^2\hbar^3 c},\quad \tilde R_\infty=\frac{m_e e^4}{8\epsz^2\hbar^3 c}
+\]
+
+\textbf{Bohr-radie}
+\[
+ a_0=\frac{4\pi\epsz\hbar^2}{m_e e^2}
+\]
+
+\textbf{Radiell sannolikhetsf\"ordelning}
+\[
+P(r)\,\dd r=r^2|R(r)|^2\,\dd r
+\]
+
+\textbf{Orbitalapproximationen och spinn-orbitaler}
+\[
+\Psi(r_1,\dots,r_N)=\psi(r_1)\psi(r_2)\cdots\psi(r_N)+\cdots
+\]
+\[ \psi_{\phi}^{\alpha}(j)=\phi(j)\alpha(j), \quad\psi_{\phi}^{\beta}(j)=\phi(j)\beta(j)
+\]
+
+\textbf{Effektiv k\"arnladdning}
+\[
+Z_{\text{eff}}=Z-\sigma
+\]
+
+\textbf{Koppling (Clebsch--Gordan)}
+\[
+L=|l_1-l_2|,\ |l_1-l_2|+1,\dots,l_1+l_2,\quad M_L=0,\pm1,\dots,\pm L
+\]
+\[
+J_{\text{tot}}=|j_1-j_2|,\ |j_1-j_2|+1,\dots, j_1+j_2,\quad M_J=0,\pm1,\dots,\pm J_{\text{tot}}
+\]
+\[
+J\ \text{betecknar totala angular momentum fr\aa n koppling }\{L,S\}\to J
+\]
+
+\textbf{Spin--orbit (form)}
+\[
+E_{\mathrm{SOC}}\propto Z^4\bigl[J(J+1)-L(L+1)-S(S+1)\bigr]
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{9 NMR}
+
+\[
+\nu_0=\frac{\omega_0}{2\pi}= -\frac{\gamma}{2\pi}B_0,\quad
+\nu_{\text{res}}=-\frac{\gamma}{2\pi}B_{\text{sum}}=\nu_0(1+\delta_j)
+\]
+\[
+\delta_j=\frac{\nu_j-\nu_{\mathrm{ref}}}{\nu_{\mathrm{ref}}},\quad
+\delta_{\mathrm{ppm}}=\delta_j\times 10^6\ \text{ppm}
+\]
+\[
+ a(t)=M_0\left(1-2\e^{-t/T_1}\right),\quad a(t)\propto M_0\e^{-t/T_2}
+\]
+\[
+\Delta\nu_{1/2}=2\lambda=\frac{1}{\pi T_2}
+\]
+
+\end{multicols*}
+\end{document}

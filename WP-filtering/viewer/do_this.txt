@@ -1,1 +1,9 @@
-put sample_df_no_filter.csv and images folder containing .pngs in this dir then run ./run_viewer.sh
+Generic viewer:
+./run_viewer.sh --csv /path/to/data.csv --image-dir /path/to/images --y-col SRES
+
+Raw SRES workflow:
+./run_sres_viewer.sh --integrate-hkl /path/to/INTEGRATE.HKL --raw-hkl /path/to/shelx.hkl --fcf /path/to/shelx.fcf --image-src /path/to/frames
+
+Reusable saved pipeline:
+cp sres_pipeline.template.env my_dataset.env
+./run_sres_viewer.sh --config my_dataset.env
